@@ -34,6 +34,37 @@ abstract class Aggregate<E>(
 
             return newAggregate
         }
+
+        @JvmStatic
+        protected fun <A: Aggregate<E>, E: Event> applyAllEvents(
+            aggregate: A?,
+            events: List<E>,
+            handler: (aggregate: A?, event: E) -> A?,
+        ): A? {
+            var newAggregate = aggregate?.clone() as A?
+            var newEvents = newAggregate?.events?.toMutableList() ?: mutableListOf()
+
+            for (event in events) {
+                if (aggregate != null && event.modelId != aggregate.modelId) error("Model ID mismatch (Aggregate / Event)")
+
+                newAggregate = handler(newAggregate, event)
+
+                if (newAggregate != null) {
+                    if (newAggregate.events != newEvents) {
+                        newEvents = newAggregate.events.toMutableList()
+                    }
+
+                    newEvents.add(event)
+                    newAggregate.events = newEvents
+                }
+            }
+
+            if (newAggregate != null) {
+                newAggregate.events = newAggregate.events.toList()
+            }
+
+            return newAggregate
+        }
     }
 
     override fun equals(other: Any?): Boolean = other is Aggregate<*> && events == other.events

@@ -44,6 +44,8 @@ class User private constructor(
 
         fun applyEvent(user: User?, event: UserEvent): User? = applyEvent(user, event, ::applyEventInternal)
 
+        fun applyAllEvents(user: User?, events: List<UserEvent>): User? = applyAllEvents(user, events, ::applyEventInternal)
+
         private fun applyEventInternal(user: User?, event: UserEvent): User? {
             var user = user
 
