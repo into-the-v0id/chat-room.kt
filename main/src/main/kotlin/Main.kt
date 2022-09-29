@@ -1,5 +1,5 @@
-import org.chatRoom.aggreagte.User
-import org.chatRoom.events.user.DeleteUser
+import org.chatRoom.core.aggreagte.User
+import org.chatRoom.core.events.user.DeleteUser
 
 fun main(args: Array<String>) {
     val user = User.create(email = "some@mail.com")

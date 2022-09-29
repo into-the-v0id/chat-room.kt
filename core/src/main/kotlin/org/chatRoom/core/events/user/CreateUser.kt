@@ -1,6 +1,6 @@
-package org.chatRoom.events.user
+package org.chatRoom.core.events.user
 
-import org.chatRoom.valueObject.Id
+import org.chatRoom.core.valueObject.Id
 import java.util.Date
 
 data class CreateUser(

@@ -1,4 +1,4 @@
-package org.chatRoom.valueObject
+package org.chatRoom.core.valueObject
 
 import java.util.UUID
 

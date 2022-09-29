@@ -1,7 +1,7 @@
-package org.chatRoom.aggreagte
+package org.chatRoom.core.aggreagte
 
-import org.chatRoom.events.Event
-import org.chatRoom.valueObject.Id
+import org.chatRoom.core.events.Event
+import org.chatRoom.core.valueObject.Id
 
 abstract class Aggregate<E>(
     modelId: Id,

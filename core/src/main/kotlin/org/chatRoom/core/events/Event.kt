@@ -1,6 +1,6 @@
-package org.chatRoom.events
+package org.chatRoom.core.events
 
-import org.chatRoom.valueObject.Id
+import org.chatRoom.core.valueObject.Id
 import java.util.Date
 
 interface Event {

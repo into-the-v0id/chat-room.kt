@@ -1,10 +1,10 @@
-package org.chatRoom.aggreagte
+package org.chatRoom.core.aggreagte
 
-import org.chatRoom.events.user.ChangeEmail
-import org.chatRoom.events.user.CreateUser
-import org.chatRoom.events.user.DeleteUser
-import org.chatRoom.events.user.UserEvent
-import org.chatRoom.valueObject.Id
+import org.chatRoom.core.events.user.ChangeEmail
+import org.chatRoom.core.events.user.CreateUser
+import org.chatRoom.core.events.user.DeleteUser
+import org.chatRoom.core.events.user.UserEvent
+import org.chatRoom.core.valueObject.Id
 import java.util.Date
 
 class User private constructor(
@@ -42,9 +42,9 @@ class User private constructor(
             return applyEvent(null, event) ?: error("Expected user")
         }
 
-        fun applyEvent(user: User?, event: UserEvent): User? = applyEvent(user, event, ::applyEventInternal)
+        fun applyEvent(user: User?, event: UserEvent): User? = applyEvent(user, event, Companion::applyEventInternal)
 
-        fun applyAllEvents(user: User?, events: List<UserEvent>): User? = applyAllEvents(user, events, ::applyEventInternal)
+        fun applyAllEvents(user: User?, events: List<UserEvent>): User? = applyAllEvents(user, events, Companion::applyEventInternal)
 
         private fun applyEventInternal(user: User?, event: UserEvent): User? {
             var user = user
