@@ -1,7 +1,20 @@
-fun main(args: Array<String>) {
-    println("Hello World!")
+import org.chatRoom.aggreagte.User
+import org.chatRoom.events.user.DeleteUser
 
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-    println("Program arguments: ${args.joinToString()}")
+fun main(args: Array<String>) {
+    val user = User.create(email = "some@mail.com")
+
+    val newUser = user.changeEmail("other@mail.com")
+
+    println(user.email)
+    println(newUser.email)
+
+    println(user.events)
+    println(newUser.events)
+
+    val deletedUser = User.applyEvent(
+        newUser,
+        DeleteUser(modelId = newUser.modelId)
+    )
+    println(deletedUser)
 }

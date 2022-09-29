@@ -5,7 +5,7 @@ plugins {
     application
 }
 
-group = "org.chat-room"
+group = "org.chatRoom"
 version = "1.0-SNAPSHOT"
 
 repositories {
