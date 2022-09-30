@@ -1,4 +1,4 @@
-package org.chatRoom.core.events
+package org.chatRoom.core.event
 
 import org.chatRoom.core.valueObject.Id
 import java.util.Date

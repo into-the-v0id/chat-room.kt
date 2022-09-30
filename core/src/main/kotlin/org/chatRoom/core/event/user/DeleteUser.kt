@@ -1,11 +1,10 @@
-package org.chatRoom.core.events.user
+package org.chatRoom.core.event.user
 
 import org.chatRoom.core.valueObject.Id
 import java.util.Date
 
-data class ChangeEmail(
+data class DeleteUser(
     override val eventId: Id = Id(),
     override val modelId: Id,
     override val dateIssued: Date = Date(),
-    val email: String,
 ) : UserEvent

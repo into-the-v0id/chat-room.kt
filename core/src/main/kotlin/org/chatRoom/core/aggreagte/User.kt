@@ -1,9 +1,9 @@
 package org.chatRoom.core.aggreagte
 
-import org.chatRoom.core.events.user.ChangeEmail
-import org.chatRoom.core.events.user.CreateUser
-import org.chatRoom.core.events.user.DeleteUser
-import org.chatRoom.core.events.user.UserEvent
+import org.chatRoom.core.event.user.ChangeEmail
+import org.chatRoom.core.event.user.CreateUser
+import org.chatRoom.core.event.user.DeleteUser
+import org.chatRoom.core.event.user.UserEvent
 import org.chatRoom.core.valueObject.Id
 import java.util.Date
 

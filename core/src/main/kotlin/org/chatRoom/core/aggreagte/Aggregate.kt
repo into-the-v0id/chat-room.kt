@@ -1,6 +1,6 @@
 package org.chatRoom.core.aggreagte
 
-import org.chatRoom.core.events.Event
+import org.chatRoom.core.event.Event
 import org.chatRoom.core.valueObject.Id
 
 abstract class Aggregate<E>(
