@@ -7,7 +7,7 @@ import org.chatRoom.core.event.user.UserEvent
 import org.chatRoom.core.valueObject.Id
 import java.util.Date
 
-class User private constructor(
+class User protected constructor(
     modelId: Id,
     email: String,
     firstName: String? = null,
