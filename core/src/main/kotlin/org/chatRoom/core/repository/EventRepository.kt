@@ -34,7 +34,7 @@ abstract class EventRepository<E: Event>(
         statement.setString(positionOffset + 2, event.modelId.toString())
         statement.setString(positionOffset + 3, eventType)
         statement.setString(positionOffset + 4, data.toString())
-        statement.setTimestamp(positionOffset + 5, Timestamp(event.dateIssued.time))
+        statement.setTimestamp(positionOffset + 5, Timestamp.from(event.dateIssued))
     }
 
     protected fun persistAllEvents(events: List<E>) {
@@ -75,7 +75,7 @@ abstract class EventRepository<E: Event>(
 
         val eventId = resultSet.getString("event_id") ?: error("Expected event ID")
         val modelId = resultSet.getString("model_id") ?: error("Expected model ID")
-        val dateIssued = resultSet.getDate("date_issued") ?: error("Expected event date")
+        val dateIssued = resultSet.getTimestamp("date_issued") ?: error("Expected event date")
         dataMap["eventId"] = JsonPrimitive(eventId)
         dataMap["modelId"] = JsonPrimitive(modelId)
         dataMap["dateIssued"] = JsonPrimitive(dateIssued.time)

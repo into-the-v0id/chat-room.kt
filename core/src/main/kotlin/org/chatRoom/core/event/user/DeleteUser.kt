@@ -1,14 +1,14 @@
 package org.chatRoom.core.event.user
 
 import kotlinx.serialization.Serializable
-import org.chatRoom.core.serializer.DateSerializer
+import org.chatRoom.core.serializer.InstantSerializer
 import org.chatRoom.core.valueObject.Id
-import java.util.Date
+import java.time.Instant
 
 @Serializable
 data class DeleteUser(
     override val eventId: Id = Id(),
     override val modelId: Id,
-    @Serializable(with = DateSerializer::class)
-    override val dateIssued: Date = Date(),
+    @Serializable(with = InstantSerializer::class)
+    override val dateIssued: Instant = Instant.now(),
 ) : UserEvent

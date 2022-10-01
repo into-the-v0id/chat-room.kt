@@ -5,14 +5,15 @@ import org.chatRoom.core.event.user.CreateUser
 import org.chatRoom.core.event.user.DeleteUser
 import org.chatRoom.core.event.user.UserEvent
 import org.chatRoom.core.valueObject.Id
-import java.util.Date
+import java.time.Instant
+import java.time.OffsetDateTime
 
 class User protected constructor(
     modelId: Id,
     email: String,
     firstName: String? = null,
     lastName: String? = null,
-    dateCreated: Date = Date(),
+    dateCreated: Instant = Instant.now(),
 ) : Aggregate<UserEvent>(modelId = modelId) {
     var email: String = email
         protected set
@@ -23,7 +24,7 @@ class User protected constructor(
     var lastName: String? = lastName
         protected set
 
-    var dateCreated: Date = dateCreated
+    var dateCreated: Instant = dateCreated
         protected set
 
     companion object {
