@@ -28,8 +28,17 @@ class UserRepository(connection: Connection) : EventRepository<UserEvent>(connec
         }
     }
 
-    // TODO: check for modelId collisions
-    fun persist(user: User) = persistAllEvents(user.events)
+    fun create(user: User) {
+        if (getById(user.modelId) != null) error("Unable to create user: User already exists")
+
+        persistAllEvents(user.events)
+    }
+
+    fun update(user: User) {
+        if (getById(user.modelId) == null) error("Unable to update user: User not found")
+
+        persistAllEvents(user.events)
+    }
 
     fun delete(user: User) {
         if (getById(user.modelId) == null) error("Unable to delete user: User not found")

@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
     newUser = newUser.changeEmail("other3@mail.com")
     println(newUser.email)
     println(newUser.events)
-    userRepository.persist(newUser)
+    userRepository.create(newUser)
 
     val deletedUser = User.applyEvent(
         newUser,
