@@ -1,2 +1,2 @@
 rootProject.name = "chat-room"
-include("core", "main")
+include("core", "api", "main")
