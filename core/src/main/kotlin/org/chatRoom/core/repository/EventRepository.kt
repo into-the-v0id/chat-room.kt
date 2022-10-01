@@ -3,9 +3,9 @@ package org.chatRoom.core.repository
 import kotlinx.serialization.json.*
 import org.chatRoom.core.event.Event
 import java.sql.Connection
-import java.sql.Date
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.sql.Timestamp
 
 abstract class EventRepository<E: Event>(
     protected val connection: Connection,
@@ -34,7 +34,7 @@ abstract class EventRepository<E: Event>(
         statement.setString(positionOffset + 2, event.modelId.toString())
         statement.setString(positionOffset + 3, eventType)
         statement.setString(positionOffset + 4, data.toString())
-        statement.setDate(positionOffset + 5, Date(event.dateIssued.time))
+        statement.setTimestamp(positionOffset + 5, Timestamp(event.dateIssued.time))
     }
 
     protected fun persistAllEvents(events: List<E>) {
