@@ -62,4 +62,20 @@ class UserRepository(connection: Connection) : EventRepository<UserEvent>(connec
 
         return User.applyAllEvents(null, events)
     }
+
+    fun getAll(): Collection<User> {
+        val sql = """
+            SELECT *
+            FROM $tableName
+            ORDER BY date_issued ASC
+        """.trimIndent()
+        val statement = connection.prepareStatement(sql)
+
+        val resultSet = statement.executeQuery()
+        val allEvents = parseAllEvents(resultSet)
+
+        return allEvents.groupBy { event -> event.modelId }
+            .map { (_, events) -> User.applyAllEvents(null, events) }
+            .filterNotNull()
+    }
 }

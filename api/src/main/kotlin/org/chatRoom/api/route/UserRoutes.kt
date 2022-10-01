@@ -10,7 +10,10 @@ import org.chatRoom.core.valueObject.Id
 
 fun Route.userRouting(userRepository: UserRepository) {
     get {
-        TODO("user list")
+        val users = userRepository.getAll()
+            .map { userAggregate -> User(userAggregate) }
+
+        call.respond(users)
     }
 
     post {
@@ -35,6 +38,10 @@ fun Route.userRouting(userRepository: UserRepository) {
 
             val userModel = User(userAggregate)
             call.respond(userModel)
+        }
+
+        put {
+            TODO("update user")
         }
 
         delete {
