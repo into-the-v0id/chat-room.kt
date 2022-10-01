@@ -1,6 +1,7 @@
 import org.chatRoom.core.aggreagte.User
 import org.chatRoom.core.db.MigrationManager
 import org.chatRoom.core.event.user.DeleteUser
+import org.chatRoom.core.repository.UserRepository
 import org.postgresql.ds.PGPoolingDataSource
 
 fun main(args: Array<String>) {
@@ -16,6 +17,8 @@ fun main(args: Array<String>) {
     migrationManager.migrate()
 
 
+    val userRepository = UserRepository(dataSource.connection)
+
     val user = User.create(email = "some@mail.com")
     println(user.email)
     println(user.events)
@@ -25,6 +28,7 @@ fun main(args: Array<String>) {
     newUser = newUser.changeEmail("other3@mail.com")
     println(newUser.email)
     println(newUser.events)
+    userRepository.persist(newUser)
 
     val deletedUser = User.applyEvent(
         newUser,
@@ -40,4 +44,10 @@ fun main(args: Array<String>) {
     println(userTwo?.events)
 
     println(userTwo == newUser)
+
+    val dbUser = userRepository.getById(newUser.modelId)
+    println(dbUser?.email)
+    println(dbUser?.events)
+
+    userRepository.delete(newUser)
 }

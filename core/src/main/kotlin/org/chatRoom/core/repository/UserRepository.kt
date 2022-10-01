@@ -37,7 +37,8 @@ class UserRepository(connection: Connection) : EventRepository<UserEvent>(connec
         val sql = """
             SELECT *
             FROM $tableName
-            WHERE model_id = ?
+            WHERE model_id = ?::uuid
+            ORDER BY date_issued ASC
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
         statement.setString(1, id.toString())

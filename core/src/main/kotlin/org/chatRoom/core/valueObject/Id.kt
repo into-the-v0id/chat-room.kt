@@ -1,7 +1,9 @@
 package org.chatRoom.core.valueObject
 
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
+@Serializable
 @JvmInline
 value class Id(private val id: String) {
     constructor(): this(UUID.randomUUID().toString())

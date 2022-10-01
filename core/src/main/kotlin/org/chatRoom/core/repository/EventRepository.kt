@@ -40,7 +40,7 @@ abstract class EventRepository<E: Event>(
     protected fun persistAllEvents(events: List<E>) {
         val sql = """
             INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
-            VALUES ${ "(?, ?, ?, ?, ?)".repeat(events.size).replace(")(", "), (") }
+            VALUES ${ "(?::uuid, ?::uuid, ?, ?::json, ?)".repeat(events.size).replace(")(", "), (") }
             ON CONFLICT (event_id) DO NOTHING
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
@@ -53,7 +53,7 @@ abstract class EventRepository<E: Event>(
     protected fun insertEvent(event: E) {
         val sql = """
             INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?::uuid, ?::uuid, ?, ?::json, ?)
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
         prepareStatementWithEvent(statement, event)
@@ -78,7 +78,7 @@ abstract class EventRepository<E: Event>(
         val dateIssued = resultSet.getDate("date_issued") ?: error("Expected event date")
         dataMap["eventId"] = JsonPrimitive(eventId)
         dataMap["modelId"] = JsonPrimitive(modelId)
-        dataMap["dateIssued"] = JsonPrimitive(dateIssued.toString())
+        dataMap["dateIssued"] = JsonPrimitive(dateIssued.time)
 
         data = JsonObject(dataMap)
 
