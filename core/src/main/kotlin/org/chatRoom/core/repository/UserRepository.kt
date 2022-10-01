@@ -28,10 +28,14 @@ class UserRepository(connection: Connection) : EventRepository<UserEvent>(connec
         }
     }
 
+    // TODO: check for modelId collisions
     fun persist(user: User) = persistAllEvents(user.events)
 
-    // TODO: check if user is already deleted
-    fun delete(user: User) = insertEvent(DeleteUser(modelId = user.modelId))
+    fun delete(user: User) {
+        if (getById(user.modelId) == null) error("Unable to delete user: User not found")
+
+        insertEvent(DeleteUser(modelId = user.modelId))
+    }
 
     fun getById(id: Id): User? {
         val sql = """
