@@ -1,7 +1,21 @@
 import org.chatRoom.core.aggreagte.User
+import org.chatRoom.core.db.MigrationManager
 import org.chatRoom.core.event.user.DeleteUser
+import org.postgresql.ds.PGPoolingDataSource
 
 fun main(args: Array<String>) {
+    val dataSource = PGPoolingDataSource().apply {
+        serverNames = arrayOf("localhost")
+        databaseName = "app"
+        user = "app"
+        password = "app"
+//        maxConnections = 10
+    }
+
+    val migrationManager = MigrationManager(dataSource)
+    migrationManager.migrate()
+
+
     val user = User.create(email = "some@mail.com")
     println(user.email)
     println(user.events)

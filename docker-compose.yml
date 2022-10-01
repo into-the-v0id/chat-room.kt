@@ -1,0 +1,28 @@
+version: "3.9"
+
+x-templates:
+  default-service: &default-service
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    init: true
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+services:
+  db:
+    <<: *default-service
+    image: postgres:14-alpine
+    container_name: chat-room-db
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
+    driver: local

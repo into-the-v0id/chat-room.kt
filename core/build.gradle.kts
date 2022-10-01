@@ -14,6 +14,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    implementation("org.flywaydb:flyway-core:9.3.1")
     testImplementation(kotlin("test"))
 }
 
