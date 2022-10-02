@@ -6,7 +6,6 @@ import org.chatRoom.core.event.user.DeleteUser
 import org.chatRoom.core.event.user.UserEvent
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
-import java.time.OffsetDateTime
 
 class User protected constructor(
     modelId: Id,
