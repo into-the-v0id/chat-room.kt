@@ -6,8 +6,7 @@ import org.apache.commons.validator.routines.EmailValidator
 @Serializable
 data class CreateUser(
     val email: String,
-    val firstName: String? = null,
-    val lastName: String? = null,
+    val handle: String,
 ) {
     init {
         if (! EmailValidator.getInstance().isValid(email)) error("Invalid email")

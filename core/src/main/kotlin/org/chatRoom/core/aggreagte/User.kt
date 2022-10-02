@@ -11,17 +11,13 @@ import java.time.OffsetDateTime
 class User protected constructor(
     modelId: Id,
     email: String,
-    firstName: String? = null,
-    lastName: String? = null,
+    handle: String,
     dateCreated: Instant = Instant.now(),
 ) : Aggregate<UserEvent>(modelId = modelId) {
     var email: String = email
         protected set
 
-    var firstName: String? = firstName
-        protected set
-
-    var lastName: String? = lastName
+    var handle: String = handle
         protected set
 
     var dateCreated: Instant = dateCreated
@@ -30,14 +26,12 @@ class User protected constructor(
     companion object {
         fun create(
             email: String,
-            firstName: String? = null,
-            lastName: String? = null,
+            handle: String,
         ): User {
             val event = CreateUser(
                 modelId = Id(),
                 email = email,
-                firstName = firstName,
-                lastName = lastName,
+                handle = handle,
             )
 
             return applyEvent(null, event) ?: error("Expected user")
@@ -56,8 +50,7 @@ class User protected constructor(
                     user = User(
                         modelId = event.modelId,
                         email = event.email,
-                        firstName = event.firstName,
-                        lastName = event.lastName,
+                        handle = event.handle,
                         dateCreated = event.dateIssued,
                     )
                 }

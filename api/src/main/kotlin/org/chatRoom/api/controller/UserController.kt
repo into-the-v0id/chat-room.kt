@@ -45,8 +45,7 @@ class UserController(private val userRepository: UserRepository) {
 
         val user = UserAggregate.create(
             email = payload.email,
-            firstName = payload.firstName,
-            lastName = payload.lastName,
+            handle = payload.handle,
         )
         userRepository.create(user)
 

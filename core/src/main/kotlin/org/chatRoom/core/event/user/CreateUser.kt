@@ -12,6 +12,5 @@ data class CreateUser(
     @Serializable(with = InstantSerializer::class)
     override val dateIssued: Instant = Instant.now(),
     val email: String,
-    val firstName: String? = null,
-    val lastName: String? = null,
+    val handle: String,
 ) : UserEvent

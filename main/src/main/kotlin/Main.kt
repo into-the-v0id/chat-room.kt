@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
 
     val userRepository = UserRepository(dataSource.connection)
 
-    val user = User.create(email = "some@mail.com")
+    val user = User.create(email = "some@mail.com", handle = "sdf")
     println(user.email)
     println(user.events)
 
