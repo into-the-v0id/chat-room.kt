@@ -7,6 +7,8 @@ import org.chatRoom.api.controller.MessageController
 import org.chatRoom.api.controller.RoomController
 import org.chatRoom.api.controller.UserController
 import org.chatRoom.api.plugin.*
+import org.chatRoom.api.route.MemberRoutes
+import org.chatRoom.api.route.MessageRoutes
 import org.chatRoom.api.route.RoomRoutes
 import org.chatRoom.api.route.UserRoutes
 import org.chatRoom.core.db.MigrationManager
@@ -51,8 +53,10 @@ object ServiceContainer {
         singleOf(::RoomRoutes)
         singleOf(::RoomController)
         singleOf(::RoomRepository)
+        singleOf(::MemberRoutes)
         singleOf(::MemberController)
         singleOf(::MemberRepository)
+        singleOf(::MessageRoutes)
         singleOf(::MessageController)
         singleOf(::MessageRepository)
     }
