@@ -6,6 +6,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import org.chatRoom.api.model.User
 import org.chatRoom.api.payload.user.CreateUser
+import org.chatRoom.api.payload.user.UpdateUser
 import org.chatRoom.core.repository.UserRepository
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.aggreagte.User.Companion as UserAggregate
@@ -52,7 +53,32 @@ class UserController(private val userRepository: UserRepository) {
     }
 
     suspend fun update(call: ApplicationCall) {
-        TODO("update user")
+        val rawId = call.parameters["id"]!!
+
+        val id = try {
+            Id(rawId)
+        } catch (e: Throwable) {
+            call.respond(HttpStatusCode.NotFound)
+            return
+        }
+
+        var userAggregate = userRepository.getById(id)
+        if (userAggregate == null) {
+            call.respond(HttpStatusCode.NotFound)
+            return
+        }
+
+        val payload = call.receive<UpdateUser>()
+
+        if (payload.email != userAggregate.email) {
+            userAggregate = userAggregate.changeEmail(payload.email)
+        }
+
+        // TODO: allow update of firstName & lastName
+
+        userRepository.update(userAggregate)
+
+        call.respond(HttpStatusCode.OK)
     }
 
     suspend fun delete(call: ApplicationCall) {
