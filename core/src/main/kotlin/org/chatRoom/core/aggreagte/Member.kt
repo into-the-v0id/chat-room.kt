@@ -22,11 +22,11 @@ class Member protected constructor(
         protected set
 
     companion object {
-        fun create(userId: Id, roomId: Id): Member {
+        fun create(user: User, room: Room): Member {
             val event = CreateMember(
                 modelId = Id(),
-                userId = userId,
-                roomId = roomId,
+                userId = user.modelId,
+                roomId = room.modelId,
             )
 
             return applyEvent(null, event) ?: error("Expected member")

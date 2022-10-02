@@ -59,8 +59,8 @@ class MemberController(
         val roomAggregate = roomRepository.getById(payload.roomId) ?: throw BadRequestException("Unknown room")
 
         val member = MemberAggregate.create(
-            userId = userAggregate.modelId,
-            roomId = roomAggregate.modelId,
+            user = userAggregate,
+            room = roomAggregate,
         )
         memberRepository.create(member)
 

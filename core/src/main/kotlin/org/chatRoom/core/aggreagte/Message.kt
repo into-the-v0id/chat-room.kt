@@ -22,10 +22,10 @@ class Message protected constructor(
         protected set
 
     companion object {
-        fun create(memberId: Id, content: String): Message {
+        fun create(member: Member, content: String): Message {
             val event = CreateMessage(
                 modelId = Id(),
-                memberId = memberId,
+                memberId = member.modelId,
                 content = content,
             )
 

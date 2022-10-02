@@ -51,7 +51,7 @@ class MessageController(
         val memberAggregate = memberRepository.getById(payload.memberId) ?: throw BadRequestException("Unknown member")
 
         val message = MessageAggregate.create(
-            memberId = memberAggregate.modelId,
+            member = memberAggregate,
             content = payload.content,
         )
         messageRepository.create(message)
