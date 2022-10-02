@@ -35,6 +35,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("org.postgresql:postgresql:42.5.0")
     implementation("io.insert-koin:koin-core:$koin_version")
+    implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("io.insert-koin:koin-test:$koin_version")

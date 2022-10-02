@@ -10,6 +10,7 @@ import org.chatRoom.core.repository.UserRepository
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
+import org.koin.logger.slf4jLogger
 import org.postgresql.ds.PGPoolingDataSource
 import java.sql.Connection
 import javax.sql.DataSource
@@ -42,6 +43,7 @@ object ServiceContainer {
     }
 
     val koin = koinApplication {
+        slf4jLogger()
         modules(module)
     }
 }
