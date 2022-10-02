@@ -16,12 +16,13 @@ class UserController(private val userRepository: UserRepository) {
     }
 
     suspend fun detail(call: ApplicationCall) {
-        val rawId = call.parameters["id"] ?: return call.respond(HttpStatusCode.BadRequest)
+        val rawId = call.parameters["id"]!!
 
         val id = try {
             Id(rawId)
         } catch (e: Throwable) {
-            return call.respond(HttpStatusCode.BadRequest)
+            call.respond(HttpStatusCode.NotFound)
+            return
         }
 
         val userAggregate = userRepository.getById(id)
@@ -43,12 +44,13 @@ class UserController(private val userRepository: UserRepository) {
     }
 
     suspend fun delete(call: ApplicationCall) {
-        val rawId = call.parameters["id"] ?: return call.respond(HttpStatusCode.BadRequest)
+        val rawId = call.parameters["id"]!!
 
         val id = try {
             Id(rawId)
         } catch (e: Throwable) {
-            return call.respond(HttpStatusCode.BadRequest)
+            call.respond(HttpStatusCode.NotFound)
+            return
         }
 
         val userAggregate = userRepository.getById(id)
