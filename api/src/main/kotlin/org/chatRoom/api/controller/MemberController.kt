@@ -8,10 +8,16 @@ import io.ktor.server.response.*
 import org.chatRoom.api.model.Member
 import org.chatRoom.api.payload.member.CreateMember
 import org.chatRoom.core.repository.MemberRepository
+import org.chatRoom.core.repository.RoomRepository
+import org.chatRoom.core.repository.UserRepository
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.aggreagte.Member as MemberAggregate
 
-class MemberController(private val memberRepository: MemberRepository) {
+class MemberController(
+    private val memberRepository: MemberRepository,
+    private val userRepository: UserRepository,
+    private val roomRepository: RoomRepository,
+) {
     private fun fetchMember(call: ApplicationCall) : MemberAggregate? {
         val rawId = call.parameters["memberId"] ?: return null
 
@@ -49,9 +55,12 @@ class MemberController(private val memberRepository: MemberRepository) {
     suspend fun create(call: ApplicationCall) {
         val payload = call.receive<CreateMember>()
 
+        val userAggregate = userRepository.getById(payload.userId) ?: throw BadRequestException("Unknown user")
+        val roomAggregate = roomRepository.getById(payload.roomId) ?: throw BadRequestException("Unknown room")
+
         val member = MemberAggregate.create(
-            userId = payload.userId,
-            roomId = payload.roomId,
+            userId = userAggregate.modelId,
+            roomId = roomAggregate.modelId,
         )
         memberRepository.create(member)
 
