@@ -36,6 +36,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.5.0")
     implementation("io.insert-koin:koin-core:$koin_version")
     implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
+    implementation("commons-validator:commons-validator:1.7")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("io.insert-koin:koin-test:$koin_version")

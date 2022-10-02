@@ -2,10 +2,13 @@ package org.chatRoom.api.controller
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import org.chatRoom.api.model.User
+import org.chatRoom.api.payload.user.CreateUser
 import org.chatRoom.core.repository.UserRepository
 import org.chatRoom.core.valueObject.Id
+import org.chatRoom.core.aggreagte.User.Companion as UserAggregate
 
 class UserController(private val userRepository: UserRepository) {
     suspend fun list(call: ApplicationCall) {
@@ -36,7 +39,16 @@ class UserController(private val userRepository: UserRepository) {
     }
 
     suspend fun create(call: ApplicationCall) {
-        TODO("create user")
+        val payload = call.receive<CreateUser>()
+
+        val user = UserAggregate.create(
+            email = payload.email,
+            firstName = payload.firstName,
+            lastName = payload.lastName,
+        )
+        userRepository.create(user)
+
+        call.respond(HttpStatusCode.OK)
     }
 
     suspend fun update(call: ApplicationCall) {
