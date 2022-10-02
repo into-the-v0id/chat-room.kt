@@ -20,7 +20,14 @@ class MessageController(private val messageRepository: MessageRepository) {
     }
 
     suspend fun list(call: ApplicationCall) {
-        val messages = messageRepository.getAll()
+        val rawMemberId = call.request.queryParameters["member_id"]
+        val memberId = if (rawMemberId != null) {
+            Id.tryFrom(rawMemberId) ?: throw BadRequestException("Invalid ID")
+        } else {
+            null
+        }
+
+        val messages = messageRepository.getAll(memberId = memberId)
             .map { messageAggregate -> Message(messageAggregate) }
 
         call.respond(messages)
