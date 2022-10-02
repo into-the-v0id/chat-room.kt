@@ -2,6 +2,7 @@ package org.chatRoom.api.payload.user
 
 import kotlinx.serialization.Serializable
 import org.apache.commons.validator.routines.EmailValidator
+import org.chatRoom.api.validator.HandleValidator
 
 @Serializable
 data class CreateUser(
@@ -10,5 +11,6 @@ data class CreateUser(
 ) {
     init {
         if (! EmailValidator.getInstance().isValid(email)) error("Invalid email")
+        if (! HandleValidator.instance.isValid(handle)) error("Invalid handle")
     }
 }
