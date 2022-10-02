@@ -3,6 +3,7 @@ package org.chatRoom.api
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.chatRoom.api.controller.MemberController
+import org.chatRoom.api.controller.MessageController
 import org.chatRoom.api.controller.RoomController
 import org.chatRoom.api.controller.UserController
 import org.chatRoom.api.plugin.*
@@ -10,6 +11,7 @@ import org.chatRoom.api.route.RoomRoutes
 import org.chatRoom.api.route.UserRoutes
 import org.chatRoom.core.db.MigrationManager
 import org.chatRoom.core.repository.MemberRepository
+import org.chatRoom.core.repository.MessageRepository
 import org.chatRoom.core.repository.RoomRepository
 import org.chatRoom.core.repository.UserRepository
 import org.koin.core.module.dsl.singleOf
@@ -51,6 +53,8 @@ object ServiceContainer {
         singleOf(::RoomRepository)
         singleOf(::MemberController)
         singleOf(::MemberRepository)
+        singleOf(::MessageController)
+        singleOf(::MessageRepository)
     }
 
     val koin = koinApplication {
