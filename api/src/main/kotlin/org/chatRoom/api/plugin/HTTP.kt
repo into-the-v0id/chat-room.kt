@@ -15,7 +15,7 @@ fun Application.configureHTTP() {
         header("Server", "Ktor")
     }
     install(ConditionalHeaders) {
-        version { call, content ->
+        version { _, content ->
             when (content) {
                 is OutgoingContent.ByteArrayContent -> listOf(
                     EntityTagVersion(Base64.getEncoder().encodeToString(content.bytes()).hashCode().toString()),
