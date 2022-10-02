@@ -16,9 +16,9 @@ data class User(
     val dateCreated: OffsetDateTime,
 ) {
     constructor(user: UserAggregate) : this(
-        user.modelId,
-        user.email,
-        user.handle,
-        user.dateCreated.atOffset(ZoneOffset.UTC),
+        id = user.modelId,
+        email = user.email,
+        handle = user.handle,
+        dateCreated = user.dateCreated.atOffset(ZoneOffset.UTC),
     )
 }

@@ -16,9 +16,9 @@ data class Member(
     val dateCreated: OffsetDateTime,
 ) {
     constructor(member: MemberAggregate) : this(
-        member.modelId,
-        member.userId,
-        member.roomId,
-        member.dateCreated.atOffset(ZoneOffset.UTC),
+        id = member.modelId,
+        userId = member.userId,
+        roomId = member.roomId,
+        dateCreated = member.dateCreated.atOffset(ZoneOffset.UTC),
     )
 }

@@ -16,9 +16,9 @@ data class Message(
     val dateCreated: OffsetDateTime,
 ) {
     constructor(message: MessageAggregate) : this(
-        message.modelId,
-        message.memberId,
-        message.content,
-        message.dateCreated.atOffset(ZoneOffset.UTC),
+        id = message.modelId,
+        memberId = message.memberId,
+        content = message.content,
+        dateCreated = message.dateCreated.atOffset(ZoneOffset.UTC),
     )
 }

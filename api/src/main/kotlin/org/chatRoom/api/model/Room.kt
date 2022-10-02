@@ -15,8 +15,8 @@ data class Room(
     val dateCreated: OffsetDateTime,
 ) {
     constructor(room: RoomAggregate) : this(
-        room.modelId,
-        room.handle,
-        room.dateCreated.atOffset(ZoneOffset.UTC),
+        id = room.modelId,
+        handle = room.handle,
+        dateCreated = room.dateCreated.atOffset(ZoneOffset.UTC),
     )
 }
