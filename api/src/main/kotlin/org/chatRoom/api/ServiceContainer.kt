@@ -20,6 +20,7 @@ object ServiceContainer {
         single<ApplicationEngine> {
             embeddedServer(Netty, host = "0.0.0.0", port = 8080) {
                 configureHTTP()
+                configureMonitoring()
                 configureSerialization()
                 get<Routing>().apply { configureRouting() }
             }

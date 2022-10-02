@@ -31,6 +31,8 @@ dependencies {
     implementation("io.ktor:ktor-server-default-headers:$ktor_version")
     implementation("io.ktor:ktor-server-auto-head-response:$ktor_version")
     implementation("io.ktor:ktor-server-cors-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-call-id:$ktor_version")
+    implementation("io.ktor:ktor-server-call-logging:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("org.postgresql:postgresql:42.5.0")
