@@ -30,7 +30,7 @@ class UserRepository(connection: Connection) : EventRepository<UserEvent>(connec
 
     fun create(user: User) {
         if (getById(user.modelId) != null) error("Unable to create user: User already exists")
-        // TODO: prevent duplicate email addresses
+        // TODO: prevent duplicate handles
 
         persistAllEvents(user.events)
     }

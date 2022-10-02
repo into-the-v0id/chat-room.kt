@@ -24,10 +24,7 @@ class User protected constructor(
         protected set
 
     companion object {
-        fun create(
-            email: String,
-            handle: String,
-        ): User {
+        fun create(email: String, handle: String): User {
             val event = CreateUser(
                 modelId = Id(),
                 email = email,
