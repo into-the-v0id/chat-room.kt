@@ -25,7 +25,14 @@ class MemberController(private val memberRepository: MemberRepository) {
     }
 
     suspend fun list(call: ApplicationCall) {
-        val members = memberRepository.getAll()
+        val rawRoomId = call.request.queryParameters["room_id"]
+        val roomId = if (rawRoomId != null) {
+            Id.tryFrom(rawRoomId) ?: throw BadRequestException("Invalid ID")
+        } else {
+            null
+        }
+
+        val members = memberRepository.getAll(roomId = roomId)
             .map { memberAggregate -> Member(memberAggregate) }
 
         call.respond(members)

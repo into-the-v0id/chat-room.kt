@@ -14,12 +14,7 @@ import org.chatRoom.core.aggreagte.Message as MessageAggregate
 class MessageController(private val messageRepository: MessageRepository) {
     private fun fetchMessage(call: ApplicationCall) : MessageAggregate? {
         val rawId = call.parameters["messageId"] ?: return null
-
-        val id = try {
-            Id(rawId)
-        } catch (e: Throwable) {
-            return null
-        }
+        val id = Id.tryFrom(rawId) ?: return null
 
         return messageRepository.getById(id)
     }

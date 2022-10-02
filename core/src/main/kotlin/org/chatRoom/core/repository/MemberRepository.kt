@@ -61,13 +61,30 @@ class MemberRepository(connection: Connection) : EventRepository<MemberEvent>(co
         return Member.applyAllEvents(null, events)
     }
 
-    fun getAll(): Collection<Member> {
+    fun getAll(roomId: Id? = null): Collection<Member> {
+        val conditions = mutableListOf("TRUE")
+        if (roomId != null) {
+            conditions.add("""
+                event_id IN (
+                    SELECT event_id
+                    FROM $tableName
+                    WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'roomId' = ?)
+                )
+            """.trimIndent())
+        }
+
         val sql = """
             SELECT *
             FROM $tableName
+            WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
             ORDER BY date_issued ASC
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
+        var parameterCount = 0
+        if (roomId != null) {
+            parameterCount += 1
+            statement.setString(parameterCount, roomId.toString())
+        }
 
         val resultSet = statement.executeQuery()
         val allEvents = parseAllEvents(resultSet)
@@ -75,5 +92,12 @@ class MemberRepository(connection: Connection) : EventRepository<MemberEvent>(co
         return allEvents.groupBy { event -> event.modelId }
             .map { (_, events) -> Member.applyAllEvents(null, events) }
             .filterNotNull()
+            .filter { member ->
+                if (roomId != null && member.roomId != roomId) {
+                    return@filter false
+                }
+
+                return@filter true
+            }
     }
 }
