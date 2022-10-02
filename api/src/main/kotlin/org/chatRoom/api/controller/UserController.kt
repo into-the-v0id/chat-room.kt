@@ -3,27 +3,11 @@ package org.chatRoom.api.controller
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import org.chatRoom.api.model.User
 import org.chatRoom.core.repository.UserRepository
 import org.chatRoom.core.valueObject.Id
 
 class UserController(private val userRepository: UserRepository) {
-    fun register(application: Application) {
-        application.routing {
-            route("/users") {
-                get { list(call) }
-                post { create(call) }
-
-                route("{id}") {
-                    get { detail(call) }
-                    put { update(call) }
-                    delete { delete(call) }
-                }
-            }
-        }
-    }
-
     suspend fun list(call: ApplicationCall) {
         val users = userRepository.getAll()
             .map { userAggregate -> User(userAggregate) }

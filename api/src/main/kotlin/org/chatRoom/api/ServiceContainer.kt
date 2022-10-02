@@ -4,6 +4,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.chatRoom.api.controller.UserController
 import org.chatRoom.api.plugin.*
+import org.chatRoom.api.route.UserRoutes
 import org.chatRoom.core.db.MigrationManager
 import org.chatRoom.core.repository.UserRepository
 import org.koin.core.module.dsl.singleOf
@@ -19,8 +20,7 @@ object ServiceContainer {
             embeddedServer(Netty, host = "0.0.0.0", port = 8080) {
                 configureHTTP()
                 configureSerialization()
-                configureRouting()
-                get<UserController>().register(this)
+                get<Routing>().apply { configureRouting() }
             }
         }
         single<DataSource> {
@@ -35,6 +35,8 @@ object ServiceContainer {
         factory<Connection> { get<DataSource>().connection }
 
         singleOf(::MigrationManager)
+        singleOf(::Routing)
+        singleOf(::UserRoutes)
         singleOf(::UserController)
         singleOf(::UserRepository)
     }
