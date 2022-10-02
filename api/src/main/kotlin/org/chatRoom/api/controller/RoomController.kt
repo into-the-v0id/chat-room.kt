@@ -13,7 +13,7 @@ import org.chatRoom.core.aggreagte.Room as RoomAggregate
 
 class RoomController(private val roomRepository: RoomRepository) {
     private fun fetchRoom(call: ApplicationCall) : RoomAggregate? {
-        val rawId = call.parameters["id"] ?: return null
+        val rawId = call.parameters["roomId"] ?: return null
 
         val id = try {
             Id(rawId)

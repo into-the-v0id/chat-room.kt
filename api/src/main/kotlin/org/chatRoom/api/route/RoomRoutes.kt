@@ -12,11 +12,11 @@ class RoomRoutes(
     private val messageController: MessageController,
 ) {
     fun Route.roomRouting() {
-        route("/rooms") {
+        route("rooms") {
             get { roomController.list(call) }
             post { roomController.create(call) }
 
-            route("{id}") {
+            route("{roomId}") {
                 get { roomController.detail(call) }
                 delete { roomController.delete(call) }
 
@@ -24,7 +24,7 @@ class RoomRoutes(
                     get { memberController.list(call) }
                     post { memberController.create(call) }
 
-                    route("{id}") {
+                    route("{memberId}") {
                         get { memberController.detail(call) }
                         delete { memberController.delete(call) }
                     }
@@ -34,7 +34,7 @@ class RoomRoutes(
                     get { messageController.list(call) }
                     post { messageController.create(call) }
 
-                    route("{id}") {
+                    route("{messageId}") {
                         get { messageController.detail(call) }
                         delete { messageController.delete(call) }
                     }

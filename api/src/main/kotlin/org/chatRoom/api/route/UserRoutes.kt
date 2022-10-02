@@ -8,11 +8,11 @@ class UserRoutes(
     private val userController: UserController,
 ) {
     fun Route.userRouting() {
-        route("/users") {
+        route("users") {
             get { userController.list(call) }
             post { userController.create(call) }
 
-            route("{id}") {
+            route("{userId}") {
                 get { userController.detail(call) }
                 put { userController.update(call) }
                 delete { userController.delete(call) }

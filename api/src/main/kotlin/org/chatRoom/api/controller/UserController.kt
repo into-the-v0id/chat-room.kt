@@ -14,7 +14,7 @@ import org.chatRoom.core.aggreagte.User as UserAggregate
 
 class UserController(private val userRepository: UserRepository) {
     private fun fetchUser(call: ApplicationCall) : UserAggregate? {
-        val rawId = call.parameters["id"] ?: return null
+        val rawId = call.parameters["userId"] ?: return null
 
         val id = try {
             Id(rawId)

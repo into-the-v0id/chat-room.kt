@@ -13,7 +13,7 @@ import org.chatRoom.core.aggreagte.Member as MemberAggregate
 
 class MemberController(private val memberRepository: MemberRepository) {
     private fun fetchMember(call: ApplicationCall) : MemberAggregate? {
-        val rawId = call.parameters["id"] ?: return null
+        val rawId = call.parameters["memberId"] ?: return null
 
         val id = try {
             Id(rawId)
