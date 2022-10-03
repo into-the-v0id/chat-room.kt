@@ -8,7 +8,10 @@ import org.chatRoom.core.event.room.RoomEvent
 import org.chatRoom.core.valueObject.Id
 import java.sql.Connection
 
-class RoomRepository(connection: Connection) : EventRepository<RoomEvent>(connection, "room_events") {
+class RoomRepository(
+    connection: Connection,
+    private val memberRepository: MemberRepository,
+) : EventRepository<RoomEvent>(connection, "room_events") {
     override fun serializeEvent(event: RoomEvent): Pair<String, JsonElement> {
         return when (event) {
             is CreateRoom -> CreateRoom::class.java.name to Json.encodeToJsonElement(event)
@@ -40,6 +43,9 @@ class RoomRepository(connection: Connection) : EventRepository<RoomEvent>(connec
 
     fun delete(room: Room) {
         if (getById(room.modelId) == null) error("Unable to delete room: Room not found")
+
+        val members = memberRepository.getAll(roomId = room.modelId)
+        members.forEach { member -> memberRepository.delete(member) }
 
         insertEvent(DeleteRoom(modelId = room.modelId))
     }

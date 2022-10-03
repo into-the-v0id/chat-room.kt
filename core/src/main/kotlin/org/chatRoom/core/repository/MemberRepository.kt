@@ -8,7 +8,10 @@ import org.chatRoom.core.event.member.MemberEvent
 import org.chatRoom.core.valueObject.Id
 import java.sql.Connection
 
-class MemberRepository(connection: Connection) : EventRepository<MemberEvent>(connection, "member_events") {
+class MemberRepository(
+    connection: Connection,
+    private val messageRepository: MessageRepository,
+) : EventRepository<MemberEvent>(connection, "member_events") {
     override fun serializeEvent(event: MemberEvent): Pair<String, JsonElement> {
         return when (event) {
             is CreateMember -> CreateMember::class.java.name to Json.encodeToJsonElement(event)
@@ -40,6 +43,9 @@ class MemberRepository(connection: Connection) : EventRepository<MemberEvent>(co
     fun delete(member: Member) {
         if (getById(member.modelId) == null) error("Unable to delete member: Member not found")
 
+        val messages = messageRepository.getAll(memberId = member.modelId)
+        messages.forEach { message -> messageRepository.delete(message) }
+
         insertEvent(DeleteMember(modelId = member.modelId))
     }
 
@@ -60,7 +66,7 @@ class MemberRepository(connection: Connection) : EventRepository<MemberEvent>(co
         return Member.applyAllEvents(null, events)
     }
 
-    fun getAll(roomId: Id? = null): Collection<Member> {
+    fun getAll(userId: Id? = null, roomId: Id? = null): Collection<Member> {
         val conditions = mutableListOf("TRUE")
         if (roomId != null) {
             conditions.add("""
@@ -68,6 +74,15 @@ class MemberRepository(connection: Connection) : EventRepository<MemberEvent>(co
                     SELECT event_id
                     FROM $tableName
                     WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'roomId' = ?)
+                )
+            """.trimIndent())
+        }
+        if (userId != null) {
+            conditions.add("""
+                event_id IN (
+                    SELECT event_id
+                    FROM $tableName
+                    WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'userId' = ?)
                 )
             """.trimIndent())
         }
@@ -84,6 +99,10 @@ class MemberRepository(connection: Connection) : EventRepository<MemberEvent>(co
             parameterCount += 1
             statement.setString(parameterCount, roomId.toString())
         }
+        if (userId != null) {
+            parameterCount += 1
+            statement.setString(parameterCount, userId.toString())
+        }
 
         val resultSet = statement.executeQuery()
         val allEvents = parseAllEvents(resultSet)
@@ -93,6 +112,10 @@ class MemberRepository(connection: Connection) : EventRepository<MemberEvent>(co
             .filterNotNull()
             .filter { member ->
                 if (roomId != null && member.roomId != roomId) {
+                    return@filter false
+                }
+
+                if (userId != null && member.userId != userId) {
                     return@filter false
                 }
 

@@ -9,7 +9,10 @@ import org.chatRoom.core.event.user.UserEvent
 import org.chatRoom.core.valueObject.Id
 import java.sql.Connection
 
-class UserRepository(connection: Connection) : EventRepository<UserEvent>(connection, "user_events") {
+class UserRepository(
+    connection: Connection,
+    private val memberRepository: MemberRepository,
+) : EventRepository<UserEvent>(connection, "user_events") {
     override fun serializeEvent(event: UserEvent): Pair<String, JsonElement> {
         return when (event) {
             is CreateUser -> CreateUser::class.java.name to Json.encodeToJsonElement(event)
@@ -43,6 +46,9 @@ class UserRepository(connection: Connection) : EventRepository<UserEvent>(connec
 
     fun delete(user: User) {
         if (getById(user.modelId) == null) error("Unable to delete user: User not found")
+
+        val members = memberRepository.getAll(userId = user.modelId)
+        members.forEach { member -> memberRepository.delete(member) }
 
         insertEvent(DeleteUser(modelId = user.modelId))
     }
