@@ -32,7 +32,7 @@ class RoomRepository(
         if (getById(room.modelId) != null) error("Unable to create room: Room already exists")
         if (getByHandle(room.handle) != null) error("Unable to create room: Handle already exists")
 
-        persistAllEvents(room.events)
+        createAllEvents(room.events)
     }
 
     fun update(room: Room) {
@@ -47,7 +47,7 @@ class RoomRepository(
         val members = memberRepository.getAll(roomId = room.modelId)
         members.forEach { member -> memberRepository.delete(member) }
 
-        insertEvent(DeleteRoom(modelId = room.modelId))
+        createEvent(DeleteRoom(modelId = room.modelId))
     }
 
     fun getById(id: Id): Room? {

@@ -37,6 +37,20 @@ abstract class EventRepository<E: Event>(
         statement.setTimestamp(positionOffset + 5, Timestamp.from(event.dateIssued))
     }
 
+    protected fun createEvent(event: E) = createAllEvents(listOf(event))
+
+    protected fun createAllEvents(events: List<E>) {
+        val sql = """
+            INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
+            VALUES ${ "(?::uuid, ?::uuid, ?, ?::json, ?)".repeat(events.size).replace(")(", "), (") }
+        """.trimIndent()
+        val statement = connection.prepareStatement(sql)
+        events.forEachIndexed { index, event -> prepareStatementWithEvent(statement, event, index * 5) }
+
+        val modifiedRowCount = statement.executeUpdate()
+        if (modifiedRowCount == 0) error("Unable to insert events")
+    }
+
     protected fun persistAllEvents(events: List<E>) {
         val sql = """
             INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
@@ -48,18 +62,6 @@ abstract class EventRepository<E: Event>(
 
         val modifiedRowCount = statement.executeUpdate()
         if (modifiedRowCount == 0) { /* do nothing */ }
-    }
-
-    protected fun insertEvent(event: E) {
-        val sql = """
-            INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
-            VALUES (?::uuid, ?::uuid, ?, ?::json, ?)
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        prepareStatementWithEvent(statement, event)
-
-        val modifiedRowCount = statement.executeUpdate()
-        if (modifiedRowCount == 0) error("Unable to insert event")
     }
 
     protected abstract fun deserializeEvent(type: String, data: JsonElement) : E

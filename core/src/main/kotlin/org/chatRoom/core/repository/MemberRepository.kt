@@ -31,7 +31,7 @@ class MemberRepository(
     fun create(member: Member) {
         if (getById(member.modelId) != null) error("Unable to create member: Member already exists")
 
-        persistAllEvents(member.events)
+        createAllEvents(member.events)
     }
 
     fun update(member: Member) {
@@ -46,7 +46,7 @@ class MemberRepository(
         val messages = messageRepository.getAll(memberId = member.modelId)
         messages.forEach { message -> messageRepository.delete(message) }
 
-        insertEvent(DeleteMember(modelId = member.modelId))
+        createEvent(DeleteMember(modelId = member.modelId))
     }
 
     fun getById(id: Id): Member? {

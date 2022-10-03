@@ -35,7 +35,7 @@ class UserRepository(
         if (getById(user.modelId) != null) error("Unable to create user: User already exists")
         if (getByHandle(user.handle) != null) error("Unable to create user: Handle already exists")
 
-        persistAllEvents(user.events)
+        createAllEvents(user.events)
     }
 
     fun update(user: User) {
@@ -50,7 +50,7 @@ class UserRepository(
         val members = memberRepository.getAll(userId = user.modelId)
         members.forEach { member -> memberRepository.delete(member) }
 
-        insertEvent(DeleteUser(modelId = user.modelId))
+        createEvent(DeleteUser(modelId = user.modelId))
     }
 
     fun getById(id: Id): User? {

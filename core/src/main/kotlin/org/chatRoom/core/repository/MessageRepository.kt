@@ -28,7 +28,7 @@ class MessageRepository(connection: Connection) : EventRepository<MessageEvent>(
     fun create(message: Message) {
         if (getById(message.modelId) != null) error("Unable to create message: Message already exists")
 
-        persistAllEvents(message.events)
+        createAllEvents(message.events)
     }
 
     fun update(message: Message) {
@@ -40,7 +40,7 @@ class MessageRepository(connection: Connection) : EventRepository<MessageEvent>(
     fun delete(message: Message) {
         if (getById(message.modelId) == null) error("Unable to delete message: Message not found")
 
-        insertEvent(DeleteMessage(modelId = message.modelId))
+        createEvent(DeleteMessage(modelId = message.modelId))
     }
 
     fun getById(id: Id): Message? {
