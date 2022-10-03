@@ -33,7 +33,7 @@ class UserRepository(
 
     fun create(user: User) {
         if (getById(user.modelId) != null) error("Unable to create user: User already exists")
-        if (getByHandle(user.handle) != null) error("Unable to create user: Handle already exists")
+        if (getAll(handle = user.handle).isNotEmpty()) error("Unable to create user: Handle already exists")
 
         createAllEvents(user.events)
     }
@@ -70,34 +70,30 @@ class UserRepository(
         return User.applyAllEvents(null, events)
     }
 
-    fun getByHandle(handle: String): User? {
+    fun getAll(handle: String? = null): Collection<User> {
+        val conditions = mutableListOf("TRUE")
+        if (handle != null) {
+            conditions.add("""
+                event_id IN (
+                    SELECT event_id
+                    FROM $tableName
+                    WHERE (event_type = '${CreateUser::class.java.name}' AND event_data->>'handle' = ?)
+                )
+            """.trimIndent())
+        }
+
         val sql = """
             SELECT *
             FROM $tableName
-            WHERE event_id IN (
-                SELECT event_id
-                FROM $tableName
-                WHERE (event_type = '${CreateUser::class.java.name}' AND event_data->>'handle' = ?)
-            )
+            WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
             ORDER BY date_issued ASC
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
-        statement.setString(1, handle)
-
-        val resultSet = statement.executeQuery()
-        val events = parseAllEvents(resultSet)
-        if (events.isEmpty()) return null
-
-        return User.applyAllEvents(null, events)
-    }
-
-    fun getAll(): Collection<User> {
-        val sql = """
-            SELECT *
-            FROM $tableName
-            ORDER BY date_issued ASC
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
+        var parameterCount = 0
+        if (handle != null) {
+            parameterCount += 1
+            statement.setString(parameterCount, handle)
+        }
 
         val resultSet = statement.executeQuery()
         val allEvents = parseAllEvents(resultSet)
@@ -105,5 +101,12 @@ class UserRepository(
         return allEvents.groupBy { event -> event.modelId }
             .map { (_, events) -> User.applyAllEvents(null, events) }
             .filterNotNull()
+            .filter { member ->
+                if (handle != null && member.handle != handle) {
+                    return@filter false
+                }
+
+                return@filter true
+            }
     }
 }
