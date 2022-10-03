@@ -30,7 +30,7 @@ class RoomRepository(
 
     fun create(room: Room) {
         if (getById(room.modelId) != null) error("Unable to create room: Room already exists")
-        if (getByHandle(room.handle) != null) error("Unable to create room: Handle already exists")
+        if (getAll(handle = room.handle).isNotEmpty()) error("Unable to create room: Handle already exists")
 
         createAllEvents(room.events)
     }
@@ -67,34 +67,30 @@ class RoomRepository(
         return Room.applyAllEvents(null, events)
     }
 
-    fun getByHandle(handle: String): Room? {
+    fun getAll(handle: String? = null): Collection<Room> {
+        val conditions = mutableListOf("TRUE")
+        if (handle != null) {
+            conditions.add("""
+                event_id IN (
+                    SELECT event_id
+                    FROM $tableName
+                    WHERE (event_type = '${CreateRoom::class.java.name}' AND event_data->>'handle' = ?)
+                )
+            """.trimIndent())
+        }
+
         val sql = """
             SELECT *
             FROM $tableName
-            WHERE event_id IN (
-                SELECT event_id
-                FROM $tableName
-                WHERE (event_type = '${CreateRoom::class.java.name}' AND event_data->>'handle' = ?)
-            )
+            WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
             ORDER BY date_issued ASC
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
-        statement.setString(1, handle)
-
-        val resultSet = statement.executeQuery()
-        val events = parseAllEvents(resultSet)
-        if (events.isEmpty()) return null
-
-        return Room.applyAllEvents(null, events)
-    }
-
-    fun getAll(): Collection<Room> {
-        val sql = """
-            SELECT *
-            FROM $tableName
-            ORDER BY date_issued ASC
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
+        var parameterCount = 0
+        if (handle != null) {
+            parameterCount += 1
+            statement.setString(parameterCount, handle)
+        }
 
         val resultSet = statement.executeQuery()
         val allEvents = parseAllEvents(resultSet)
@@ -102,5 +98,12 @@ class RoomRepository(
         return allEvents.groupBy { event -> event.modelId }
             .map { (_, events) -> Room.applyAllEvents(null, events) }
             .filterNotNull()
+            .filter { member ->
+                if (handle != null && member.handle != handle) {
+                    return@filter false
+                }
+
+                return@filter true
+            }
     }
 }
