@@ -27,7 +27,7 @@ class RoomRepository(connection: Connection) : EventRepository<RoomEvent>(connec
 
     fun create(room: Room) {
         if (getById(room.modelId) != null) error("Unable to create room: Room already exists")
-        // TODO: prevent duplicate handle
+        if (getByHandle(room.handle) != null) error("Unable to create room: Handle already exists")
 
         persistAllEvents(room.events)
     }
@@ -53,6 +53,27 @@ class RoomRepository(connection: Connection) : EventRepository<RoomEvent>(connec
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
         statement.setString(1, id.toString())
+
+        val resultSet = statement.executeQuery()
+        val events = parseAllEvents(resultSet)
+        if (events.isEmpty()) return null
+
+        return Room.applyAllEvents(null, events)
+    }
+
+    fun getByHandle(handle: String): Room? {
+        val sql = """
+            SELECT *
+            FROM $tableName
+            WHERE event_id IN (
+                SELECT event_id
+                FROM $tableName
+                WHERE (event_type = '${CreateRoom::class.java.name}' AND event_data->>'handle' = ?)
+            )
+            ORDER BY date_issued ASC
+        """.trimIndent()
+        val statement = connection.prepareStatement(sql)
+        statement.setString(1, handle)
 
         val resultSet = statement.executeQuery()
         val events = parseAllEvents(resultSet)

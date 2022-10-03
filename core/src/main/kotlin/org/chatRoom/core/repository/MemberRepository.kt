@@ -27,7 +27,6 @@ class MemberRepository(connection: Connection) : EventRepository<MemberEvent>(co
 
     fun create(member: Member) {
         if (getById(member.modelId) != null) error("Unable to create member: Member already exists")
-        // TODO: prevent duplicate handles
 
         persistAllEvents(member.events)
     }

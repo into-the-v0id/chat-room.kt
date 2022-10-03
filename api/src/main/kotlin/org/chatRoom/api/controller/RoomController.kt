@@ -37,6 +37,9 @@ class RoomController(private val roomRepository: RoomRepository) {
     suspend fun create(call: ApplicationCall) {
         val payload = call.receive<CreateRoom>()
 
+        val existingRoom = roomRepository.getByHandle(payload.handle)
+        if (existingRoom != null) throw BadRequestException("Handle in use")
+
         val room = RoomAggregate.create(handle = payload.handle)
         roomRepository.create(room)
 

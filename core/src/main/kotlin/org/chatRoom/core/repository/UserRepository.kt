@@ -30,7 +30,7 @@ class UserRepository(connection: Connection) : EventRepository<UserEvent>(connec
 
     fun create(user: User) {
         if (getById(user.modelId) != null) error("Unable to create user: User already exists")
-        // TODO: prevent duplicate handles
+        if (getByHandle(user.handle) != null) error("Unable to create user: Handle already exists")
 
         persistAllEvents(user.events)
     }
@@ -56,6 +56,27 @@ class UserRepository(connection: Connection) : EventRepository<UserEvent>(connec
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
         statement.setString(1, id.toString())
+
+        val resultSet = statement.executeQuery()
+        val events = parseAllEvents(resultSet)
+        if (events.isEmpty()) return null
+
+        return User.applyAllEvents(null, events)
+    }
+
+    fun getByHandle(handle: String): User? {
+        val sql = """
+            SELECT *
+            FROM $tableName
+            WHERE event_id IN (
+                SELECT event_id
+                FROM $tableName
+                WHERE (event_type = '${CreateUser::class.java.name}' AND event_data->>'handle' = ?)
+            )
+            ORDER BY date_issued ASC
+        """.trimIndent()
+        val statement = connection.prepareStatement(sql)
+        statement.setString(1, handle)
 
         val resultSet = statement.executeQuery()
         val events = parseAllEvents(resultSet)

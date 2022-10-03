@@ -27,7 +27,6 @@ class MessageRepository(connection: Connection) : EventRepository<MessageEvent>(
 
     fun create(message: Message) {
         if (getById(message.modelId) != null) error("Unable to create message: Message already exists")
-        // TODO: prevent duplicate handles
 
         persistAllEvents(message.events)
     }

@@ -38,6 +38,9 @@ class UserController(private val userRepository: UserRepository) {
     suspend fun create(call: ApplicationCall) {
         val payload = call.receive<CreateUser>()
 
+        val existingUser = userRepository.getByHandle(payload.handle)
+        if (existingUser != null) throw BadRequestException("Handle in use")
+
         val user = UserAggregate.create(
             email = payload.email,
             handle = payload.handle,
