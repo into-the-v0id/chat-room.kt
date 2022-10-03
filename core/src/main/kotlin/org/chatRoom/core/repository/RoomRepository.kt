@@ -5,6 +5,7 @@ import org.chatRoom.core.aggreagte.Room
 import org.chatRoom.core.event.room.CreateRoom
 import org.chatRoom.core.event.room.DeleteRoom
 import org.chatRoom.core.event.room.RoomEvent
+import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.sql.Connection
 
@@ -67,7 +68,7 @@ class RoomRepository(
         return Room.applyAllEvents(null, events)
     }
 
-    fun getAll(handle: String? = null): Collection<Room> {
+    fun getAll(handle: Handle? = null): Collection<Room> {
         val conditions = mutableListOf("TRUE")
         if (handle != null) {
             conditions.add("""
@@ -89,7 +90,7 @@ class RoomRepository(
         var parameterCount = 0
         if (handle != null) {
             parameterCount += 1
-            statement.setString(parameterCount, handle)
+            statement.setString(parameterCount, handle.toString())
         }
 
         val resultSet = statement.executeQuery()

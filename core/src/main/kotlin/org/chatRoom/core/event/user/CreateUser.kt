@@ -2,6 +2,7 @@ package org.chatRoom.core.event.user
 
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.serializer.InstantSerializer
+import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
 
@@ -12,5 +13,5 @@ data class CreateUser(
     @Serializable(with = InstantSerializer::class)
     override val dateIssued: Instant = Instant.now(),
     val email: String,
-    val handle: String,
+    val handle: Handle,
 ) : UserEvent

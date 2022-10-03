@@ -3,22 +3,23 @@ package org.chatRoom.core.aggreagte
 import org.chatRoom.core.event.room.CreateRoom
 import org.chatRoom.core.event.room.DeleteRoom
 import org.chatRoom.core.event.room.RoomEvent
+import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
 
 class Room protected constructor(
     modelId: Id,
-    handle: String,
+    handle: Handle,
     dateCreated: Instant = Instant.now(),
 ) : Aggregate<RoomEvent>(modelId = modelId) {
-    var handle: String = handle
+    var handle: Handle = handle
         protected set
 
     var dateCreated: Instant = dateCreated
         protected set
 
     companion object {
-        fun create(handle: String): Room {
+        fun create(handle: Handle): Room {
             val event = CreateRoom(
                 modelId = Id(),
                 handle = handle,

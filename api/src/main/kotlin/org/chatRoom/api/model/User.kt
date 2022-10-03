@@ -2,6 +2,7 @@ package org.chatRoom.api.model
 
 import kotlinx.serialization.Serializable
 import org.chatRoom.api.serializer.OffsetDateTimeSerializer
+import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.aggreagte.User as UserAggregate
 import org.chatRoom.core.valueObject.Id
 import java.time.OffsetDateTime
@@ -11,7 +12,7 @@ import java.time.ZoneOffset
 data class User(
     val id: Id,
     val email: String,
-    val handle: String,
+    val handle: Handle,
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateCreated: OffsetDateTime,
 ) {

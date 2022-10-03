@@ -4,26 +4,27 @@ import org.chatRoom.core.event.user.ChangeEmail
 import org.chatRoom.core.event.user.CreateUser
 import org.chatRoom.core.event.user.DeleteUser
 import org.chatRoom.core.event.user.UserEvent
+import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
 
 class User protected constructor(
     modelId: Id,
     email: String,
-    handle: String,
+    handle: Handle,
     dateCreated: Instant = Instant.now(),
 ) : Aggregate<UserEvent>(modelId = modelId) {
     var email: String = email
         protected set
 
-    var handle: String = handle
+    var handle: Handle = handle
         protected set
 
     var dateCreated: Instant = dateCreated
         protected set
 
     companion object {
-        fun create(email: String, handle: String): User {
+        fun create(email: String, handle: Handle): User {
             val event = CreateUser(
                 modelId = Id(),
                 email = email,

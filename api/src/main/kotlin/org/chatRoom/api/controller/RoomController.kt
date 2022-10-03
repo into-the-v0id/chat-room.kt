@@ -8,6 +8,7 @@ import io.ktor.server.response.*
 import org.chatRoom.api.model.Room
 import org.chatRoom.api.payload.room.CreateRoom
 import org.chatRoom.core.repository.RoomRepository
+import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.aggreagte.Room as RoomAggregate
 
@@ -20,7 +21,12 @@ class RoomController(private val roomRepository: RoomRepository) {
     }
 
     suspend fun list(call: ApplicationCall) {
-        val handle = call.request.queryParameters["handle"]
+        val rawHandle = call.request.queryParameters["handle"]
+        val handle = if (rawHandle != null) {
+            Handle.tryFrom(rawHandle) ?: throw BadRequestException("Invalid handle")
+        } else {
+            null
+        }
 
         val rooms = roomRepository.getAll(handle = handle)
             .map { roomAggregate -> Room(roomAggregate) }

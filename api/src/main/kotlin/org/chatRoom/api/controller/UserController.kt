@@ -9,6 +9,7 @@ import org.chatRoom.api.model.User
 import org.chatRoom.api.payload.user.CreateUser
 import org.chatRoom.api.payload.user.UpdateUser
 import org.chatRoom.core.repository.UserRepository
+import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.aggreagte.User as UserAggregate
 
@@ -21,7 +22,12 @@ class UserController(private val userRepository: UserRepository) {
     }
 
     suspend fun list(call: ApplicationCall) {
-        val handle = call.request.queryParameters["handle"]
+        val rawHandle = call.request.queryParameters["handle"]
+        val handle = if (rawHandle != null) {
+            Handle.tryFrom(rawHandle) ?: throw BadRequestException("Invalid handle")
+        } else {
+            null
+        }
 
         val users = userRepository.getAll(handle = handle)
             .map { userAggregate -> User(userAggregate) }

@@ -1,13 +1,7 @@
 package org.chatRoom.api.payload.room
 
 import kotlinx.serialization.Serializable
-import org.chatRoom.api.validator.HandleValidator
+import org.chatRoom.core.valueObject.Handle
 
 @Serializable
-data class CreateRoom(
-    val handle: String,
-) {
-    init {
-        if (! HandleValidator.instance.isValid(handle)) error("Invalid handle")
-    }
-}
+data class CreateRoom(val handle: Handle)

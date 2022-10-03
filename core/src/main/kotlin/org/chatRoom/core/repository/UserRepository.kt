@@ -6,6 +6,7 @@ import org.chatRoom.core.event.user.ChangeEmail
 import org.chatRoom.core.event.user.CreateUser
 import org.chatRoom.core.event.user.DeleteUser
 import org.chatRoom.core.event.user.UserEvent
+import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.sql.Connection
 
@@ -70,7 +71,7 @@ class UserRepository(
         return User.applyAllEvents(null, events)
     }
 
-    fun getAll(handle: String? = null): Collection<User> {
+    fun getAll(handle: Handle? = null): Collection<User> {
         val conditions = mutableListOf("TRUE")
         if (handle != null) {
             conditions.add("""
@@ -92,7 +93,7 @@ class UserRepository(
         var parameterCount = 0
         if (handle != null) {
             parameterCount += 1
-            statement.setString(parameterCount, handle)
+            statement.setString(parameterCount, handle.toString())
         }
 
         val resultSet = statement.executeQuery()
