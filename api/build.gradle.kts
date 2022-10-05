@@ -54,7 +54,7 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    mainClass.set("org.chat-room.api.ApplicationKt")
+    mainClass.set("org.chatRoom.api.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
