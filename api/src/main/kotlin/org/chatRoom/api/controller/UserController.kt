@@ -55,6 +55,12 @@ class UserController(private val userRepository: UserRepository) {
 
         val payload = call.receive<UpdateUser>()
 
+        if (payload.handle != userAggregate.handle) {
+            val existingUsers = userRepository.getAll(handles = listOf(payload.handle))
+            if (existingUsers.isNotEmpty()) throw BadRequestException("Handle in use")
+
+            userAggregate = userAggregate.changeHandle(payload.handle)
+        }
         if (payload.email != userAggregate.email) {
             userAggregate = userAggregate.changeEmail(payload.email)
         }

@@ -1,9 +1,6 @@
 package org.chatRoom.core.aggreagte
 
-import org.chatRoom.core.event.user.ChangeEmail
-import org.chatRoom.core.event.user.CreateUser
-import org.chatRoom.core.event.user.DeleteUser
-import org.chatRoom.core.event.user.UserEvent
+import org.chatRoom.core.event.user.*
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
@@ -51,6 +48,10 @@ class User protected constructor(
                         dateCreated = event.dateIssued,
                     )
                 }
+                is ChangeHandle -> {
+                    if (user == null) error("Expected user")
+                    user.handle = event.handle
+                }
                 is ChangeEmail -> {
                     if (user == null) error("Expected user")
                     user.email = event.email
@@ -64,6 +65,15 @@ class User protected constructor(
 
             return user
         }
+    }
+
+    fun changeHandle(handle: Handle): User {
+        val event = ChangeHandle(
+            modelId = this.modelId,
+            handle = handle,
+        )
+
+        return applyEvent(this, event) ?: error("Expected user")
     }
 
     fun changeEmail(email: String): User {
