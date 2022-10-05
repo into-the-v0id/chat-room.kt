@@ -7,6 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import org.chatRoom.api.model.Room
 import org.chatRoom.api.payload.room.CreateRoom
+import org.chatRoom.api.payload.room.UpdateRoom
 import org.chatRoom.core.repository.RoomRepository
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
@@ -45,6 +46,23 @@ class RoomController(private val roomRepository: RoomRepository) {
 
         val room = RoomAggregate.create(handle = payload.handle)
         roomRepository.create(room)
+
+        call.respond(HttpStatusCode.OK)
+    }
+
+    suspend fun update(call: ApplicationCall) {
+        var roomAggregate = fetchRoom(call) ?: throw NotFoundException()
+
+        val payload = call.receive<UpdateRoom>()
+
+        if (payload.handle != roomAggregate.handle) {
+            val existingRooms = roomRepository.getAll(handles = listOf(payload.handle))
+            if (existingRooms.isNotEmpty()) throw BadRequestException("Handle in use")
+
+            roomAggregate = roomAggregate.changeHandle(payload.handle)
+        }
+
+        roomRepository.update(roomAggregate)
 
         call.respond(HttpStatusCode.OK)
     }

@@ -14,6 +14,7 @@ class RoomRoutes(
 
             route("{roomId}") {
                 get { roomController.detail(call) }
+                put { roomController.update(call) }
                 delete { roomController.delete(call) }
             }
         }

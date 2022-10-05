@@ -2,6 +2,7 @@ package org.chatRoom.core.repository
 
 import kotlinx.serialization.json.*
 import org.chatRoom.core.aggreagte.Room
+import org.chatRoom.core.event.room.ChangeHandle
 import org.chatRoom.core.event.room.CreateRoom
 import org.chatRoom.core.event.room.DeleteRoom
 import org.chatRoom.core.event.room.RoomEvent
@@ -16,6 +17,7 @@ class RoomRepository(
     override fun serializeEvent(event: RoomEvent): Pair<String, JsonElement> {
         return when (event) {
             is CreateRoom -> CreateRoom::class.java.name to Json.encodeToJsonElement(event)
+            is ChangeHandle -> ChangeHandle::class.java.name to Json.encodeToJsonElement(event)
             is DeleteRoom -> DeleteRoom::class.java.name to Json.encodeToJsonElement(event)
             else -> error("Unknown event")
         }
@@ -24,6 +26,7 @@ class RoomRepository(
     override fun deserializeEvent(type: String, data: JsonElement): RoomEvent {
         return when (type) {
             CreateRoom::class.java.name -> Json.decodeFromJsonElement<CreateRoom>(data)
+            ChangeHandle::class.java.name -> Json.decodeFromJsonElement<ChangeHandle>(data)
             DeleteRoom::class.java.name -> Json.decodeFromJsonElement<DeleteRoom>(data)
             else -> error("Unknown event type")
         }

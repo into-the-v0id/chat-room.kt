@@ -1,5 +1,6 @@
 package org.chatRoom.core.aggreagte
 
+import org.chatRoom.core.event.room.ChangeHandle
 import org.chatRoom.core.event.room.CreateRoom
 import org.chatRoom.core.event.room.DeleteRoom
 import org.chatRoom.core.event.room.RoomEvent
@@ -44,6 +45,10 @@ class Room protected constructor(
                         dateCreated = event.dateIssued,
                     )
                 }
+                is ChangeHandle -> {
+                    if (room == null) error("Expected room")
+                    room.handle = event.handle
+                }
                 is DeleteRoom -> {
                     if (room == null) error("Expected room")
                     room = null
@@ -53,5 +58,14 @@ class Room protected constructor(
 
             return room
         }
+    }
+
+    fun changeHandle(handle: Handle): Room {
+        val event = ChangeHandle(
+            modelId = this.modelId,
+            handle = handle,
+        )
+
+        return applyEvent(this, event) ?: error("Expected user")
     }
 }
