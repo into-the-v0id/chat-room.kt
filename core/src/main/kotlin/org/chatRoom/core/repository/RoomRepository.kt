@@ -45,7 +45,7 @@ class RoomRepository(
     fun delete(room: Room) {
         if (getById(room.modelId) == null) error("Unable to delete room: Room not found")
 
-        val members = memberRepository.getAll(roomId = room.modelId)
+        val members = memberRepository.getAll(roomIds = listOf(room.modelId))
         members.forEach { member -> memberRepository.delete(member) }
 
         createEvent(DeleteRoom(modelId = room.modelId))

@@ -9,7 +9,6 @@ import org.chatRoom.api.model.Message
 import org.chatRoom.api.payload.message.CreateMessage
 import org.chatRoom.core.repository.MemberRepository
 import org.chatRoom.core.repository.MessageRepository
-import org.chatRoom.core.repository.RoomRepository
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.aggreagte.Message as MessageAggregate
 
@@ -25,35 +24,27 @@ class MessageController(
     }
 
     suspend fun list(call: ApplicationCall) {
-        var memberIds: MutableList<Id>? = null
+        var allMemberIds: MutableList<Id>? = null
 
-        val rawMemberId = call.request.queryParameters["member_id"]
-        val memberId = if (rawMemberId != null) {
-            Id.tryFrom(rawMemberId) ?: throw BadRequestException("Invalid ID")
-        } else {
-            null
-        }
-        if (memberId != null) {
-            if (memberIds == null) memberIds = mutableListOf()
-            memberIds.add(memberId)
+        val memberIds = call.request.queryParameters.getAll("member_id")
+            ?.map { rawId -> Id.tryFrom(rawId) ?: throw BadRequestException("Invalid ID") }
+        if (memberIds != null) {
+            if (allMemberIds == null) allMemberIds = mutableListOf()
+            allMemberIds.addAll(memberIds)
         }
 
-        val rawRoomId = call.request.queryParameters["room_id"]
-        val roomId = if (rawRoomId != null) {
-            Id.tryFrom(rawRoomId) ?: throw BadRequestException("Invalid ID")
-        } else {
-            null
-        }
-        if (roomId != null) {
-            val roomMemberAggregates = memberRepository.getAll(roomId = roomId)
+        val roomIds = call.request.queryParameters.getAll("room_id")
+            ?.map { rawId -> Id.tryFrom(rawId) ?: throw BadRequestException("Invalid ID") }
+        if (roomIds != null) {
+            val roomMemberAggregates = memberRepository.getAll(roomIds = roomIds)
             val roomMemberIds = roomMemberAggregates.map { member -> member.modelId }
 
-            memberIds = (memberIds ?: roomMemberIds)
+            allMemberIds = (allMemberIds ?: roomMemberIds)
                 .intersect(roomMemberIds)
                 .toMutableList()
         }
 
-        val messages = messageRepository.getAll(memberIds = memberIds)
+        val messages = messageRepository.getAll(memberIds = allMemberIds)
             .map { messageAggregate -> Message(messageAggregate) }
 
         call.respond(messages)

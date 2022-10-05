@@ -46,8 +46,8 @@ class MemberController(
         }
 
         val members = memberRepository.getAll(
-            userId = userId,
-            roomId = roomId,
+            userIds = if (userId != null) listOf(userId) else null,
+            roomIds = if (roomId != null) listOf(roomId) else null,
         )
             .map { memberAggregate -> Member(memberAggregate) }
 

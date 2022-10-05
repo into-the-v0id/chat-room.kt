@@ -48,7 +48,7 @@ class UserRepository(
     fun delete(user: User) {
         if (getById(user.modelId) == null) error("Unable to delete user: User not found")
 
-        val members = memberRepository.getAll(userId = user.modelId)
+        val members = memberRepository.getAll(userIds = listOf(user.modelId))
         members.forEach { member -> memberRepository.delete(member) }
 
         createEvent(DeleteUser(modelId = user.modelId))

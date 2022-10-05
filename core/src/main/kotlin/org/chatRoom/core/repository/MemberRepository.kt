@@ -66,23 +66,23 @@ class MemberRepository(
         return Member.applyAllEvents(null, events)
     }
 
-    fun getAll(userId: Id? = null, roomId: Id? = null): Collection<Member> {
+    fun getAll(userIds: List<Id>? = null, roomIds: List<Id>? = null): Collection<Member> {
         val conditions = mutableListOf("TRUE")
-        if (roomId != null) {
+        if (roomIds != null) {
             conditions.add("""
                 event_id IN (
                     SELECT event_id
                     FROM $tableName
-                    WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'roomId' = ?)
+                    WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'roomId' = ANY(?))
                 )
             """.trimIndent())
         }
-        if (userId != null) {
+        if (userIds != null) {
             conditions.add("""
                 event_id IN (
                     SELECT event_id
                     FROM $tableName
-                    WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'userId' = ?)
+                    WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'userId' = ANY(?))
                 )
             """.trimIndent())
         }
@@ -95,13 +95,19 @@ class MemberRepository(
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
         var parameterCount = 0
-        if (roomId != null) {
+        if (roomIds != null) {
             parameterCount += 1
-            statement.setString(parameterCount, roomId.toString())
+            statement.setArray(
+                parameterCount,
+                connection.createArrayOf("text", roomIds.map { id -> id.toString() }.toTypedArray())
+            )
         }
-        if (userId != null) {
+        if (userIds != null) {
             parameterCount += 1
-            statement.setString(parameterCount, userId.toString())
+            statement.setArray(
+                parameterCount,
+                connection.createArrayOf("text", userIds.map { id -> id.toString() }.toTypedArray())
+            )
         }
 
         val resultSet = statement.executeQuery()
@@ -111,11 +117,11 @@ class MemberRepository(
             .map { (_, events) -> Member.applyAllEvents(null, events) }
             .filterNotNull()
             .filter { member ->
-                if (roomId != null && member.roomId != roomId) {
+                if (roomIds != null && member.roomId !in roomIds) {
                     return@filter false
                 }
 
-                if (userId != null && member.userId != userId) {
+                if (userIds != null && member.userId !in userIds) {
                     return@filter false
                 }
 
