@@ -60,14 +60,14 @@ class MessageRepository(connection: Connection) : EventRepository<MessageEvent>(
         return Message.applyAllEvents(null, events)
     }
 
-    fun getAll(memberId: Id? = null): Collection<Message> {
+    fun getAll(memberIds: List<Id>? = null): Collection<Message> {
         val conditions = mutableListOf("TRUE")
-        if (memberId != null) {
+        if (memberIds != null) {
             conditions.add("""
                 event_id IN (
                     SELECT event_id
                     FROM $tableName
-                    WHERE (event_type = '${CreateMessage::class.java.name}' AND event_data->>'memberId' = ?)
+                    WHERE (event_type = '${CreateMessage::class.java.name}' AND event_data->>'memberId' = ANY(?))
                 )
             """.trimIndent())
         }
@@ -80,9 +80,12 @@ class MessageRepository(connection: Connection) : EventRepository<MessageEvent>(
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
         var parameterCount = 0
-        if (memberId != null) {
+        if (memberIds != null) {
             parameterCount += 1
-            statement.setString(parameterCount, memberId.toString())
+            statement.setArray(
+                parameterCount,
+                connection.createArrayOf("text", memberIds.map { id -> id.toString() }.toTypedArray())
+            )
         }
 
         val resultSet = statement.executeQuery()
@@ -92,7 +95,7 @@ class MessageRepository(connection: Connection) : EventRepository<MessageEvent>(
             .map { (_, events) -> Message.applyAllEvents(null, events) }
             .filterNotNull()
             .filter { message ->
-                if (memberId != null && message.memberId != memberId) {
+                if (memberIds != null && message.memberId !in memberIds) {
                     return@filter false
                 }
 

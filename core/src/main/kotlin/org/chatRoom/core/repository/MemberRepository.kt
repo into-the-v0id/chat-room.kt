@@ -43,7 +43,7 @@ class MemberRepository(
     fun delete(member: Member) {
         if (getById(member.modelId) == null) error("Unable to delete member: Member not found")
 
-        val messages = messageRepository.getAll(memberId = member.modelId)
+        val messages = messageRepository.getAll(memberIds = listOf(member.modelId))
         messages.forEach { message -> messageRepository.delete(message) }
 
         createEvent(DeleteMember(modelId = member.modelId))
