@@ -22,14 +22,10 @@ class UserController(private val userRepository: UserRepository) {
     }
 
     suspend fun list(call: ApplicationCall) {
-        val rawHandle = call.request.queryParameters["handle"]
-        val handle = if (rawHandle != null) {
-            Handle.tryFrom(rawHandle) ?: throw BadRequestException("Invalid handle")
-        } else {
-            null
-        }
+        val handles = call.request.queryParameters.getAll("handle")
+            ?.map { rawHandle -> Handle.tryFrom(rawHandle) ?: throw BadRequestException("Invalid handle") }
 
-        val users = userRepository.getAll(handle = handle)
+        val users = userRepository.getAll(handles = handles)
             .map { userAggregate -> User(userAggregate) }
 
         call.respond(users)
@@ -46,7 +42,7 @@ class UserController(private val userRepository: UserRepository) {
     suspend fun create(call: ApplicationCall) {
         val payload = call.receive<CreateUser>()
 
-        val existingUsers = userRepository.getAll(handle = payload.handle)
+        val existingUsers = userRepository.getAll(handles = listOf(payload.handle))
         if (existingUsers.isNotEmpty()) throw BadRequestException("Handle in use")
 
         val user = UserAggregate.create(
