@@ -33,7 +33,6 @@ class UserController(private val userRepository: UserRepository) {
 
     suspend fun detail(call: ApplicationCall) {
         val userAggregate = fetchUser(call) ?: throw NotFoundException()
-
         val userModel = User(userAggregate)
 
         call.respond(userModel)
@@ -45,10 +44,7 @@ class UserController(private val userRepository: UserRepository) {
         val existingUsers = userRepository.getAll(handles = listOf(payload.handle))
         if (existingUsers.isNotEmpty()) throw BadRequestException("Handle in use")
 
-        val user = UserAggregate.create(
-            email = payload.email,
-            handle = payload.handle,
-        )
+        val user = UserAggregate.create(email = payload.email, handle = payload.handle)
         userRepository.create(user)
 
         call.respond(HttpStatusCode.OK)
@@ -62,8 +58,6 @@ class UserController(private val userRepository: UserRepository) {
         if (payload.email != userAggregate.email) {
             userAggregate = userAggregate.changeEmail(payload.email)
         }
-
-        // TODO: allow update of firstName & lastName
 
         userRepository.update(userAggregate)
 

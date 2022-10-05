@@ -24,14 +24,8 @@ class MessageController(
     }
 
     suspend fun list(call: ApplicationCall) {
-        var allMemberIds: MutableList<Id>? = null
-
-        val memberIds = call.request.queryParameters.getAll("member_id")
+        var memberIds = call.request.queryParameters.getAll("member_id")
             ?.map { rawId -> Id.tryFrom(rawId) ?: throw BadRequestException("Invalid ID") }
-        if (memberIds != null) {
-            if (allMemberIds == null) allMemberIds = mutableListOf()
-            allMemberIds.addAll(memberIds)
-        }
 
         val roomIds = call.request.queryParameters.getAll("room_id")
             ?.map { rawId -> Id.tryFrom(rawId) ?: throw BadRequestException("Invalid ID") }
@@ -39,12 +33,12 @@ class MessageController(
             val roomMemberAggregates = memberRepository.getAll(roomIds = roomIds)
             val roomMemberIds = roomMemberAggregates.map { member -> member.modelId }
 
-            allMemberIds = (allMemberIds ?: roomMemberIds)
+            memberIds = (memberIds ?: roomMemberIds)
                 .intersect(roomMemberIds)
-                .toMutableList()
+                .toList()
         }
 
-        val messages = messageRepository.getAll(memberIds = allMemberIds)
+        val messages = messageRepository.getAll(memberIds = memberIds)
             .map { messageAggregate -> Message(messageAggregate) }
 
         call.respond(messages)
@@ -52,7 +46,6 @@ class MessageController(
 
     suspend fun detail(call: ApplicationCall) {
         val messageAggregate = fetchMessage(call) ?: throw NotFoundException()
-
         val messageModel = Message(messageAggregate)
 
         call.respond(messageModel)
@@ -63,10 +56,7 @@ class MessageController(
 
         val memberAggregate = memberRepository.getById(payload.memberId) ?: throw BadRequestException("Unknown member")
 
-        val message = MessageAggregate.create(
-            member = memberAggregate,
-            content = payload.content,
-        )
+        val message = MessageAggregate.create(member = memberAggregate, content = payload.content)
         messageRepository.create(message)
 
         call.respond(HttpStatusCode.OK)

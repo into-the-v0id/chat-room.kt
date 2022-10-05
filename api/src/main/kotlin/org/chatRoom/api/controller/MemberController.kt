@@ -20,12 +20,7 @@ class MemberController(
 ) {
     private fun fetchMember(call: ApplicationCall) : MemberAggregate? {
         val rawId = call.parameters["memberId"] ?: return null
-
-        val id = try {
-            Id(rawId)
-        } catch (e: Throwable) {
-            return null
-        }
+        val id = Id.tryFrom(rawId) ?: return null
 
         return memberRepository.getById(id)
     }
@@ -45,7 +40,6 @@ class MemberController(
 
     suspend fun detail(call: ApplicationCall) {
         val memberAggregate = fetchMember(call) ?: throw NotFoundException()
-
         val memberModel = Member(memberAggregate)
 
         call.respond(memberModel)
@@ -57,10 +51,7 @@ class MemberController(
         val userAggregate = userRepository.getById(payload.userId) ?: throw BadRequestException("Unknown user")
         val roomAggregate = roomRepository.getById(payload.roomId) ?: throw BadRequestException("Unknown room")
 
-        val member = MemberAggregate.create(
-            user = userAggregate,
-            room = roomAggregate,
-        )
+        val member = MemberAggregate.create(user = userAggregate, room = roomAggregate)
         memberRepository.create(member)
 
         call.respond(HttpStatusCode.OK)

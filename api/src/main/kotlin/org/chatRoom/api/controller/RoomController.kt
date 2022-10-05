@@ -32,7 +32,6 @@ class RoomController(private val roomRepository: RoomRepository) {
 
     suspend fun detail(call: ApplicationCall) {
         val roomAggregate = fetchRoom(call) ?: throw NotFoundException()
-
         val roomModel = Room(roomAggregate)
 
         call.respond(roomModel)
