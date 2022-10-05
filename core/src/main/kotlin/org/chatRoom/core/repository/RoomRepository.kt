@@ -31,7 +31,7 @@ class RoomRepository(
 
     fun create(room: Room) {
         if (getById(room.modelId) != null) error("Unable to create room: Room already exists")
-        if (getAll(handle = room.handle).isNotEmpty()) error("Unable to create room: Handle already exists")
+        if (getAll(handles = listOf(room.handle)).isNotEmpty()) error("Unable to create room: Handle already exists")
 
         createAllEvents(room.events)
     }
@@ -68,14 +68,14 @@ class RoomRepository(
         return Room.applyAllEvents(null, events)
     }
 
-    fun getAll(handle: Handle? = null): Collection<Room> {
+    fun getAll(handles: List<Handle>? = null): Collection<Room> {
         val conditions = mutableListOf("TRUE")
-        if (handle != null) {
+        if (handles != null) {
             conditions.add("""
                 event_id IN (
                     SELECT event_id
                     FROM $tableName
-                    WHERE (event_type = '${CreateRoom::class.java.name}' AND event_data->>'handle' = ?)
+                    WHERE (event_type = '${CreateRoom::class.java.name}' AND event_data->>'handle' = ANY(?))
                 )
             """.trimIndent())
         }
@@ -88,9 +88,12 @@ class RoomRepository(
         """.trimIndent()
         val statement = connection.prepareStatement(sql)
         var parameterCount = 0
-        if (handle != null) {
+        if (handles != null) {
             parameterCount += 1
-            statement.setString(parameterCount, handle.toString())
+            statement.setArray(
+                parameterCount,
+                connection.createArrayOf("text", handles.map { handle -> handle.toString() }.toTypedArray())
+            )
         }
 
         val resultSet = statement.executeQuery()
@@ -100,7 +103,7 @@ class RoomRepository(
             .map { (_, events) -> Room.applyAllEvents(null, events) }
             .filterNotNull()
             .filter { member ->
-                if (handle != null && member.handle != handle) {
+                if (handles != null && member.handle !in handles) {
                     return@filter false
                 }
 

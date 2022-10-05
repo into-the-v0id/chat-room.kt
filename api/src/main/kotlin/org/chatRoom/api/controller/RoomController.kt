@@ -21,14 +21,10 @@ class RoomController(private val roomRepository: RoomRepository) {
     }
 
     suspend fun list(call: ApplicationCall) {
-        val rawHandle = call.request.queryParameters["handle"]
-        val handle = if (rawHandle != null) {
-            Handle.tryFrom(rawHandle) ?: throw BadRequestException("Invalid handle")
-        } else {
-            null
-        }
+        val handles = call.request.queryParameters.getAll("handle")
+            ?.map { rawHandle -> Handle.tryFrom(rawHandle) ?: throw BadRequestException("Invalid handle") }
 
-        val rooms = roomRepository.getAll(handle = handle)
+        val rooms = roomRepository.getAll(handles = handles)
             .map { roomAggregate -> Room(roomAggregate) }
 
         call.respond(rooms)
@@ -45,7 +41,7 @@ class RoomController(private val roomRepository: RoomRepository) {
     suspend fun create(call: ApplicationCall) {
         val payload = call.receive<CreateRoom>()
 
-        val existingRooms = roomRepository.getAll(handle = payload.handle)
+        val existingRooms = roomRepository.getAll(handles = listOf(payload.handle))
         if (existingRooms.isNotEmpty()) throw BadRequestException("Handle in use")
 
         val room = RoomAggregate.create(handle = payload.handle)
