@@ -14,6 +14,7 @@ class MessageRoutes(
 
             route("{messageId}") {
                 get { messageController.detail(call) }
+                put { messageController.update(call) }
                 delete { messageController.delete(call) }
             }
         }

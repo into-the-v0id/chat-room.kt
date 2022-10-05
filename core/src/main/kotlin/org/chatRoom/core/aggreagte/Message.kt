@@ -1,5 +1,6 @@
 package org.chatRoom.core.aggreagte
 
+import org.chatRoom.core.event.message.ChangeContent
 import org.chatRoom.core.event.message.CreateMessage
 import org.chatRoom.core.event.message.DeleteMessage
 import org.chatRoom.core.event.message.MessageEvent
@@ -49,6 +50,10 @@ class Message protected constructor(
                         dateCreated = event.dateIssued,
                     )
                 }
+                is ChangeContent -> {
+                    if (message == null) error("Expected message")
+                    message.content = event.content
+                }
                 is DeleteMessage -> {
                     if (message == null) error("Expected message")
                     message = null
@@ -58,5 +63,14 @@ class Message protected constructor(
 
             return message
         }
+    }
+
+    fun changeContent(content: String): Message {
+        val event = ChangeContent(
+            modelId = this.modelId,
+            content = content,
+        )
+
+        return applyEvent(this, event) ?: error("Expected message")
     }
 }

@@ -66,6 +66,6 @@ class Room protected constructor(
             handle = handle,
         )
 
-        return applyEvent(this, event) ?: error("Expected user")
+        return applyEvent(this, event) ?: error("Expected room")
     }
 }

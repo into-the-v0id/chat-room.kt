@@ -7,6 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import org.chatRoom.api.model.Message
 import org.chatRoom.api.payload.message.CreateMessage
+import org.chatRoom.api.payload.message.UpdateMessage
 import org.chatRoom.core.repository.MemberRepository
 import org.chatRoom.core.repository.MessageRepository
 import org.chatRoom.core.valueObject.Id
@@ -58,6 +59,20 @@ class MessageController(
 
         val message = MessageAggregate.create(member = memberAggregate, content = payload.content)
         messageRepository.create(message)
+
+        call.respond(HttpStatusCode.OK)
+    }
+
+    suspend fun update(call: ApplicationCall) {
+        var messageAggregate = fetchMessage(call) ?: throw NotFoundException()
+
+        val payload = call.receive<UpdateMessage>()
+
+        if (payload.content != messageAggregate.content) {
+            messageAggregate = messageAggregate.changeContent(payload.content)
+        }
+
+        messageRepository.update(messageAggregate)
 
         call.respond(HttpStatusCode.OK)
     }

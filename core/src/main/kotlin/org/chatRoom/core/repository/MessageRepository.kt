@@ -2,6 +2,7 @@ package org.chatRoom.core.repository
 
 import kotlinx.serialization.json.*
 import org.chatRoom.core.aggreagte.Message
+import org.chatRoom.core.event.message.ChangeContent
 import org.chatRoom.core.event.message.CreateMessage
 import org.chatRoom.core.event.message.DeleteMessage
 import org.chatRoom.core.event.message.MessageEvent
@@ -12,6 +13,7 @@ class MessageRepository(connection: Connection) : EventRepository<MessageEvent>(
     override fun serializeEvent(event: MessageEvent): Pair<String, JsonElement> {
         return when (event) {
             is CreateMessage -> CreateMessage::class.java.name to Json.encodeToJsonElement(event)
+            is ChangeContent -> ChangeContent::class.java.name to Json.encodeToJsonElement(event)
             is DeleteMessage -> DeleteMessage::class.java.name to Json.encodeToJsonElement(event)
             else -> error("Unknown event")
         }
@@ -20,6 +22,7 @@ class MessageRepository(connection: Connection) : EventRepository<MessageEvent>(
     override fun deserializeEvent(type: String, data: JsonElement): MessageEvent {
         return when (type) {
             CreateMessage::class.java.name -> Json.decodeFromJsonElement<CreateMessage>(data)
+            ChangeContent::class.java.name -> Json.decodeFromJsonElement<ChangeContent>(data)
             DeleteMessage::class.java.name -> Json.decodeFromJsonElement<DeleteMessage>(data)
             else -> error("Unknown event type")
         }
