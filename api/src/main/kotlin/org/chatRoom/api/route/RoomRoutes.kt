@@ -10,7 +10,7 @@ class RoomRoutes(
     private val roomController: RoomController,
 ) {
     fun Route.roomRouting() {
-        get<Rooms> { roomController.list(call) }
+        get<Rooms> { resource -> roomController.list(call, resource) }
         post<Rooms> { roomController.create(call) }
 
         get<Rooms.Detail> { resource -> roomController.detail(call, resource) }

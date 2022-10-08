@@ -12,7 +12,6 @@ import org.chatRoom.api.resource.Members
 import org.chatRoom.core.repository.MemberRepository
 import org.chatRoom.core.repository.RoomRepository
 import org.chatRoom.core.repository.UserRepository
-import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.aggreagte.Member as MemberAggregate
 
 class MemberController(
@@ -20,17 +19,14 @@ class MemberController(
     private val userRepository: UserRepository,
     private val roomRepository: RoomRepository,
 ) {
-    suspend fun list(call: ApplicationCall) {
-        val userIds = call.request.queryParameters.getAll("user_id")
-            ?.map { rawId -> Id.tryFrom(rawId) ?: throw BadRequestException("Invalid ID") }
+    suspend fun list(call: ApplicationCall, resource: Members) {
+        val userIds = resource.userIds.ifEmpty { null }
+        val roomIds = resource.roomIds.ifEmpty { null }
 
-        val roomIds = call.request.queryParameters.getAll("room_id")
-            ?.map { rawId -> Id.tryFrom(rawId) ?: throw BadRequestException("Invalid ID") }
-
-        val members = memberRepository.getAll(userIds = userIds, roomIds = roomIds)
+        val memberModels = memberRepository.getAll(userIds = userIds, roomIds = roomIds)
             .map { memberAggregate -> Member(memberAggregate) }
 
-        call.respond(members)
+        call.respond(memberModels)
     }
 
     suspend fun detail(call: ApplicationCall, resource: Members.Detail) {

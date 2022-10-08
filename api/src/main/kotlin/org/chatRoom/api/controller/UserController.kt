@@ -11,18 +11,16 @@ import org.chatRoom.api.payload.user.CreateUser
 import org.chatRoom.api.payload.user.UpdateUser
 import org.chatRoom.api.resource.Users
 import org.chatRoom.core.repository.UserRepository
-import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.aggreagte.User as UserAggregate
 
 class UserController(private val userRepository: UserRepository) {
-    suspend fun list(call: ApplicationCall) {
-        val handles = call.request.queryParameters.getAll("handle")
-            ?.map { rawHandle -> Handle.tryFrom(rawHandle) ?: throw BadRequestException("Invalid handle") }
+    suspend fun list(call: ApplicationCall, resource: Users) {
+        val handles = resource.handles.ifEmpty { null }
 
-        val users = userRepository.getAll(handles = handles)
+        val userModels = userRepository.getAll(handles = handles)
             .map { userAggregate -> User(userAggregate) }
 
-        call.respond(users)
+        call.respond(userModels)
     }
 
     suspend fun detail(call: ApplicationCall, resource: Users.Detail) {

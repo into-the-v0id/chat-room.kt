@@ -10,7 +10,7 @@ class UserRoutes(
     private val userController: UserController,
 ) {
     fun Route.userRouting() {
-        get<Users> { userController.list(call) }
+        get<Users> { resource -> userController.list(call, resource) }
         post<Users> { userController.create(call) }
 
         get<Users.Detail> { resource -> userController.detail(call, resource) }

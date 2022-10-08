@@ -12,20 +12,17 @@ import org.chatRoom.api.payload.message.UpdateMessage
 import org.chatRoom.api.resource.Messages
 import org.chatRoom.core.repository.MemberRepository
 import org.chatRoom.core.repository.MessageRepository
-import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.aggreagte.Message as MessageAggregate
 
 class MessageController(
     private val messageRepository: MessageRepository,
     private val memberRepository: MemberRepository,
 ) {
-    suspend fun list(call: ApplicationCall) {
-        var memberIds = call.request.queryParameters.getAll("member_id")
-            ?.map { rawId -> Id.tryFrom(rawId) ?: throw BadRequestException("Invalid ID") }
+    suspend fun list(call: ApplicationCall, resource: Messages) {
+        var memberIds = resource.memberIds.ifEmpty { null }
 
-        val roomIds = call.request.queryParameters.getAll("room_id")
-            ?.map { rawId -> Id.tryFrom(rawId) ?: throw BadRequestException("Invalid ID") }
-        if (roomIds != null) {
+        val roomIds = resource.roomIds
+        if (roomIds.isNotEmpty()) {
             val roomMemberAggregates = memberRepository.getAll(roomIds = roomIds)
             val roomMemberIds = roomMemberAggregates.map { member -> member.modelId }
 
@@ -34,10 +31,10 @@ class MessageController(
                 .toList()
         }
 
-        val messages = messageRepository.getAll(memberIds = memberIds)
+        val messageModels = messageRepository.getAll(memberIds = memberIds)
             .map { messageAggregate -> Message(messageAggregate) }
 
-        call.respond(messages)
+        call.respond(messageModels)
     }
 
     suspend fun detail(call: ApplicationCall, resource: Messages.Detail) {

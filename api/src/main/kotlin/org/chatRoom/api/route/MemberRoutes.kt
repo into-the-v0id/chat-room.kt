@@ -10,7 +10,7 @@ class MemberRoutes(
     private val memberController: MemberController,
 ) {
     fun Route.memberRouting() {
-        get<Members> { memberController.list(call) }
+        get<Members> { resource -> memberController.list(call, resource) }
         post<Members> { memberController.create(call) }
 
         get<Members.Detail> { resource -> memberController.detail(call, resource) }

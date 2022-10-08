@@ -11,18 +11,16 @@ import org.chatRoom.api.payload.room.CreateRoom
 import org.chatRoom.api.payload.room.UpdateRoom
 import org.chatRoom.api.resource.Rooms
 import org.chatRoom.core.repository.RoomRepository
-import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.aggreagte.Room as RoomAggregate
 
 class RoomController(private val roomRepository: RoomRepository) {
-    suspend fun list(call: ApplicationCall) {
-        val handles = call.request.queryParameters.getAll("handle")
-            ?.map { rawHandle -> Handle.tryFrom(rawHandle) ?: throw BadRequestException("Invalid handle") }
+    suspend fun list(call: ApplicationCall, resource: Rooms) {
+        val handles = resource.handles.ifEmpty { null }
 
-        val rooms = roomRepository.getAll(handles = handles)
+        val roomModels = roomRepository.getAll(handles = handles)
             .map { roomAggregate -> Room(roomAggregate) }
 
-        call.respond(rooms)
+        call.respond(roomModels)
     }
 
     suspend fun detail(call: ApplicationCall, resource: Rooms.Detail) {

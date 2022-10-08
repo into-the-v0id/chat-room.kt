@@ -10,7 +10,7 @@ class MessageRoutes(
     private val messageController: MessageController,
 ) {
     fun Route.messageRouting() {
-        get<Messages> { messageController.list(call) }
+        get<Messages> { resource -> messageController.list(call, resource) }
         post<Messages> { messageController.create(call) }
 
         get<Messages.Detail> { resource -> messageController.detail(call, resource) }
