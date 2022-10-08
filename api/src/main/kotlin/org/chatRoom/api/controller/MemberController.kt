@@ -51,10 +51,12 @@ class MemberController(
         val userAggregate = userRepository.getById(payload.userId) ?: throw BadRequestException("Unknown user")
         val roomAggregate = roomRepository.getById(payload.roomId) ?: throw BadRequestException("Unknown room")
 
-        val member = MemberAggregate.create(user = userAggregate, room = roomAggregate)
-        memberRepository.create(member)
+        val memberAggregate = MemberAggregate.create(user = userAggregate, room = roomAggregate)
+        memberRepository.create(memberAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        val memberModel = Member(memberAggregate)
+
+        call.respond(HttpStatusCode.Created, memberModel)
     }
 
     suspend fun delete(call: ApplicationCall) {

@@ -57,10 +57,12 @@ class MessageController(
 
         val memberAggregate = memberRepository.getById(payload.memberId) ?: throw BadRequestException("Unknown member")
 
-        val message = MessageAggregate.create(member = memberAggregate, content = payload.content)
-        messageRepository.create(message)
+        val messageAggregate = MessageAggregate.create(member = memberAggregate, content = payload.content)
+        messageRepository.create(messageAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        val messageModel = Message(messageAggregate)
+
+        call.respond(HttpStatusCode.Created, messageModel)
     }
 
     suspend fun update(call: ApplicationCall) {

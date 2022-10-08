@@ -44,10 +44,12 @@ class UserController(private val userRepository: UserRepository) {
         val existingUsers = userRepository.getAll(handles = listOf(payload.handle))
         if (existingUsers.isNotEmpty()) throw BadRequestException("Handle in use")
 
-        val user = UserAggregate.create(email = payload.email, handle = payload.handle)
-        userRepository.create(user)
+        val userAggregate = UserAggregate.create(email = payload.email, handle = payload.handle)
+        userRepository.create(userAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        val userModel = User(userAggregate)
+
+        call.respond(HttpStatusCode.Created, userModel)
     }
 
     suspend fun update(call: ApplicationCall) {

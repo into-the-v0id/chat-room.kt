@@ -44,10 +44,12 @@ class RoomController(private val roomRepository: RoomRepository) {
         val existingRooms = roomRepository.getAll(handles = listOf(payload.handle))
         if (existingRooms.isNotEmpty()) throw BadRequestException("Handle in use")
 
-        val room = RoomAggregate.create(handle = payload.handle)
-        roomRepository.create(room)
+        val roomAggregate = RoomAggregate.create(handle = payload.handle)
+        roomRepository.create(roomAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        val roomModel = Room(roomAggregate)
+
+        call.respond(HttpStatusCode.Created, roomModel)
     }
 
     suspend fun update(call: ApplicationCall) {
