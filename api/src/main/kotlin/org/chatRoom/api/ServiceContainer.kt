@@ -21,7 +21,6 @@ import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import org.koin.logger.slf4jLogger
 import org.postgresql.ds.PGPoolingDataSource
-import java.sql.Connection
 import javax.sql.DataSource
 
 object ServiceContainer {
@@ -43,7 +42,6 @@ object ServiceContainer {
 //                maxConnections = 10
             }
         }
-        factory<Connection> { get<DataSource>().connection }
 
         singleOf(::MigrationManager)
         singleOf(::Routing)

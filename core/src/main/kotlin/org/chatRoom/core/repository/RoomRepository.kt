@@ -8,12 +8,12 @@ import org.chatRoom.core.event.room.DeleteRoom
 import org.chatRoom.core.event.room.RoomEvent
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
-import java.sql.Connection
+import javax.sql.DataSource
 
 class RoomRepository(
-    connection: Connection,
+    dataSource: DataSource,
     private val memberRepository: MemberRepository,
-) : EventRepository<RoomEvent>(connection, "room_events") {
+) : EventRepository<RoomEvent>(dataSource, "room_events") {
     override fun serializeEvent(event: RoomEvent): Pair<String, JsonElement> {
         return when (event) {
             is CreateRoom -> CreateRoom::class.java.name to Json.encodeToJsonElement(event)
@@ -55,52 +55,57 @@ class RoomRepository(
     }
 
     fun getById(id: Id): Room? {
-        val sql = """
-            SELECT *
-            FROM $tableName
-            WHERE model_id = ?::uuid
-            ORDER BY date_issued ASC
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        statement.setString(1, id.toString())
+        val events = dataSource.connection.use { connection ->
+            val sql = """
+                SELECT *
+                FROM $tableName
+                WHERE model_id = ?::uuid
+                ORDER BY date_issued ASC
+            """.trimIndent()
+            val statement = connection.prepareStatement(sql)
+            statement.setString(1, id.toString())
 
-        val resultSet = statement.executeQuery()
-        val events = parseAllEvents(resultSet)
+            val resultSet = statement.executeQuery()
+            parseAllEvents(resultSet)
+        }
+
         if (events.isEmpty()) return null
 
         return Room.applyAllEvents(null, events)
     }
 
     fun getAll(handles: List<Handle>? = null): Collection<Room> {
-        val conditions = mutableListOf("TRUE")
-        if (handles != null) {
-            conditions.add("""
-                event_id IN (
-                    SELECT event_id
-                    FROM $tableName
-                    WHERE (event_type = '${CreateRoom::class.java.name}' AND event_data->>'handle' = ANY(?))
+        val allEvents = dataSource.connection.use { connection ->
+            val conditions = mutableListOf("TRUE")
+            if (handles != null) {
+                conditions.add("""
+                    event_id IN (
+                        SELECT event_id
+                        FROM $tableName
+                        WHERE (event_type = '${CreateRoom::class.java.name}' AND event_data->>'handle' = ANY(?))
+                    )
+                """.trimIndent())
+            }
+
+            val sql = """
+                SELECT *
+                FROM $tableName
+                WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
+                ORDER BY date_issued ASC
+            """.trimIndent()
+            val statement = connection.prepareStatement(sql)
+            var parameterCount = 0
+            if (handles != null) {
+                parameterCount += 1
+                statement.setArray(
+                    parameterCount,
+                    connection.createArrayOf("text", handles.map { handle -> handle.toString() }.toTypedArray())
                 )
-            """.trimIndent())
-        }
+            }
 
-        val sql = """
-            SELECT *
-            FROM $tableName
-            WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
-            ORDER BY date_issued ASC
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        var parameterCount = 0
-        if (handles != null) {
-            parameterCount += 1
-            statement.setArray(
-                parameterCount,
-                connection.createArrayOf("text", handles.map { handle -> handle.toString() }.toTypedArray())
-            )
+            val resultSet = statement.executeQuery()
+            parseAllEvents(resultSet)
         }
-
-        val resultSet = statement.executeQuery()
-        val allEvents = parseAllEvents(resultSet)
 
         return allEvents.groupBy { event -> event.modelId }
             .map { (_, events) -> Room.applyAllEvents(null, events) }

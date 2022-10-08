@@ -7,9 +7,9 @@ import org.chatRoom.core.event.message.CreateMessage
 import org.chatRoom.core.event.message.DeleteMessage
 import org.chatRoom.core.event.message.MessageEvent
 import org.chatRoom.core.valueObject.Id
-import java.sql.Connection
+import javax.sql.DataSource
 
-class MessageRepository(connection: Connection) : EventRepository<MessageEvent>(connection, "message_events") {
+class MessageRepository(dataSource: DataSource) : EventRepository<MessageEvent>(dataSource, "message_events") {
     override fun serializeEvent(event: MessageEvent): Pair<String, JsonElement> {
         return when (event) {
             is CreateMessage -> CreateMessage::class.java.name to Json.encodeToJsonElement(event)
@@ -47,52 +47,57 @@ class MessageRepository(connection: Connection) : EventRepository<MessageEvent>(
     }
 
     fun getById(id: Id): Message? {
-        val sql = """
-            SELECT *
-            FROM $tableName
-            WHERE model_id = ?::uuid
-            ORDER BY date_issued ASC
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        statement.setString(1, id.toString())
+        val events = dataSource.connection.use { connection ->
+            val sql = """
+                SELECT *
+                FROM $tableName
+                WHERE model_id = ?::uuid
+                ORDER BY date_issued ASC
+            """.trimIndent()
+            val statement = connection.prepareStatement(sql)
+            statement.setString(1, id.toString())
 
-        val resultSet = statement.executeQuery()
-        val events = parseAllEvents(resultSet)
+            val resultSet = statement.executeQuery()
+            parseAllEvents(resultSet)
+        }
+
         if (events.isEmpty()) return null
 
         return Message.applyAllEvents(null, events)
     }
 
     fun getAll(memberIds: List<Id>? = null): Collection<Message> {
-        val conditions = mutableListOf("TRUE")
-        if (memberIds != null) {
-            conditions.add("""
-                event_id IN (
-                    SELECT event_id
-                    FROM $tableName
-                    WHERE (event_type = '${CreateMessage::class.java.name}' AND event_data->>'memberId' = ANY(?))
+        val allEvents = dataSource.connection.use { connection ->
+            val conditions = mutableListOf("TRUE")
+            if (memberIds != null) {
+                conditions.add("""
+                    event_id IN (
+                        SELECT event_id
+                        FROM $tableName
+                        WHERE (event_type = '${CreateMessage::class.java.name}' AND event_data->>'memberId' = ANY(?))
+                    )
+                """.trimIndent())
+            }
+
+            val sql = """
+                SELECT *
+                FROM $tableName
+                WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
+                ORDER BY date_issued ASC
+            """.trimIndent()
+            val statement = connection.prepareStatement(sql)
+            var parameterCount = 0
+            if (memberIds != null) {
+                parameterCount += 1
+                statement.setArray(
+                    parameterCount,
+                    connection.createArrayOf("text", memberIds.map { id -> id.toString() }.toTypedArray())
                 )
-            """.trimIndent())
-        }
+            }
 
-        val sql = """
-            SELECT *
-            FROM $tableName
-            WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
-            ORDER BY date_issued ASC
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        var parameterCount = 0
-        if (memberIds != null) {
-            parameterCount += 1
-            statement.setArray(
-                parameterCount,
-                connection.createArrayOf("text", memberIds.map { id -> id.toString() }.toTypedArray())
-            )
+            val resultSet = statement.executeQuery()
+            parseAllEvents(resultSet)
         }
-
-        val resultSet = statement.executeQuery()
-        val allEvents = parseAllEvents(resultSet)
 
         return allEvents.groupBy { event -> event.modelId }
             .map { (_, events) -> Message.applyAllEvents(null, events) }

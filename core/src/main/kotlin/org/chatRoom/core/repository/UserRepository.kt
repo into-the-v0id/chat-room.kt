@@ -5,12 +5,12 @@ import org.chatRoom.core.aggreagte.User
 import org.chatRoom.core.event.user.*
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
-import java.sql.Connection
+import javax.sql.DataSource
 
 class UserRepository(
-    connection: Connection,
+    dataSource: DataSource,
     private val memberRepository: MemberRepository,
-) : EventRepository<UserEvent>(connection, "user_events") {
+) : EventRepository<UserEvent>(dataSource, "user_events") {
     override fun serializeEvent(event: UserEvent): Pair<String, JsonElement> {
         return when (event) {
             is CreateUser -> CreateUser::class.java.name to Json.encodeToJsonElement(event)
@@ -54,52 +54,57 @@ class UserRepository(
     }
 
     fun getById(id: Id): User? {
-        val sql = """
-            SELECT *
-            FROM $tableName
-            WHERE model_id = ?::uuid
-            ORDER BY date_issued ASC
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        statement.setString(1, id.toString())
+        val events = dataSource.connection.use { connection ->
+            val sql = """
+                SELECT *
+                FROM $tableName
+                WHERE model_id = ?::uuid
+                ORDER BY date_issued ASC
+            """.trimIndent()
+            val statement = connection.prepareStatement(sql)
+            statement.setString(1, id.toString())
 
-        val resultSet = statement.executeQuery()
-        val events = parseAllEvents(resultSet)
+            val resultSet = statement.executeQuery()
+            parseAllEvents(resultSet)
+        }
+
         if (events.isEmpty()) return null
 
         return User.applyAllEvents(null, events)
     }
 
     fun getAll(handles: List<Handle>? = null): Collection<User> {
-        val conditions = mutableListOf("TRUE")
-        if (handles != null) {
-            conditions.add("""
-                event_id IN (
-                    SELECT event_id
-                    FROM $tableName
-                    WHERE (event_type = '${CreateUser::class.java.name}' AND event_data->>'handle' = ANY(?))
+        val allEvents = dataSource.connection.use { connection ->
+            val conditions = mutableListOf("TRUE")
+            if (handles != null) {
+                conditions.add("""
+                    event_id IN (
+                        SELECT event_id
+                        FROM $tableName
+                        WHERE (event_type = '${CreateUser::class.java.name}' AND event_data->>'handle' = ANY(?))
+                    )
+                """.trimIndent())
+            }
+
+            val sql = """
+                SELECT *
+                FROM $tableName
+                WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
+                ORDER BY date_issued ASC
+            """.trimIndent()
+            val statement = connection.prepareStatement(sql)
+            var parameterCount = 0
+            if (handles != null) {
+                parameterCount += 1
+                statement.setArray(
+                    parameterCount,
+                    connection.createArrayOf("text", handles.map { handle -> handle.toString() }.toTypedArray())
                 )
-            """.trimIndent())
-        }
+            }
 
-        val sql = """
-            SELECT *
-            FROM $tableName
-            WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
-            ORDER BY date_issued ASC
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        var parameterCount = 0
-        if (handles != null) {
-            parameterCount += 1
-            statement.setArray(
-                parameterCount,
-                connection.createArrayOf("text", handles.map { handle -> handle.toString() }.toTypedArray())
-            )
+            val resultSet = statement.executeQuery()
+            parseAllEvents(resultSet)
         }
-
-        val resultSet = statement.executeQuery()
-        val allEvents = parseAllEvents(resultSet)
 
         return allEvents.groupBy { event -> event.modelId }
             .map { (_, events) -> User.applyAllEvents(null, events) }

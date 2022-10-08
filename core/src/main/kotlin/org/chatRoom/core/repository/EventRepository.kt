@@ -2,13 +2,13 @@ package org.chatRoom.core.repository
 
 import kotlinx.serialization.json.*
 import org.chatRoom.core.event.Event
-import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Timestamp
+import javax.sql.DataSource
 
 abstract class EventRepository<E: Event>(
-    protected val connection: Connection,
+    protected val dataSource: DataSource,
     protected val tableName: String,
 ) {
     protected abstract fun serializeEvent(event: E) : Pair<String, JsonElement>
@@ -40,28 +40,32 @@ abstract class EventRepository<E: Event>(
     protected fun createEvent(event: E) = createAllEvents(listOf(event))
 
     protected fun createAllEvents(events: List<E>) {
-        val sql = """
-            INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
-            VALUES ${ "(?::uuid, ?::uuid, ?, ?::json, ?)".repeat(events.size).replace(")(", "), (") }
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        events.forEachIndexed { index, event -> prepareStatementWithEvent(statement, event, index * 5) }
+        dataSource.connection.use { connection ->
+            val sql = """
+                INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
+                VALUES ${ "(?::uuid, ?::uuid, ?, ?::json, ?)".repeat(events.size).replace(")(", "), (") }
+            """.trimIndent()
+            val statement = connection.prepareStatement(sql)
+            events.forEachIndexed { index, event -> prepareStatementWithEvent(statement, event, index * 5) }
 
-        val modifiedRowCount = statement.executeUpdate()
-        if (modifiedRowCount == 0) error("Unable to insert events")
+            val modifiedRowCount = statement.executeUpdate()
+            if (modifiedRowCount == 0) error("Unable to insert events")
+        }
     }
 
     protected fun persistAllEvents(events: List<E>) {
-        val sql = """
-            INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
-            VALUES ${ "(?::uuid, ?::uuid, ?, ?::json, ?)".repeat(events.size).replace(")(", "), (") }
-            ON CONFLICT (event_id) DO NOTHING
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        events.forEachIndexed { index, event -> prepareStatementWithEvent(statement, event, index * 5) }
+        dataSource.connection.use { connection ->
+            val sql = """
+                INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
+                VALUES ${ "(?::uuid, ?::uuid, ?, ?::json, ?)".repeat(events.size).replace(")(", "), (") }
+                ON CONFLICT (event_id) DO NOTHING
+            """.trimIndent()
+            val statement = connection.prepareStatement(sql)
+            events.forEachIndexed { index, event -> prepareStatementWithEvent(statement, event, index * 5) }
 
-        val modifiedRowCount = statement.executeUpdate()
-        if (modifiedRowCount == 0) { /* do nothing */ }
+            val modifiedRowCount = statement.executeUpdate()
+            if (modifiedRowCount == 0) { /* do nothing */ }
+        }
     }
 
     protected abstract fun deserializeEvent(type: String, data: JsonElement) : E

@@ -6,12 +6,12 @@ import org.chatRoom.core.event.member.CreateMember
 import org.chatRoom.core.event.member.DeleteMember
 import org.chatRoom.core.event.member.MemberEvent
 import org.chatRoom.core.valueObject.Id
-import java.sql.Connection
+import javax.sql.DataSource
 
 class MemberRepository(
-    connection: Connection,
+    dataSource: DataSource,
     private val messageRepository: MessageRepository,
-) : EventRepository<MemberEvent>(connection, "member_events") {
+) : EventRepository<MemberEvent>(dataSource, "member_events") {
     override fun serializeEvent(event: MemberEvent): Pair<String, JsonElement> {
         return when (event) {
             is CreateMember -> CreateMember::class.java.name to Json.encodeToJsonElement(event)
@@ -50,68 +50,73 @@ class MemberRepository(
     }
 
     fun getById(id: Id): Member? {
-        val sql = """
-            SELECT *
-            FROM $tableName
-            WHERE model_id = ?::uuid
-            ORDER BY date_issued ASC
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        statement.setString(1, id.toString())
+        val events = dataSource.connection.use { connection ->
+            val sql = """
+                SELECT *
+                FROM $tableName
+                WHERE model_id = ?::uuid
+                ORDER BY date_issued ASC
+            """.trimIndent()
+            val statement = connection.prepareStatement(sql)
+            statement.setString(1, id.toString())
 
-        val resultSet = statement.executeQuery()
-        val events = parseAllEvents(resultSet)
+            val resultSet = statement.executeQuery()
+            parseAllEvents(resultSet)
+        }
+
         if (events.isEmpty()) return null
 
         return Member.applyAllEvents(null, events)
     }
 
     fun getAll(userIds: List<Id>? = null, roomIds: List<Id>? = null): Collection<Member> {
-        val conditions = mutableListOf("TRUE")
-        if (roomIds != null) {
-            conditions.add("""
-                event_id IN (
-                    SELECT event_id
-                    FROM $tableName
-                    WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'roomId' = ANY(?))
-                )
-            """.trimIndent())
-        }
-        if (userIds != null) {
-            conditions.add("""
-                event_id IN (
-                    SELECT event_id
-                    FROM $tableName
-                    WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'userId' = ANY(?))
-                )
-            """.trimIndent())
-        }
+        val allEvents = dataSource.connection.use { connection ->
+            val conditions = mutableListOf("TRUE")
+            if (roomIds != null) {
+                conditions.add("""
+                    event_id IN (
+                        SELECT event_id
+                        FROM $tableName
+                        WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'roomId' = ANY(?))
+                    )
+                """.trimIndent())
+            }
+            if (userIds != null) {
+                conditions.add("""
+                    event_id IN (
+                        SELECT event_id
+                        FROM $tableName
+                        WHERE (event_type = '${CreateMember::class.java.name}' AND event_data->>'userId' = ANY(?))
+                    )
+                """.trimIndent())
+            }
 
-        val sql = """
-            SELECT *
-            FROM $tableName
-            WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
-            ORDER BY date_issued ASC
-        """.trimIndent()
-        val statement = connection.prepareStatement(sql)
-        var parameterCount = 0
-        if (roomIds != null) {
-            parameterCount += 1
-            statement.setArray(
-                parameterCount,
-                connection.createArrayOf("text", roomIds.map { id -> id.toString() }.toTypedArray())
-            )
-        }
-        if (userIds != null) {
-            parameterCount += 1
-            statement.setArray(
-                parameterCount,
-                connection.createArrayOf("text", userIds.map { id -> id.toString() }.toTypedArray())
-            )
-        }
+            val sql = """
+                SELECT *
+                FROM $tableName
+                WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
+                ORDER BY date_issued ASC
+            """.trimIndent()
+            val statement = connection.prepareStatement(sql)
+            var parameterCount = 0
+            if (roomIds != null) {
+                parameterCount += 1
+                statement.setArray(
+                    parameterCount,
+                    connection.createArrayOf("text", roomIds.map { id -> id.toString() }.toTypedArray())
+                )
+            }
+            if (userIds != null) {
+                parameterCount += 1
+                statement.setArray(
+                    parameterCount,
+                    connection.createArrayOf("text", userIds.map { id -> id.toString() }.toTypedArray())
+                )
+            }
 
-        val resultSet = statement.executeQuery()
-        val allEvents = parseAllEvents(resultSet)
+            val resultSet = statement.executeQuery()
+            parseAllEvents(resultSet)
+        }
 
         return allEvents.groupBy { event -> event.modelId }
             .map { (_, events) -> Member.applyAllEvents(null, events) }
