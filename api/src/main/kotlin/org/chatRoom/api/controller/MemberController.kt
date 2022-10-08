@@ -64,6 +64,6 @@ class MemberController(
 
         memberRepository.delete(memberAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        call.respond(HttpStatusCode.NoContent)
     }
 }

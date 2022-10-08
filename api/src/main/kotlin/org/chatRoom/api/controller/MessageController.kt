@@ -84,6 +84,6 @@ class MessageController(
 
         messageRepository.delete(messageAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        call.respond(HttpStatusCode.NoContent)
     }
 }

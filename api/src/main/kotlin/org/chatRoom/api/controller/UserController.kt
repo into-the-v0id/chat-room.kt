@@ -77,6 +77,6 @@ class UserController(private val userRepository: UserRepository) {
 
         userRepository.delete(userAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        call.respond(HttpStatusCode.NoContent)
     }
 }

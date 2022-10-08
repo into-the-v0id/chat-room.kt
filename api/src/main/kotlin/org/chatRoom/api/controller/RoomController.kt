@@ -74,6 +74,6 @@ class RoomController(private val roomRepository: RoomRepository) {
 
         roomRepository.delete(roomAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        call.respond(HttpStatusCode.NoContent)
     }
 }
