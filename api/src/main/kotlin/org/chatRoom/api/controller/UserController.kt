@@ -69,7 +69,9 @@ class UserController(private val userRepository: UserRepository) {
 
         userRepository.update(userAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        val userModel = User(userAggregate)
+
+        call.respond(userModel)
     }
 
     suspend fun delete(call: ApplicationCall) {

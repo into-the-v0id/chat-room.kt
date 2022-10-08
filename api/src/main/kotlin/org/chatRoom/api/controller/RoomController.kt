@@ -66,7 +66,9 @@ class RoomController(private val roomRepository: RoomRepository) {
 
         roomRepository.update(roomAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        val roomModel = Room(roomAggregate)
+
+        call.respond(roomModel)
     }
 
     suspend fun delete(call: ApplicationCall) {

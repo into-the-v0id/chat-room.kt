@@ -76,7 +76,9 @@ class MessageController(
 
         messageRepository.update(messageAggregate)
 
-        call.respond(HttpStatusCode.OK)
+        val messageModel = Message(messageAggregate)
+
+        call.respond(messageModel)
     }
 
     suspend fun delete(call: ApplicationCall) {
