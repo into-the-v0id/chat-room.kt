@@ -7,6 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import org.chatRoom.api.model.Member
 import org.chatRoom.api.payload.member.CreateMember
+import org.chatRoom.api.resource.Members
 import org.chatRoom.core.repository.MemberRepository
 import org.chatRoom.core.repository.RoomRepository
 import org.chatRoom.core.repository.UserRepository
@@ -18,13 +19,6 @@ class MemberController(
     private val userRepository: UserRepository,
     private val roomRepository: RoomRepository,
 ) {
-    private fun fetchMember(call: ApplicationCall) : MemberAggregate? {
-        val rawId = call.parameters["memberId"] ?: return null
-        val id = Id.tryFrom(rawId) ?: return null
-
-        return memberRepository.getById(id)
-    }
-
     suspend fun list(call: ApplicationCall) {
         val userIds = call.request.queryParameters.getAll("user_id")
             ?.map { rawId -> Id.tryFrom(rawId) ?: throw BadRequestException("Invalid ID") }
@@ -38,8 +32,8 @@ class MemberController(
         call.respond(members)
     }
 
-    suspend fun detail(call: ApplicationCall) {
-        val memberAggregate = fetchMember(call) ?: throw NotFoundException()
+    suspend fun detail(call: ApplicationCall, resource: Members.Detail) {
+        val memberAggregate = memberRepository.getById(resource.id) ?: throw NotFoundException()
         val memberModel = Member(memberAggregate)
 
         call.respond(memberModel)
@@ -59,8 +53,8 @@ class MemberController(
         call.respond(HttpStatusCode.Created, memberModel)
     }
 
-    suspend fun delete(call: ApplicationCall) {
-        val memberAggregate = fetchMember(call) ?: throw NotFoundException()
+    suspend fun delete(call: ApplicationCall, resource: Members.Detail) {
+        val memberAggregate = memberRepository.getById(resource.id) ?: throw NotFoundException()
 
         memberRepository.delete(memberAggregate)
 

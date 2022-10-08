@@ -8,19 +8,12 @@ import io.ktor.server.response.*
 import org.chatRoom.api.model.Room
 import org.chatRoom.api.payload.room.CreateRoom
 import org.chatRoom.api.payload.room.UpdateRoom
+import org.chatRoom.api.resource.Rooms
 import org.chatRoom.core.repository.RoomRepository
 import org.chatRoom.core.valueObject.Handle
-import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.aggreagte.Room as RoomAggregate
 
 class RoomController(private val roomRepository: RoomRepository) {
-    private fun fetchRoom(call: ApplicationCall) : RoomAggregate? {
-        val rawId = call.parameters["roomId"] ?: return null
-        val id = Id.tryFrom(rawId) ?: return null
-
-        return roomRepository.getById(id)
-    }
-
     suspend fun list(call: ApplicationCall) {
         val handles = call.request.queryParameters.getAll("handle")
             ?.map { rawHandle -> Handle.tryFrom(rawHandle) ?: throw BadRequestException("Invalid handle") }
@@ -31,8 +24,8 @@ class RoomController(private val roomRepository: RoomRepository) {
         call.respond(rooms)
     }
 
-    suspend fun detail(call: ApplicationCall) {
-        val roomAggregate = fetchRoom(call) ?: throw NotFoundException()
+    suspend fun detail(call: ApplicationCall, resource: Rooms.Detail) {
+        val roomAggregate = roomRepository.getById(resource.id) ?: throw NotFoundException()
         val roomModel = Room(roomAggregate)
 
         call.respond(roomModel)
@@ -52,8 +45,8 @@ class RoomController(private val roomRepository: RoomRepository) {
         call.respond(HttpStatusCode.Created, roomModel)
     }
 
-    suspend fun update(call: ApplicationCall) {
-        var roomAggregate = fetchRoom(call) ?: throw NotFoundException()
+    suspend fun update(call: ApplicationCall, resource: Rooms.Detail) {
+        var roomAggregate = roomRepository.getById(resource.id) ?: throw NotFoundException()
 
         val payload = call.receive<UpdateRoom>()
 
@@ -71,8 +64,8 @@ class RoomController(private val roomRepository: RoomRepository) {
         call.respond(roomModel)
     }
 
-    suspend fun delete(call: ApplicationCall) {
-        val roomAggregate = fetchRoom(call) ?: throw NotFoundException()
+    suspend fun delete(call: ApplicationCall, resource: Rooms.Detail) {
+        val roomAggregate = roomRepository.getById(resource.id) ?: throw NotFoundException()
 
         roomRepository.delete(roomAggregate)
 

@@ -2,6 +2,7 @@ package org.chatRoom.api.plugin
 
 import io.ktor.server.application.*
 import io.ktor.server.plugins.autohead.*
+import io.ktor.server.resources.*
 import io.ktor.server.routing.*
 import org.chatRoom.api.route.MemberRoutes
 import org.chatRoom.api.route.MessageRoutes
@@ -16,6 +17,7 @@ class Routing(
 ) {
     fun Application.configureRouting() {
         install(AutoHeadResponse)
+        install(Resources)
 
         routing {
             userRoutes.apply { userRouting() }

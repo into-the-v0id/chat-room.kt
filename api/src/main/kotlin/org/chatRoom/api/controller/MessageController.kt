@@ -8,6 +8,7 @@ import io.ktor.server.response.*
 import org.chatRoom.api.model.Message
 import org.chatRoom.api.payload.message.CreateMessage
 import org.chatRoom.api.payload.message.UpdateMessage
+import org.chatRoom.api.resource.Messages
 import org.chatRoom.core.repository.MemberRepository
 import org.chatRoom.core.repository.MessageRepository
 import org.chatRoom.core.valueObject.Id
@@ -17,13 +18,6 @@ class MessageController(
     private val messageRepository: MessageRepository,
     private val memberRepository: MemberRepository,
 ) {
-    private fun fetchMessage(call: ApplicationCall) : MessageAggregate? {
-        val rawId = call.parameters["messageId"] ?: return null
-        val id = Id.tryFrom(rawId) ?: return null
-
-        return messageRepository.getById(id)
-    }
-
     suspend fun list(call: ApplicationCall) {
         var memberIds = call.request.queryParameters.getAll("member_id")
             ?.map { rawId -> Id.tryFrom(rawId) ?: throw BadRequestException("Invalid ID") }
@@ -45,8 +39,8 @@ class MessageController(
         call.respond(messages)
     }
 
-    suspend fun detail(call: ApplicationCall) {
-        val messageAggregate = fetchMessage(call) ?: throw NotFoundException()
+    suspend fun detail(call: ApplicationCall, resource: Messages.Detail) {
+        val messageAggregate = messageRepository.getById(resource.id) ?: throw NotFoundException()
         val messageModel = Message(messageAggregate)
 
         call.respond(messageModel)
@@ -65,8 +59,8 @@ class MessageController(
         call.respond(HttpStatusCode.Created, messageModel)
     }
 
-    suspend fun update(call: ApplicationCall) {
-        var messageAggregate = fetchMessage(call) ?: throw NotFoundException()
+    suspend fun update(call: ApplicationCall, resource: Messages.Detail) {
+        var messageAggregate = messageRepository.getById(resource.id) ?: throw NotFoundException()
 
         val payload = call.receive<UpdateMessage>()
 
@@ -81,8 +75,8 @@ class MessageController(
         call.respond(messageModel)
     }
 
-    suspend fun delete(call: ApplicationCall) {
-        val messageAggregate = fetchMessage(call) ?: throw NotFoundException()
+    suspend fun delete(call: ApplicationCall, resource: Messages.Detail) {
+        val messageAggregate = messageRepository.getById(resource.id) ?: throw NotFoundException()
 
         messageRepository.delete(messageAggregate)
 

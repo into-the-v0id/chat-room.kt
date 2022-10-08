@@ -1,22 +1,20 @@
 package org.chatRoom.api.route
 
 import io.ktor.server.application.*
-import io.ktor.server.routing.*
+import io.ktor.server.resources.*
+import io.ktor.server.routing.Route
 import org.chatRoom.api.controller.UserController
+import org.chatRoom.api.resource.Users
 
 class UserRoutes(
     private val userController: UserController,
 ) {
     fun Route.userRouting() {
-        route("users") {
-            get { userController.list(call) }
-            post { userController.create(call) }
+        get<Users> { userController.list(call) }
+        post<Users> { userController.create(call) }
 
-            route("{userId}") {
-                get { userController.detail(call) }
-                put { userController.update(call) }
-                delete { userController.delete(call) }
-            }
-        }
+        get<Users.Detail> { resource -> userController.detail(call, resource) }
+        put<Users.Detail> { resource -> userController.update(call, resource) }
+        delete<Users.Detail> { resource -> userController.delete(call, resource) }
     }
 }

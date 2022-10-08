@@ -8,19 +8,12 @@ import io.ktor.server.response.*
 import org.chatRoom.api.model.User
 import org.chatRoom.api.payload.user.CreateUser
 import org.chatRoom.api.payload.user.UpdateUser
+import org.chatRoom.api.resource.Users
 import org.chatRoom.core.repository.UserRepository
 import org.chatRoom.core.valueObject.Handle
-import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.aggreagte.User as UserAggregate
 
 class UserController(private val userRepository: UserRepository) {
-    private fun fetchUser(call: ApplicationCall) : UserAggregate? {
-        val rawId = call.parameters["userId"] ?: return null
-        val id = Id.tryFrom(rawId) ?: return null
-
-        return userRepository.getById(id)
-    }
-
     suspend fun list(call: ApplicationCall) {
         val handles = call.request.queryParameters.getAll("handle")
             ?.map { rawHandle -> Handle.tryFrom(rawHandle) ?: throw BadRequestException("Invalid handle") }
@@ -31,8 +24,8 @@ class UserController(private val userRepository: UserRepository) {
         call.respond(users)
     }
 
-    suspend fun detail(call: ApplicationCall) {
-        val userAggregate = fetchUser(call) ?: throw NotFoundException()
+    suspend fun detail(call: ApplicationCall, resource: Users.Detail) {
+        val userAggregate = userRepository.getById(resource.id) ?: throw NotFoundException()
         val userModel = User(userAggregate)
 
         call.respond(userModel)
@@ -52,8 +45,8 @@ class UserController(private val userRepository: UserRepository) {
         call.respond(HttpStatusCode.Created, userModel)
     }
 
-    suspend fun update(call: ApplicationCall) {
-        var userAggregate = fetchUser(call) ?: throw NotFoundException()
+    suspend fun update(call: ApplicationCall, resource: Users.Detail) {
+        var userAggregate = userRepository.getById(resource.id) ?: throw NotFoundException()
 
         val payload = call.receive<UpdateUser>()
 
@@ -74,8 +67,8 @@ class UserController(private val userRepository: UserRepository) {
         call.respond(userModel)
     }
 
-    suspend fun delete(call: ApplicationCall) {
-        val userAggregate = fetchUser(call) ?: throw NotFoundException()
+    suspend fun delete(call: ApplicationCall, resource: Users.Detail) {
+        val userAggregate = userRepository.getById(resource.id) ?: throw NotFoundException()
 
         userRepository.delete(userAggregate)
 
