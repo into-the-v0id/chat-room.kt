@@ -9,5 +9,7 @@ import org.chatRoom.core.valueObject.Id
 class Users {
     @Serializable
     @Resource("{id}")
-    class Detail(val parent: Users = Users(), val id: Id)
+    class Detail(val id: Id) {
+        val parent: Users = Users()
+    }
 }
