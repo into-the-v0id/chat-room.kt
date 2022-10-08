@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
+import io.ktor.server.resources.*
 import io.ktor.server.response.*
 import org.chatRoom.api.model.Message
 import org.chatRoom.api.payload.message.CreateMessage
@@ -56,6 +57,10 @@ class MessageController(
 
         val messageModel = Message(messageAggregate)
 
+        call.response.header(
+            HttpHeaders.Location,
+            call.application.href(Messages.Detail(messageAggregate.modelId))
+        )
         call.respond(HttpStatusCode.Created, messageModel)
     }
 

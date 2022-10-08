@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
+import io.ktor.server.resources.*
 import io.ktor.server.response.*
 import org.chatRoom.api.model.Member
 import org.chatRoom.api.payload.member.CreateMember
@@ -50,6 +51,10 @@ class MemberController(
 
         val memberModel = Member(memberAggregate)
 
+        call.response.header(
+            HttpHeaders.Location,
+            call.application.href(Members.Detail(memberAggregate.modelId))
+        )
         call.respond(HttpStatusCode.Created, memberModel)
     }
 

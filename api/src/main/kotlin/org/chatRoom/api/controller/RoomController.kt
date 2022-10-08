@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
+import io.ktor.server.resources.*
 import io.ktor.server.response.*
 import org.chatRoom.api.model.Room
 import org.chatRoom.api.payload.room.CreateRoom
@@ -42,6 +43,10 @@ class RoomController(private val roomRepository: RoomRepository) {
 
         val roomModel = Room(roomAggregate)
 
+        call.response.header(
+            HttpHeaders.Location,
+            call.application.href(Rooms.Detail(roomAggregate.modelId))
+        )
         call.respond(HttpStatusCode.Created, roomModel)
     }
 

@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
+import io.ktor.server.resources.*
 import io.ktor.server.response.*
 import org.chatRoom.api.model.User
 import org.chatRoom.api.payload.user.CreateUser
@@ -42,6 +43,10 @@ class UserController(private val userRepository: UserRepository) {
 
         val userModel = User(userAggregate)
 
+        call.response.header(
+            HttpHeaders.Location,
+            call.application.href(Users.Detail(userAggregate.modelId))
+        )
         call.respond(HttpStatusCode.Created, userModel)
     }
 
