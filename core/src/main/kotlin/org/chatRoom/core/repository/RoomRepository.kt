@@ -8,6 +8,9 @@ import org.chatRoom.core.event.room.DeleteRoom
 import org.chatRoom.core.event.room.RoomEvent
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
+import org.jooq.Condition
+import org.jooq.SQLDialect
+import org.jooq.impl.DSL
 import javax.sql.DataSource
 
 class RoomRepository(
@@ -56,17 +59,14 @@ class RoomRepository(
 
     fun getById(id: Id): Room? {
         val events = dataSource.connection.use { connection ->
-            val sql = """
-                SELECT *
-                FROM $tableName
-                WHERE model_id = ?::uuid
-                ORDER BY date_issued ASC
-            """.trimIndent()
-            val statement = connection.prepareStatement(sql)
-            statement.setString(1, id.toString())
+            val query = DSL.using(connection, SQLDialect.POSTGRES)
+                .select()
+                .from(DSL.table(tableName))
+                .where("model_id = ?::uuid", DSL.value(id.toString()))
+                .orderBy(DSL.field("date_issued").asc())
 
-            val resultSet = statement.executeQuery()
-            parseAllEvents(resultSet)
+            val result = query.fetch()
+            parseAllEvents(result)
         }
 
         if (events.isEmpty()) return null
@@ -76,35 +76,29 @@ class RoomRepository(
 
     fun getAll(handles: List<Handle>? = null): Collection<Room> {
         val allEvents = dataSource.connection.use { connection ->
-            val conditions = mutableListOf("TRUE")
+            val conditions = mutableListOf<Condition>()
+
             if (handles != null) {
-                conditions.add("""
-                    event_id IN (
-                        SELECT event_id
-                        FROM $tableName
-                        WHERE (event_type = '${CreateRoom::class.java.name}' AND event_data->>'handle' = ANY(?))
+                val subquery = DSL.using(SQLDialect.POSTGRES)
+                    .select(DSL.field("event_id"))
+                    .from(DSL.table(tableName))
+                    .where(
+                        "(event_type = ? AND event_data->>'handle' = ANY(?))",
+                        DSL.value(CreateRoom::class.java.name),
+                        DSL.value(handles.map { handle -> handle.toString() }.toTypedArray()),
                     )
-                """.trimIndent())
+
+                conditions.add(DSL.condition("event_id IN (?)", subquery))
             }
 
-            val sql = """
-                SELECT *
-                FROM $tableName
-                WHERE ${conditions.map { "($it)" }.joinToString(" AND ")}
-                ORDER BY date_issued ASC
-            """.trimIndent()
-            val statement = connection.prepareStatement(sql)
-            var parameterCount = 0
-            if (handles != null) {
-                parameterCount += 1
-                statement.setArray(
-                    parameterCount,
-                    connection.createArrayOf("text", handles.map { handle -> handle.toString() }.toTypedArray())
-                )
-            }
+            val query = DSL.using(connection, SQLDialect.POSTGRES)
+                .select()
+                .from(DSL.table(tableName))
+                .where(conditions)
+                .orderBy(DSL.field("date_issued").asc())
 
-            val resultSet = statement.executeQuery()
-            parseAllEvents(resultSet)
+            val result = query.fetch()
+            parseAllEvents(result)
         }
 
         return allEvents.groupBy { event -> event.modelId }

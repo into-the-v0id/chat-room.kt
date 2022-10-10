@@ -2,9 +2,12 @@ package org.chatRoom.core.repository
 
 import kotlinx.serialization.json.*
 import org.chatRoom.core.event.Event
+import org.jooq.Record
+import org.jooq.Result
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Timestamp
+import java.time.Instant
 import javax.sql.DataSource
 
 abstract class EventRepository<E: Event>(
@@ -70,8 +73,8 @@ abstract class EventRepository<E: Event>(
 
     protected abstract fun deserializeEvent(type: String, data: JsonElement) : E
 
-    protected fun parseEvent(resultSet: ResultSet): E {
-        val rawData = resultSet.getString("event_data") ?: error("Expected event data")
+    protected fun parseEvent(record: Record): E {
+        val rawData = record.get("event_data", String::class.java) ?: error("Expected event data")
 
         var data = Json.parseToJsonElement(rawData)
         if (data !is JsonObject) error("Expected JSON object")
@@ -79,28 +82,19 @@ abstract class EventRepository<E: Event>(
         val dataMap = mutableMapOf<String, JsonElement>()
         data.entries.forEach { (key, value) -> dataMap[key] = value }
 
-        val eventId = resultSet.getString("event_id") ?: error("Expected event ID")
-        val modelId = resultSet.getString("model_id") ?: error("Expected model ID")
-        val dateIssued = resultSet.getTimestamp("date_issued") ?: error("Expected event date")
+        val eventId = record.get("event_id", String::class.java) ?: error("Expected event ID")
+        val modelId = record.get("model_id", String::class.java) ?: error("Expected model ID")
+        val dateIssued = record.get("date_issued", Instant::class.java) ?: error("Expected event date")
         dataMap["eventId"] = JsonPrimitive(eventId)
         dataMap["modelId"] = JsonPrimitive(modelId)
-        dataMap["dateIssued"] = JsonPrimitive(dateIssued.time)
+        dataMap["dateIssued"] = JsonPrimitive(dateIssued.nano)
 
         data = JsonObject(dataMap)
 
-        val eventType = resultSet.getString("event_type") ?: error("Expected event type")
+        val eventType = record.get("event_type", String::class.java) ?: error("Expected event type")
 
         return deserializeEvent(eventType, data)
     }
 
-    protected fun parseAllEvents(resultSet: ResultSet): List<E> {
-        val events = mutableListOf<E>()
-
-        while (resultSet.next()) {
-            val event = parseEvent(resultSet)
-            events.add(event)
-        }
-
-        return events
-    }
+    protected fun parseAllEvents(result: Result<Record>): List<E> = result.map { record -> parseEvent(record) }
 }
