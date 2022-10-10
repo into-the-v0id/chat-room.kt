@@ -1,5 +1,6 @@
 package org.chatRoom.api
 
+import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.chatRoom.api.controller.MemberController
@@ -20,7 +21,6 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import org.koin.logger.slf4jLogger
-import org.postgresql.ds.PGPoolingDataSource
 import javax.sql.DataSource
 
 object ServiceContainer {
@@ -34,12 +34,10 @@ object ServiceContainer {
             }
         }
         single<DataSource> {
-            PGPoolingDataSource().apply {
-                serverNames = arrayOf("localhost")
-                databaseName = "app"
-                user = "app"
+            HikariDataSource().apply {
+                jdbcUrl = "jdbc:postgresql://localhost/app"
+                username = "app"
                 password = "app"
-//                maxConnections = 10
             }
         }
 
