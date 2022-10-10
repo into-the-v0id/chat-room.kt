@@ -58,7 +58,7 @@ class MemberRepository(
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()
                 .from(DSL.table(tableName))
-                .where("model_id = ?::uuid", DSL.value(id.toString()))
+                .where(DSL.field("model_id").eq(id.toUuid()))
                 .orderBy(DSL.field("date_issued").asc())
 
             val result = query.fetch()
@@ -75,29 +75,31 @@ class MemberRepository(
             val conditions = mutableListOf<Condition>()
 
             if (roomIds != null) {
-                val subquery = DSL.using(SQLDialect.POSTGRES)
-                    .select(DSL.field("event_id"))
+                val subquery = DSL.select(DSL.field("event_id"))
                     .from(DSL.table(tableName))
                     .where(
-                        "(event_type = ? AND event_data->>'roomId' = ANY(?))",
-                        DSL.value(CreateMember::class.java.name),
-                        DSL.value(roomIds.map { id -> id.toString() }.toTypedArray()),
+                        DSL.field("event_type").eq(CreateMember::class.java.name),
+                        DSL.condition(
+                            "event_data->>'roomId' = ANY(?)",
+                            roomIds.map { id -> id.toString() }.toTypedArray(),
+                        )
                     )
 
-                conditions.add(DSL.condition("event_id IN (?)", subquery))
+                conditions.add(DSL.field("event_id").`in`(subquery))
             }
 
             if (userIds != null) {
-                val subquery = DSL.using(SQLDialect.POSTGRES)
-                    .select(DSL.field("event_id"))
+                val subquery = DSL.select(DSL.field("event_id"))
                     .from(DSL.table(tableName))
                     .where(
-                        "(event_type = ? AND event_data->>'userId' = ANY(?))",
-                        DSL.value(CreateMember::class.java.name),
-                        DSL.value(userIds.map { id -> id.toString() }.toTypedArray()),
+                        DSL.field("event_type").eq(CreateMember::class.java.name),
+                        DSL.condition(
+                            "event_data->>'userId' = ANY(?)",
+                            userIds.map { id -> id.toString() }.toTypedArray(),
+                        )
                     )
 
-                conditions.add(DSL.condition("event_id IN (?)", subquery))
+                conditions.add(DSL.field("event_id").`in`(subquery))
             }
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)

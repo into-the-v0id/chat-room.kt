@@ -24,4 +24,6 @@ value class Id(private val id: String) {
     }
 
     override fun toString(): String = id
+
+    fun toUuid(): UUID = UUID.fromString(id)
 }

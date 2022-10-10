@@ -54,7 +54,7 @@ class MessageRepository(dataSource: DataSource) : EventRepository<MessageEvent>(
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()
                 .from(DSL.table(tableName))
-                .where("model_id = ?::uuid", DSL.value(id.toString()))
+                .where(DSL.field("model_id").eq(id.toUuid()))
                 .orderBy(DSL.field("date_issued").asc())
 
             val result = query.fetch()
@@ -71,16 +71,17 @@ class MessageRepository(dataSource: DataSource) : EventRepository<MessageEvent>(
             val conditions = mutableListOf<Condition>()
 
             if (memberIds != null) {
-                val subquery = DSL.using(SQLDialect.POSTGRES)
-                    .select(DSL.field("event_id"))
+                val subquery = DSL.select(DSL.field("event_id"))
                     .from(DSL.table(tableName))
                     .where(
-                        "(event_type = ? AND event_data->>'memberId' = ANY(?))",
-                        DSL.value(CreateMessage::class.java.name),
-                        DSL.value(memberIds.map { id -> id.toString() }.toTypedArray()),
+                        DSL.field("event_type").eq(CreateMessage::class.java.name),
+                        DSL.condition(
+                            "event_data->>'memberId' = ANY(?)",
+                            memberIds.map { id -> id.toString() }.toTypedArray(),
+                        )
                     )
 
-                conditions.add(DSL.condition("event_id IN (?)", subquery))
+                conditions.add(DSL.field("event_id").`in`(subquery))
             }
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)
