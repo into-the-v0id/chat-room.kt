@@ -7,14 +7,14 @@ import java.time.Instant
 
 class User protected constructor(
     modelId: Id,
-    email: String,
     handle: Handle,
+    email: String,
     dateCreated: Instant = Instant.now(),
 ) : Aggregate<UserEvent>(modelId = modelId) {
-    var email: String = email
+    var handle: Handle = handle
         protected set
 
-    var handle: Handle = handle
+    var email: String = email
         protected set
 
     var dateCreated: Instant = dateCreated

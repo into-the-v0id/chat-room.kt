@@ -12,12 +12,14 @@ import java.time.ZoneOffset
 data class User(
     val id: Id,
     val handle: Handle,
+    val email: String,
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateCreated: OffsetDateTime,
 ) {
     constructor(user: UserAggregate) : this(
         id = user.modelId,
         handle = user.handle,
+        email = user.email,
         dateCreated = user.dateCreated.atOffset(ZoneOffset.UTC),
     )
 }
