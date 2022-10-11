@@ -53,6 +53,7 @@ class UserController(private val userRepository: UserRepository) {
 
         val payload = call.receive<UpdateUser>()
 
+        if (payload.id != userAggregate.modelId) throw BadRequestException("Mismatching IDs")
         if (payload.handle != userAggregate.handle) {
             val existingUsers = userRepository.getAll(handles = listOf(payload.handle))
             if (existingUsers.isNotEmpty()) throw BadRequestException("Handle in use")
