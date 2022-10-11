@@ -13,7 +13,7 @@ services:
   db:
     <<: *default-service
     image: postgres:14-alpine
-    container_name: chat-room-db
+    container_name: chat-room-api-db
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
@@ -25,4 +25,5 @@ services:
 
 volumes:
   db-data:
+    name: chat-room-api-db-data
     driver: local
