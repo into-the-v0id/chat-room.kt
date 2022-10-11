@@ -109,7 +109,7 @@ abstract class EventRepository<E: Event>(
         val dateIssued = record.get("date_issued", Instant::class.java) ?: error("Expected event date")
         dataMap["eventId"] = JsonPrimitive(eventId)
         dataMap["modelId"] = JsonPrimitive(modelId)
-        dataMap["dateIssued"] = JsonPrimitive(dateIssued.nano)
+        dataMap["dateIssued"] = JsonPrimitive(dateIssued.toEpochMilli())
 
         data = JsonObject(dataMap)
 
