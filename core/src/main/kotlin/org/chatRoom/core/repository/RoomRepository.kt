@@ -79,17 +79,26 @@ class RoomRepository(
             val conditions = mutableListOf<Condition>()
 
             if (handles != null) {
-                val subquery = DSL.select(DSL.field("event_id"))
+                val subquery = DSL.select(DSL.field("model_id"))
                     .from(DSL.table(tableName))
-                    .where(
-                        DSL.field("event_type").eq(CreateRoom::class.java.name),
-                        DSL.condition(
-                            "event_data->>'handle' = ANY(?)",
-                            handles.map { handle -> handle.toString() }.toTypedArray(),
-                        )
-                    )
+                    .where(DSL.or(
+                        DSL.and(
+                            DSL.field("event_type").eq(CreateRoom::class.java.name),
+                            DSL.condition(
+                                "event_data->>'handle' = ANY(?)",
+                                handles.map { handle -> handle.toString() }.toTypedArray(),
+                            )
+                        ),
+                        DSL.and(
+                            DSL.field("event_type").eq(ChangeHandle::class.java.name),
+                            DSL.condition(
+                                "event_data->>'handle' = ANY(?)",
+                                handles.map { handle -> handle.toString() }.toTypedArray(),
+                            )
+                        ),
+                    ))
 
-                conditions.add(DSL.field("event_id").`in`(subquery))
+                conditions.add(DSL.field("model_id").`in`(subquery))
             }
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)

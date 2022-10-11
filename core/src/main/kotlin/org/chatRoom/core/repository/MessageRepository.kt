@@ -71,7 +71,7 @@ class MessageRepository(dataSource: DataSource) : EventRepository<MessageEvent>(
             val conditions = mutableListOf<Condition>()
 
             if (memberIds != null) {
-                val subquery = DSL.select(DSL.field("event_id"))
+                val subquery = DSL.select(DSL.field("model_id"))
                     .from(DSL.table(tableName))
                     .where(
                         DSL.field("event_type").eq(CreateMessage::class.java.name),
@@ -81,7 +81,7 @@ class MessageRepository(dataSource: DataSource) : EventRepository<MessageEvent>(
                         )
                     )
 
-                conditions.add(DSL.field("event_id").`in`(subquery))
+                conditions.add(DSL.field("model_id").`in`(subquery))
             }
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)
