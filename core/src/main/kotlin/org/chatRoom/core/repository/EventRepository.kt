@@ -2,11 +2,12 @@ package org.chatRoom.core.repository
 
 import kotlinx.serialization.json.*
 import org.chatRoom.core.event.Event
+import org.jooq.InsertValuesStepN
+import org.jooq.JSON
 import org.jooq.Record
 import org.jooq.Result
-import java.sql.PreparedStatement
-import java.sql.ResultSet
-import java.sql.Timestamp
+import org.jooq.SQLDialect
+import org.jooq.impl.DSL
 import java.time.Instant
 import javax.sql.DataSource
 
@@ -17,10 +18,9 @@ abstract class EventRepository<E: Event>(
     protected abstract fun serializeEvent(event: E) : Pair<String, JsonElement>
 
     private fun prepareStatementWithEvent(
-        statement: PreparedStatement,
+        statement: InsertValuesStepN<Record>,
         event: E,
-        positionOffset: Int = 0
-    ) {
+    ): InsertValuesStepN<Record> {
         var (eventType, data) = serializeEvent(event)
         if (data !is JsonObject) error("Expected JSON object")
 
@@ -33,40 +33,62 @@ abstract class EventRepository<E: Event>(
 
         data = JsonObject(dataMap)
 
-        statement.setString(positionOffset + 1, event.eventId.toString())
-        statement.setString(positionOffset + 2, event.modelId.toString())
-        statement.setString(positionOffset + 3, eventType)
-        statement.setString(positionOffset + 4, data.toString())
-        statement.setTimestamp(positionOffset + 5, Timestamp.from(event.dateIssued))
+        return statement.values(listOf(
+            event.eventId.toUuid(),
+            event.modelId.toUuid(),
+            eventType,
+            JSON.valueOf(data.toString()),
+            event.dateIssued,
+        ))
     }
 
     protected fun createEvent(event: E) = createAllEvents(listOf(event))
 
     protected fun createAllEvents(events: List<E>) {
         dataSource.connection.use { connection ->
-            val sql = """
-                INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
-                VALUES ${ "(?::uuid, ?::uuid, ?, ?::json, ?)".repeat(events.size).replace(")(", "), (") }
-            """.trimIndent()
-            val statement = connection.prepareStatement(sql)
-            events.forEachIndexed { index, event -> prepareStatementWithEvent(statement, event, index * 5) }
+            var statement = DSL.using(connection, SQLDialect.POSTGRES)
+                .insertInto(
+                    DSL.table(tableName),
+                    listOf(
+                        DSL.field("event_id"),
+                        DSL.field("model_id"),
+                        DSL.field("event_type"),
+                        DSL.field("event_data"),
+                        DSL.field("date_issued"),
+                    ),
+                )
 
-            val modifiedRowCount = statement.executeUpdate()
+            events.forEach { event -> statement = prepareStatementWithEvent(statement, event) }
+
+            val modifiedRowCount = statement.execute()
             if (modifiedRowCount == 0) error("Unable to insert events")
         }
     }
 
     protected fun persistAllEvents(events: List<E>) {
         dataSource.connection.use { connection ->
-            val sql = """
-                INSERT INTO $tableName (event_id, model_id, event_type, event_data, date_issued)
-                VALUES ${ "(?::uuid, ?::uuid, ?, ?::json, ?)".repeat(events.size).replace(")(", "), (") }
-                ON CONFLICT (event_id) DO NOTHING
-            """.trimIndent()
-            val statement = connection.prepareStatement(sql)
-            events.forEachIndexed { index, event -> prepareStatementWithEvent(statement, event, index * 5) }
+            val statement = DSL.using(connection, SQLDialect.POSTGRES)
+                .insertInto(
+                    DSL.table(tableName),
+                    listOf(
+                        DSL.field("event_id"),
+                        DSL.field("model_id"),
+                        DSL.field("event_type"),
+                        DSL.field("event_data"),
+                        DSL.field("date_issued"),
+                    ),
+                )
+                .run {
+                    var statement = this
 
-            val modifiedRowCount = statement.executeUpdate()
+                    events.forEach { event -> statement = prepareStatementWithEvent(statement, event) }
+
+                    statement
+                }
+                .onConflict(DSL.field("event_id"))
+                .doNothing()
+
+            val modifiedRowCount = statement.execute()
             if (modifiedRowCount == 0) { /* do nothing */ }
         }
     }
