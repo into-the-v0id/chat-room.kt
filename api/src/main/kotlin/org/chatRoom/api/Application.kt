@@ -18,8 +18,15 @@ package org.chatRoom.api
 
 import io.ktor.server.engine.*
 import org.chatRoom.core.db.MigrationManager
+import kotlin.system.exitProcess
 
-fun main() {
+fun main(args: Array<String>) {
+    if (args.isNotEmpty()) {
+        System.err.println("error: unexpected arguments")
+        println("usage: chat-room-api")
+        exitProcess(1)
+    }
+
     val migrationManager = ServiceContainer.koin.koin.get<MigrationManager>()
     migrationManager.migrate()
 
