@@ -116,10 +116,9 @@ class UserRepository(
         return allEvents.groupBy { event -> event.modelId }
             .map { (_, events) -> User.applyAllEvents(null, events) }
             .filterNotNull()
-            .filter { member ->
-                if (handles != null && member.handle !in handles) {
-                    return@filter false
-                }
+            .filter { user ->
+                if (ids != null && user.modelId !in ids) return@filter false
+                if (handles != null && user.handle !in handles) return@filter false
 
                 return@filter true
             }

@@ -117,10 +117,9 @@ class RoomRepository(
         return allEvents.groupBy { event -> event.modelId }
             .map { (_, events) -> Room.applyAllEvents(null, events) }
             .filterNotNull()
-            .filter { member ->
-                if (handles != null && member.handle !in handles) {
-                    return@filter false
-                }
+            .filter { room ->
+                if (ids != null && room.modelId !in ids) return@filter false
+                if (handles != null && room.handle !in handles) return@filter false
 
                 return@filter true
             }

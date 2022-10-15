@@ -103,9 +103,8 @@ class MessageRepository(dataSource: DataSource) : EventRepository<MessageEvent>(
             .map { (_, events) -> Message.applyAllEvents(null, events) }
             .filterNotNull()
             .filter { message ->
-                if (memberIds != null && message.memberId !in memberIds) {
-                    return@filter false
-                }
+                if (ids != null && message.modelId !in ids) return@filter false
+                if (memberIds != null && message.memberId !in memberIds) return@filter false
 
                 return@filter true
             }

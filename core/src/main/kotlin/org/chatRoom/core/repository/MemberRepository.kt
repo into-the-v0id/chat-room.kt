@@ -118,13 +118,9 @@ class MemberRepository(
             .map { (_, events) -> Member.applyAllEvents(null, events) }
             .filterNotNull()
             .filter { member ->
-                if (roomIds != null && member.roomId !in roomIds) {
-                    return@filter false
-                }
-
-                if (userIds != null && member.userId !in userIds) {
-                    return@filter false
-                }
+                if (ids != null && member.modelId !in ids) return@filter false
+                if (roomIds != null && member.roomId !in roomIds) return@filter false
+                if (userIds != null && member.userId !in userIds) return@filter false
 
                 return@filter true
             }
