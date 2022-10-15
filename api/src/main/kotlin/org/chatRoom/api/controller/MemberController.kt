@@ -20,10 +20,11 @@ class MemberController(
     private val roomRepository: RoomRepository,
 ) {
     suspend fun list(call: ApplicationCall, resource: Members) {
+        val ids = resource.ids.ifEmpty { null }
         val userIds = resource.userIds.ifEmpty { null }
         val roomIds = resource.roomIds.ifEmpty { null }
 
-        val memberModels = memberRepository.getAll(userIds = userIds, roomIds = roomIds)
+        val memberModels = memberRepository.getAll(ids = ids, userIds = userIds, roomIds = roomIds)
             .map { memberAggregate -> Member(memberAggregate) }
 
         call.respond(memberModels)

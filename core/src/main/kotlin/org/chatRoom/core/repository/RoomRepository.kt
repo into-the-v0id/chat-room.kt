@@ -74,9 +74,16 @@ class RoomRepository(
         return Room.applyAllEvents(null, events)
     }
 
-    fun getAll(handles: List<Handle>? = null): Collection<Room> {
+    fun getAll(ids: List<Id>? = null, handles: List<Handle>? = null): Collection<Room> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
+
+            if (ids != null) {
+                conditions.add(
+                    DSL.field("model_id")
+                        .eq(DSL.any(*ids.map { id -> id.toUuid() }.toTypedArray()))
+                )
+            }
 
             if (handles != null) {
                 val subquery = DSL.select(DSL.field("model_id"))

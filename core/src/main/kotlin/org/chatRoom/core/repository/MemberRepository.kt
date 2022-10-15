@@ -70,9 +70,16 @@ class MemberRepository(
         return Member.applyAllEvents(null, events)
     }
 
-    fun getAll(userIds: List<Id>? = null, roomIds: List<Id>? = null): Collection<Member> {
+    fun getAll(ids: List<Id>? = null, userIds: List<Id>? = null, roomIds: List<Id>? = null): Collection<Member> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
+
+            if (ids != null) {
+                conditions.add(
+                    DSL.field("model_id")
+                        .eq(DSL.any(*ids.map { id -> id.toUuid() }.toTypedArray()))
+                )
+            }
 
             if (roomIds != null) {
                 val subquery = DSL.select(DSL.field("model_id"))

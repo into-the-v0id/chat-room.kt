@@ -19,6 +19,8 @@ class MessageController(
     private val memberRepository: MemberRepository,
 ) {
     suspend fun list(call: ApplicationCall, resource: Messages) {
+        val ids = resource.ids.ifEmpty { null }
+
         var memberIds = resource.memberIds.ifEmpty { null }
 
         val roomIds = resource.roomIds
@@ -31,7 +33,7 @@ class MessageController(
                 .toList()
         }
 
-        val messageModels = messageRepository.getAll(memberIds = memberIds)
+        val messageModels = messageRepository.getAll(ids = ids, memberIds = memberIds)
             .map { messageAggregate -> Message(messageAggregate) }
 
         call.respond(messageModels)

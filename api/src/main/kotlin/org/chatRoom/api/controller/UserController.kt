@@ -15,9 +15,10 @@ import org.chatRoom.core.aggreagte.User as UserAggregate
 
 class UserController(private val userRepository: UserRepository) {
     suspend fun list(call: ApplicationCall, resource: Users) {
+        val ids = resource.ids.ifEmpty { null }
         val handles = resource.handles.ifEmpty { null }
 
-        val userModels = userRepository.getAll(handles = handles)
+        val userModels = userRepository.getAll(ids = ids, handles = handles)
             .map { userAggregate -> User(userAggregate) }
 
         call.respond(userModels)

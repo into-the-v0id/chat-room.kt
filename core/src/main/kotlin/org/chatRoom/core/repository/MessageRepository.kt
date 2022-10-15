@@ -66,9 +66,16 @@ class MessageRepository(dataSource: DataSource) : EventRepository<MessageEvent>(
         return Message.applyAllEvents(null, events)
     }
 
-    fun getAll(memberIds: List<Id>? = null): Collection<Message> {
+    fun getAll(ids: List<Id>? = null, memberIds: List<Id>? = null): Collection<Message> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
+
+            if (ids != null) {
+                conditions.add(
+                    DSL.field("model_id")
+                        .eq(DSL.any(*ids.map { id -> id.toUuid() }.toTypedArray()))
+                )
+            }
 
             if (memberIds != null) {
                 val subquery = DSL.select(DSL.field("model_id"))

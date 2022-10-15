@@ -9,6 +9,8 @@ import org.chatRoom.core.valueObject.Id
 @Serializable
 @Resource("users")
 class Users(
+    @SerialName("id")
+    val ids: List<Id> = listOf(),
     @SerialName("handle")
     val handles: List<Handle> = listOf(),
 ) {

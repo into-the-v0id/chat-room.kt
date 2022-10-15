@@ -15,9 +15,10 @@ import org.chatRoom.core.aggreagte.Room as RoomAggregate
 
 class RoomController(private val roomRepository: RoomRepository) {
     suspend fun list(call: ApplicationCall, resource: Rooms) {
+        val ids = resource.ids.ifEmpty { null }
         val handles = resource.handles.ifEmpty { null }
 
-        val roomModels = roomRepository.getAll(handles = handles)
+        val roomModels = roomRepository.getAll(ids = ids, handles = handles)
             .map { roomAggregate -> Room(roomAggregate) }
 
         call.respond(roomModels)

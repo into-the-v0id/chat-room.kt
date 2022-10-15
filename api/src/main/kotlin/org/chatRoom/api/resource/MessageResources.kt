@@ -8,6 +8,8 @@ import org.chatRoom.core.valueObject.Id
 @Serializable
 @Resource("messages")
 class Messages(
+    @SerialName("id")
+    val ids: List<Id> = listOf(),
     @SerialName("member_id")
     val memberIds: List<Id> = listOf(),
     @SerialName("room_id")
