@@ -5,7 +5,6 @@ import org.chatRoom.core.aggreagte.Member
 import org.chatRoom.core.event.member.CreateMember
 import org.chatRoom.core.event.member.DeleteMember
 import org.chatRoom.core.event.member.MemberEvent
-import org.chatRoom.core.event.message.CreateMessage
 import org.chatRoom.core.valueObject.Id
 import org.jooq.Condition
 import org.jooq.SQLDialect
@@ -86,10 +85,8 @@ class MemberRepository(
                     .from(DSL.table(tableName))
                     .where(
                         DSL.field("event_type").eq(CreateMember::class.java.name),
-                        DSL.condition(
-                            "event_data->>'roomId' = ANY(?)",
-                            roomIds.map { id -> id.toString() }.toTypedArray(),
-                        )
+                        DSL.field("event_data->>'roomId'")
+                            .eq(DSL.any(*roomIds.map { id -> id.toString() }.toTypedArray())),
                     )
 
                 conditions.add(DSL.field("model_id").`in`(subquery))
@@ -100,10 +97,8 @@ class MemberRepository(
                     .from(DSL.table(tableName))
                     .where(
                         DSL.field("event_type").eq(CreateMember::class.java.name),
-                        DSL.condition(
-                            "event_data->>'userId' = ANY(?)",
-                            userIds.map { id -> id.toString() }.toTypedArray(),
-                        )
+                        DSL.field("event_data->>'userId'")
+                            .eq(DSL.any(*userIds.map { id -> id.toString() }.toTypedArray())),
                     )
 
                 conditions.add(DSL.field("model_id").`in`(subquery))

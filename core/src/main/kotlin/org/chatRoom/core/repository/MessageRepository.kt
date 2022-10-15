@@ -82,10 +82,8 @@ class MessageRepository(dataSource: DataSource) : EventRepository<MessageEvent>(
                     .from(DSL.table(tableName))
                     .where(
                         DSL.field("event_type").eq(CreateMessage::class.java.name),
-                        DSL.condition(
-                            "event_data->>'memberId' = ANY(?)",
-                            memberIds.map { id -> id.toString() }.toTypedArray(),
-                        )
+                        DSL.field("event_data->>'memberId'")
+                            .eq(DSL.any(*memberIds.map { id -> id.toString() }.toTypedArray())),
                     )
 
                 conditions.add(DSL.field("model_id").`in`(subquery))

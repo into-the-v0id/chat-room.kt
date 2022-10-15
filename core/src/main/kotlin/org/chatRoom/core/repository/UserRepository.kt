@@ -90,17 +90,13 @@ class UserRepository(
                     .where(DSL.or(
                         DSL.and(
                             DSL.field("event_type").eq(CreateUser::class.java.name),
-                            DSL.condition(
-                                "event_data->>'handle' = ANY(?)",
-                                handles.map { handle -> handle.toString() }.toTypedArray(),
-                            )
+                            DSL.field("event_data->>'handle'")
+                                .eq(DSL.any(*handles.map { handle -> handle.toString() }.toTypedArray())),
                         ),
                         DSL.and(
                             DSL.field("event_type").eq(ChangeHandle::class.java.name),
-                            DSL.condition(
-                                "event_data->>'handle' = ANY(?)",
-                                handles.map { handle -> handle.toString() }.toTypedArray(),
-                            )
+                            DSL.field("event_data->>'handle'")
+                                .eq(DSL.any(*handles.map { handle -> handle.toString() }.toTypedArray())),
                         ),
                     ))
 
