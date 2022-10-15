@@ -11,4 +11,6 @@ The Data Model is built around a concept called Event Sourcing. Basically, every
 
 ## License
 
+Copyright (C) Oliver Amann
+
 This project is licensed under the GNU Affero General Public License Version 3 (AGPL-3.0-only). Please see [LICENSE](../LICENSE) for more information.
