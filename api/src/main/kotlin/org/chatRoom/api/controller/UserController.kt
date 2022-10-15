@@ -60,9 +60,7 @@ class UserController(private val userRepository: UserRepository) {
 
             userAggregate = userAggregate.changeHandle(payload.handle)
         }
-        if (payload.email != userAggregate.email) {
-            userAggregate = userAggregate.changeEmail(payload.email)
-        }
+        if (payload.email != userAggregate.email) userAggregate = userAggregate.changeEmail(payload.email)
 
         userRepository.update(userAggregate)
 

@@ -67,9 +67,8 @@ class MessageController(
         val payload = call.receive<UpdateMessage>()
 
         if (payload.id != messageAggregate.modelId) throw BadRequestException("Mismatching IDs")
-        if (payload.content != messageAggregate.content) {
-            messageAggregate = messageAggregate.changeContent(payload.content)
-        }
+        if (payload.memberId != messageAggregate.memberId) throw BadRequestException("Attempting to modify read-only property 'memberId'")
+        if (payload.content != messageAggregate.content) messageAggregate = messageAggregate.changeContent(payload.content)
 
         messageRepository.update(messageAggregate)
 
