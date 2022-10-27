@@ -39,13 +39,15 @@ $ curl 'http://localhost:8080/messages?room_id=e516ba91-cef8-4dd2-ba93-e7afe82c6
         "id": "fd6cab76-890e-4b0e-a5e1-5bfa35ef091e",
         "memberId": "ded57fd7-4dc0-44a7-9e37-6bc9ad05dbc6",
         "content": "Hello",
-        "dateCreated": "2022-10-16T08:28:43.979Z"
+        "dateCreated": "2022-10-16T08:28:43.979Z",
+        "dateUpdated": "2022-10-16T08:28:43.979Z"
     },
     {
         "id": "6ffb6e22-872a-4322-b4b1-b287eaedfaf4",
         "memberId": "ded57fd7-4dc0-44a7-9e37-6bc9ad05dbc6",
         "content": "World",
-        "dateCreated": "2022-10-16T08:29:05.953Z"
+        "dateCreated": "2022-10-16T08:29:05.953Z",
+        "dateUpdated": "2022-10-16T08:29:05.953Z"
     }
 ]
 ```
