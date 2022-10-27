@@ -12,4 +12,6 @@ data class UpdateMessage(
     val content: String,
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateCreated: OffsetDateTime,
+    @Serializable(with = OffsetDateTimeSerializer::class)
+    val dateUpdated: OffsetDateTime,
 )

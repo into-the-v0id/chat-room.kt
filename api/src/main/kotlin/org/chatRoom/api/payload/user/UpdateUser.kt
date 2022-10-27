@@ -14,6 +14,8 @@ data class UpdateUser(
     val email: String,
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateCreated: OffsetDateTime,
+    @Serializable(with = OffsetDateTimeSerializer::class)
+    val dateUpdated: OffsetDateTime,
 ) {
     init {
         if (! EmailValidator.getInstance().isValid(email)) error("Invalid email")
