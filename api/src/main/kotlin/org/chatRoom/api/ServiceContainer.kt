@@ -1,8 +1,15 @@
 package org.chatRoom.api
 
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.hocon.Hocon
+import kotlinx.serialization.hocon.decodeFromConfig
+import org.chatRoom.api.configuration.DatabaseConfiguration
+import org.chatRoom.api.configuration.ServerConfiguration
 import org.chatRoom.api.controller.MemberController
 import org.chatRoom.api.controller.MessageController
 import org.chatRoom.api.controller.RoomController
@@ -25,19 +32,39 @@ import javax.sql.DataSource
 
 object ServiceContainer {
     val module = module {
+        single<Config> { ConfigFactory.load() }
+
+        single<ServerConfiguration> {
+            @OptIn(ExperimentalSerializationApi::class)
+            Hocon.decodeFromConfig(
+                get<Config>().getConfig("server")
+            )
+        }
         single<ApplicationEngine> {
-            embeddedServer(Netty, host = "0.0.0.0", port = 8080) {
+            val config = get<ServerConfiguration>()
+
+            embeddedServer(Netty, host = config.host, port = config.port.toInt()) {
                 configureHTTP()
                 configureMonitoring()
                 configureSerialization()
                 get<Routing>().apply { configureRouting() }
             }
         }
+
+        single<DatabaseConfiguration> {
+            @OptIn(ExperimentalSerializationApi::class)
+            Hocon.decodeFromConfig(
+                get<Config>().getConfig("db")
+            )
+        }
         single<DataSource> {
+            val config = get<DatabaseConfiguration>()
+
             HikariDataSource().apply {
-                jdbcUrl = "jdbc:postgresql://localhost/app"
-                username = "app"
-                password = "app"
+                jdbcUrl = "jdbc:postgresql://${config.host}:${config.port}/${config.name}"
+                username = config.user
+                password = config.password
+                schema = config.schema
             }
         }
 
