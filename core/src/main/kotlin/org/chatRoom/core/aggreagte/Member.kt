@@ -6,7 +6,7 @@ import org.chatRoom.core.event.member.MemberEvent
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
 
-class Member protected constructor(
+class Member(
     modelId: Id,
     userId: Id,
     roomId: Id,

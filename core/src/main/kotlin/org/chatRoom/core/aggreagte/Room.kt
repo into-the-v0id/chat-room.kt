@@ -8,7 +8,7 @@ import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
 
-class Room protected constructor(
+class Room(
     modelId: Id,
     handle: Handle,
     dateCreated: Instant = Instant.now(),

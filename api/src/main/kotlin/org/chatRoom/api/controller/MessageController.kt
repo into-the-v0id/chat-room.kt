@@ -10,13 +10,15 @@ import org.chatRoom.api.model.Message
 import org.chatRoom.api.payload.message.CreateMessage
 import org.chatRoom.api.payload.message.UpdateMessage
 import org.chatRoom.api.resource.Messages
-import org.chatRoom.core.repository.MemberRepository
-import org.chatRoom.core.repository.MessageRepository
+import org.chatRoom.core.repository.read.MemberReadRepository
+import org.chatRoom.core.repository.read.MessageReadRepository
+import org.chatRoom.core.repository.write.MessageWriteRepository
 import org.chatRoom.core.aggreagte.Message as MessageAggregate
 
 class MessageController(
-    private val messageRepository: MessageRepository,
-    private val memberRepository: MemberRepository,
+    private val messageReadRepository: MessageReadRepository,
+    private val messageWriteRepository: MessageWriteRepository,
+    private val memberReadRepository: MemberReadRepository,
 ) {
     suspend fun list(call: ApplicationCall, resource: Messages) {
         val ids = resource.ids.ifEmpty { null }
@@ -25,7 +27,7 @@ class MessageController(
 
         val roomIds = resource.roomIds
         if (roomIds.isNotEmpty()) {
-            val roomMemberAggregates = memberRepository.getAll(roomIds = roomIds)
+            val roomMemberAggregates = memberReadRepository.getAll(roomIds = roomIds)
             val roomMemberIds = roomMemberAggregates.map { member -> member.modelId }
 
             memberIds = (memberIds ?: roomMemberIds)
@@ -33,14 +35,14 @@ class MessageController(
                 .toList()
         }
 
-        val messageModels = messageRepository.getAll(ids = ids, memberIds = memberIds)
+        val messageModels = messageReadRepository.getAll(ids = ids, memberIds = memberIds)
             .map { messageAggregate -> Message(messageAggregate) }
 
         call.respond(messageModels)
     }
 
     suspend fun detail(call: ApplicationCall, resource: Messages.Detail) {
-        val messageAggregate = messageRepository.getById(resource.id) ?: throw NotFoundException()
+        val messageAggregate = messageReadRepository.getById(resource.id) ?: throw NotFoundException()
         val messageModel = Message(messageAggregate)
 
         call.respond(messageModel)
@@ -49,10 +51,10 @@ class MessageController(
     suspend fun create(call: ApplicationCall) {
         val payload = call.receive<CreateMessage>()
 
-        val memberAggregate = memberRepository.getById(payload.memberId) ?: throw BadRequestException("Unknown member")
+        val memberAggregate = memberReadRepository.getById(payload.memberId) ?: throw BadRequestException("Unknown member")
 
         val messageAggregate = MessageAggregate.create(member = memberAggregate, content = payload.content)
-        messageRepository.create(messageAggregate)
+        messageWriteRepository.create(messageAggregate)
 
         val messageModel = Message(messageAggregate)
 
@@ -64,7 +66,7 @@ class MessageController(
     }
 
     suspend fun update(call: ApplicationCall, resource: Messages.Detail) {
-        var messageAggregate = messageRepository.getById(resource.id) ?: throw NotFoundException()
+        var messageAggregate = messageReadRepository.getById(resource.id) ?: throw NotFoundException()
 
         val payload = call.receive<UpdateMessage>()
 
@@ -72,7 +74,7 @@ class MessageController(
         if (payload.memberId != messageAggregate.memberId) throw BadRequestException("Attempting to modify read-only property 'memberId'")
         if (payload.content != messageAggregate.content) messageAggregate = messageAggregate.changeContent(payload.content)
 
-        messageRepository.update(messageAggregate)
+        messageWriteRepository.update(messageAggregate)
 
         val messageModel = Message(messageAggregate)
 
@@ -80,9 +82,9 @@ class MessageController(
     }
 
     suspend fun delete(call: ApplicationCall, resource: Messages.Detail) {
-        val messageAggregate = messageRepository.getById(resource.id) ?: throw NotFoundException()
+        val messageAggregate = messageReadRepository.getById(resource.id) ?: throw NotFoundException()
 
-        messageRepository.delete(messageAggregate)
+        messageWriteRepository.delete(messageAggregate)
 
         call.respond(HttpStatusCode.NoContent)
     }

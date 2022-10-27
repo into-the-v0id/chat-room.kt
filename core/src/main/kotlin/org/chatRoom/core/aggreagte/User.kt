@@ -5,7 +5,7 @@ import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
 
-class User protected constructor(
+class User(
     modelId: Id,
     handle: Handle,
     email: String,

@@ -18,6 +18,7 @@ package org.chatRoom.api
 
 import io.ktor.server.engine.*
 import org.chatRoom.core.db.MigrationManager
+import org.chatRoom.core.state.StateManager
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
@@ -29,6 +30,9 @@ fun main(args: Array<String>) {
 
     val migrationManager = ServiceContainer.koin.koin.get<MigrationManager>()
     migrationManager.migrate()
+
+    val stateManager = ServiceContainer.koin.koin.get<StateManager>()
+    stateManager.replayAllEvents()
 
     val engine = ServiceContainer.koin.koin.get<ApplicationEngine>()
     engine.start(wait = true)

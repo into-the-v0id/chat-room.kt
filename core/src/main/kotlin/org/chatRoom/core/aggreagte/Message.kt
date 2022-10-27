@@ -7,7 +7,7 @@ import org.chatRoom.core.event.message.MessageEvent
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
 
-class Message protected constructor(
+class Message(
     modelId: Id,
     memberId: Id,
     content: String,
