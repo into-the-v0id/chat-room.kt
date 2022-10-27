@@ -8,12 +8,24 @@ This is the primary server backing Chat Room. For now, it only offers a simple H
 
 ## Usage
 
-First start the database:
+### With Docker Compose
+
 ```bash
-$ docker-compose up -d
+# Build API Server
+$ docker compose build app
+# Start API Server & Database
+$ docker compose up
 ```
 
-Then start the server:
+If you want to compile and run Kotlin manually or via your IDE, only start the Database:
+```bash
+$ docker compose up db
+```
+Also, make sure you've set the relevant environment variables (See [application.conf](./src/main/resources/application.conf)).
+
+### On Bare Metal
+
+First start your Postgres Database. Ensure you've set the relevant environment variables (See [application.conf](./src/main/resources/application.conf)). Then run the following command in order to build and start the API Server:
 ```bash
 $ ../gradlew :api:run
 ```
