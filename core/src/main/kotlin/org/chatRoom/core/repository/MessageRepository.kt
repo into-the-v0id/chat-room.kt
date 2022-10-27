@@ -18,7 +18,6 @@ class MessageRepository(dataSource: DataSource) : EventRepository<MessageEvent>(
             is CreateMessage -> CreateMessage::class.java.name to Json.encodeToJsonElement(event)
             is ChangeContent -> ChangeContent::class.java.name to Json.encodeToJsonElement(event)
             is DeleteMessage -> DeleteMessage::class.java.name to Json.encodeToJsonElement(event)
-            else -> error("Unknown event")
         }
     }
 

@@ -66,7 +66,6 @@ class User protected constructor(
                     if (user == null) error("Expected user")
                     user = null
                 }
-                else -> error("Unknown event")
             }
 
             return user

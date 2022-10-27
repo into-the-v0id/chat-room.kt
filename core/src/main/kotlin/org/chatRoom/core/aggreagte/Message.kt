@@ -63,7 +63,6 @@ class Message protected constructor(
                     if (message == null) error("Expected message")
                     message = null
                 }
-                else -> error("Unknown event")
             }
 
             return message

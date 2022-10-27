@@ -58,7 +58,6 @@ class Room protected constructor(
                     if (room == null) error("Expected room")
                     room = null
                 }
-                else -> error("Unknown event")
             }
 
             return room

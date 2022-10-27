@@ -20,7 +20,6 @@ class UserRepository(
             is ChangeHandle -> ChangeHandle::class.java.name to Json.encodeToJsonElement(event)
             is ChangeEmail -> ChangeEmail::class.java.name to Json.encodeToJsonElement(event)
             is DeleteUser -> DeleteUser::class.java.name to Json.encodeToJsonElement(event)
-            else -> error("Unknown event")
         }
     }
 

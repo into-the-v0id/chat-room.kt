@@ -19,7 +19,6 @@ class MemberRepository(
         return when (event) {
             is CreateMember -> CreateMember::class.java.name to Json.encodeToJsonElement(event)
             is DeleteMember -> DeleteMember::class.java.name to Json.encodeToJsonElement(event)
-            else -> error("Unknown event")
         }
     }
 

@@ -22,7 +22,6 @@ class RoomRepository(
             is CreateRoom -> CreateRoom::class.java.name to Json.encodeToJsonElement(event)
             is ChangeHandle -> ChangeHandle::class.java.name to Json.encodeToJsonElement(event)
             is DeleteRoom -> DeleteRoom::class.java.name to Json.encodeToJsonElement(event)
-            else -> error("Unknown event")
         }
     }
 

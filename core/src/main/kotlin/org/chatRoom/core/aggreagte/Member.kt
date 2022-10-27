@@ -57,7 +57,6 @@ class Member protected constructor(
                     if (member == null) error("Expected member")
                     member = null
                 }
-                else -> error("Unknown event")
             }
 
             return member
