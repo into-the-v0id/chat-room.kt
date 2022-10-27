@@ -10,6 +10,7 @@ class User protected constructor(
     handle: Handle,
     email: String,
     dateCreated: Instant = Instant.now(),
+    dateUpdated: Instant = dateCreated,
 ) : Aggregate<UserEvent>(modelId = modelId) {
     var handle: Handle = handle
         protected set
@@ -18,6 +19,9 @@ class User protected constructor(
         protected set
 
     var dateCreated: Instant = dateCreated
+        protected set
+
+    var dateUpdated: Instant = dateUpdated
         protected set
 
     companion object {
@@ -51,10 +55,12 @@ class User protected constructor(
                 is ChangeHandle -> {
                     if (user == null) error("Expected user")
                     user.handle = event.handle
+                    user.dateUpdated = event.dateIssued
                 }
                 is ChangeEmail -> {
                     if (user == null) error("Expected user")
                     user.email = event.email
+                    user.dateUpdated = event.dateIssued
                 }
                 is DeleteUser -> {
                     if (user == null) error("Expected user")

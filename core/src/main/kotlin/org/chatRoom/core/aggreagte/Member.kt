@@ -11,6 +11,7 @@ class Member protected constructor(
     userId: Id,
     roomId: Id,
     dateCreated: Instant = Instant.now(),
+    dateUpdated: Instant = dateCreated,
 ) : Aggregate<MemberEvent>(modelId = modelId) {
     var userId: Id = userId
         protected set
@@ -19,6 +20,9 @@ class Member protected constructor(
         protected set
 
     var dateCreated: Instant = dateCreated
+        protected set
+
+    var dateUpdated: Instant = dateUpdated
         protected set
 
     companion object {

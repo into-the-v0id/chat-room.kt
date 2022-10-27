@@ -14,11 +14,14 @@ data class Member(
     val roomId: Id,
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateCreated: OffsetDateTime,
+    @Serializable(with = OffsetDateTimeSerializer::class)
+    val dateUpdated: OffsetDateTime,
 ) {
     constructor(member: MemberAggregate) : this(
         id = member.modelId,
         userId = member.userId,
         roomId = member.roomId,
         dateCreated = member.dateCreated.atOffset(ZoneOffset.UTC),
+        dateUpdated = member.dateUpdated.atOffset(ZoneOffset.UTC),
     )
 }

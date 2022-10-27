@@ -14,10 +14,13 @@ data class Room(
     val handle: Handle,
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateCreated: OffsetDateTime,
+    @Serializable(with = OffsetDateTimeSerializer::class)
+    val dateUpdated: OffsetDateTime,
 ) {
     constructor(room: RoomAggregate) : this(
         id = room.modelId,
         handle = room.handle,
         dateCreated = room.dateCreated.atOffset(ZoneOffset.UTC),
+        dateUpdated = room.dateUpdated.atOffset(ZoneOffset.UTC),
     )
 }

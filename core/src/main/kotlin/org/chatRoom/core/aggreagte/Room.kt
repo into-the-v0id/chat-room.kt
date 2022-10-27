@@ -12,11 +12,15 @@ class Room protected constructor(
     modelId: Id,
     handle: Handle,
     dateCreated: Instant = Instant.now(),
+    dateUpdated: Instant = dateCreated,
 ) : Aggregate<RoomEvent>(modelId = modelId) {
     var handle: Handle = handle
         protected set
 
     var dateCreated: Instant = dateCreated
+        protected set
+
+    var dateUpdated: Instant = dateUpdated
         protected set
 
     companion object {
@@ -48,6 +52,7 @@ class Room protected constructor(
                 is ChangeHandle -> {
                     if (room == null) error("Expected room")
                     room.handle = event.handle
+                    room.dateUpdated = event.dateIssued
                 }
                 is DeleteRoom -> {
                     if (room == null) error("Expected room")

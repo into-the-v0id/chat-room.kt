@@ -15,11 +15,14 @@ data class User(
     val email: String,
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateCreated: OffsetDateTime,
+    @Serializable(with = OffsetDateTimeSerializer::class)
+    val dateUpdated: OffsetDateTime,
 ) {
     constructor(user: UserAggregate) : this(
         id = user.modelId,
         handle = user.handle,
         email = user.email,
         dateCreated = user.dateCreated.atOffset(ZoneOffset.UTC),
+        dateUpdated = user.dateUpdated.atOffset(ZoneOffset.UTC),
     )
 }

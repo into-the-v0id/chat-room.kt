@@ -14,11 +14,14 @@ data class Message(
     val content: String,
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateCreated: OffsetDateTime,
+    @Serializable(with = OffsetDateTimeSerializer::class)
+    val dateUpdated: OffsetDateTime,
 ) {
     constructor(message: MessageAggregate) : this(
         id = message.modelId,
         memberId = message.memberId,
         content = message.content,
         dateCreated = message.dateCreated.atOffset(ZoneOffset.UTC),
+        dateUpdated = message.dateUpdated.atOffset(ZoneOffset.UTC),
     )
 }

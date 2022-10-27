@@ -12,6 +12,7 @@ class Message protected constructor(
     memberId: Id,
     content: String,
     dateCreated: Instant = Instant.now(),
+    dateUpdated: Instant = dateCreated,
 ) : Aggregate<MessageEvent>(modelId = modelId) {
     var memberId: Id = memberId
         protected set
@@ -20,6 +21,9 @@ class Message protected constructor(
         protected set
 
     var dateCreated: Instant = dateCreated
+        protected set
+
+    var dateUpdated: Instant = dateUpdated
         protected set
 
     companion object {
@@ -53,6 +57,7 @@ class Message protected constructor(
                 is ChangeContent -> {
                     if (message == null) error("Expected message")
                     message.content = event.content
+                    message.dateUpdated = event.dateIssued
                 }
                 is DeleteMessage -> {
                     if (message == null) error("Expected message")
