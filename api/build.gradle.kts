@@ -22,6 +22,7 @@ repositories {
 dependencies {
     implementation(project(":core"))
 
+    implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
