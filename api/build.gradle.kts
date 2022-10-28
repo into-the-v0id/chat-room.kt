@@ -43,6 +43,8 @@ dependencies {
     implementation("commons-validator:commons-validator:1.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-hocon:1.4.1")
     implementation("com.typesafe:config:1.4.2")
+    implementation("org.jooq:jooq:3.17.4")
+    implementation("org.flywaydb:flyway-core:9.3.1")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("io.insert-koin:koin-test:$koin_version")

@@ -1,6 +1,5 @@
 package org.chatRoom.core.aggreagte
 
-import org.chatRoom.core.db.MigrationManager
 import org.chatRoom.core.event.Event
 import org.chatRoom.core.valueObject.Id
 import org.slf4j.LoggerFactory

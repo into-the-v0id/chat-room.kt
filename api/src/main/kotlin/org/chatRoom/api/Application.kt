@@ -17,8 +17,8 @@
 package org.chatRoom.api
 
 import io.ktor.server.engine.*
-import org.chatRoom.core.db.MigrationManager
-import org.chatRoom.core.state.StateManager
+import org.chatRoom.api.db.MigrationManager
+import org.chatRoom.api.state.StateManager
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
