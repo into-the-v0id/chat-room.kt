@@ -8,21 +8,30 @@ class MemberWriteGuardRepository(
     private val repository: MemberWriteRepository,
     private val memberReadRepository: MemberReadRepository,
 ) : MemberWriteRepository {
-    override fun create(member: Member) {
-        if (memberReadRepository.getById(member.modelId) != null) error("Unable to create member: Member already exists")
+    override fun createAll(members: List<Member>) {
+        val memberIds = members.map { member -> member.modelId }
+        if (memberReadRepository.getAll(ids = memberIds).isNotEmpty()) error("Unable to create all specified members: Member already exists")
 
-        repository.create(member)
+        repository.createAll(members)
     }
 
-    override fun update(member: Member) {
-        if (memberReadRepository.getById(member.modelId) == null) error("Unable to update member: Member not found")
+    override fun updateAll(members: List<Member>) {
+        val memberIds = members.map { member -> member.modelId }
+        val allIdsExist = memberReadRepository.getAll(ids = memberIds)
+            .map { member -> member.modelId }
+            .containsAll(memberIds)
+        if (! allIdsExist) error("Unable to update all specified members: Member not found")
 
-        repository.update(member)
+        repository.updateAll(members)
     }
 
-    override fun delete(member: Member) {
-        if (memberReadRepository.getById(member.modelId) == null) error("Unable to delete member: Member not found")
+    override fun deleteAll(members: List<Member>) {
+        val memberIds = members.map { member -> member.modelId }
+        val allIdsExist = memberReadRepository.getAll(ids = memberIds)
+            .map { member -> member.modelId }
+            .containsAll(memberIds)
+        if (! allIdsExist) error("Unable to delete all specified members: Member not found")
 
-        repository.delete(member)
+        repository.deleteAll(members)
     }
 }

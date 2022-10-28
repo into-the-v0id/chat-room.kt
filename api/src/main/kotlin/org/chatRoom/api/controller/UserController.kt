@@ -12,6 +12,9 @@ import org.chatRoom.core.payload.user.UpdateUser
 import org.chatRoom.api.resource.Users
 import org.chatRoom.core.repository.read.UserReadRepository
 import org.chatRoom.core.repository.write.UserWriteRepository
+import org.chatRoom.core.repository.write.create
+import org.chatRoom.core.repository.write.delete
+import org.chatRoom.core.repository.write.update
 import org.chatRoom.core.aggreagte.User as UserAggregate
 
 class UserController(

@@ -20,9 +20,18 @@ class MessageWriteEventRepository(
         }
     }
 
-    override fun create(message: Message) = createAllEvents(message.events)
+    override fun createAll(messages: List<Message>) {
+        val events = messages.map { message -> message.events }.flatten()
+        createAllEvents(events)
+    }
 
-    override fun update(message: Message) = persistAllEvents(message.events)
+    override fun updateAll(messages: List<Message>) {
+        val events = messages.map { message -> message.events }.flatten()
+        persistAllEvents(events)
+    }
 
-    override fun delete(message: Message) = createEvent(DeleteMessage(modelId = message.modelId))
+    override fun deleteAll(messages: List<Message>) {
+        val events = messages.map { message -> DeleteMessage(modelId = message.modelId) }
+        createAllEvents(events)
+    }
 }

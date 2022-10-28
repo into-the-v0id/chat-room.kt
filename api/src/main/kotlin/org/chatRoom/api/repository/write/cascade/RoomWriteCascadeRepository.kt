@@ -4,6 +4,7 @@ import org.chatRoom.core.aggreagte.Room
 import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.repository.write.MemberWriteRepository
 import org.chatRoom.core.repository.write.RoomWriteRepository
+import org.chatRoom.core.repository.write.delete
 import org.slf4j.LoggerFactory
 
 class RoomWriteCascadeRepository(
@@ -15,15 +16,15 @@ class RoomWriteCascadeRepository(
         private val logger = LoggerFactory.getLogger(RoomWriteCascadeRepository::class.java)
     }
 
-    override fun create(room: Room) = repository.create(room)
+    override fun createAll(rooms: List<Room>) = repository.createAll(rooms)
 
-    override fun update(room: Room) = repository.update(room)
+    override fun updateAll(rooms: List<Room>) = repository.updateAll(rooms)
 
-    override fun delete(room: Room) {
-        logger.info("Cascading deletion of room to members")
-        val members = memberReadRepository.getAll(roomIds = listOf(room.modelId))
+    override fun deleteAll(rooms: List<Room>) {
+        logger.info("Cascading deletion of all specified rooms to members")
+        val members = memberReadRepository.getAll(roomIds = rooms.map { room -> room.modelId })
         members.forEach { member -> memberWriteRepository.delete(member) }
 
-        repository.delete(room)
+        repository.deleteAll(rooms)
     }
 }

@@ -11,7 +11,7 @@ class RoomWriteStateRepository(
 ) : RoomWriteRepository {
     private val tableName = "room_state"
 
-    override fun create(room: Room) {
+    override fun createAll(rooms: List<Room>) {
         dataSource.connection.use { connection ->
             var statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .insertInto(
@@ -23,40 +23,53 @@ class RoomWriteStateRepository(
                         DSL.field("date_updated"),
                     ),
                 )
-                .values(listOf(
+
+            rooms.forEach { room ->
+                statement = statement.values(listOf(
                     room.modelId.toUuid(),
                     room.handle.toString(),
                     room.dateCreated,
                     room.dateUpdated,
                 ))
+            }
 
             val modifiedRowCount = statement.execute()
-            if (modifiedRowCount == 0) error("Unable to insert room")
+            if (modifiedRowCount != rooms.size) error("Unable to insert all specified rooms")
         }
     }
 
-    override fun update(room: Room) {
+    override fun updateAll(rooms: List<Room>) {
         dataSource.connection.use { connection ->
+            val valueRows = rooms.map { room -> DSL.row(
+                room.handle.toString(),
+                room.dateCreated,
+                room.dateUpdated,
+            ) }
+
             val statement = DSL.using(connection, SQLDialect.POSTGRES)
-                .update(DSL.table(tableName))
-                .set(DSL.field("handle"), room.handle.toString())
-                .set(DSL.field("date_created"), room.dateCreated)
-                .set(DSL.field("date_updated"), room.dateUpdated)
-                .where(DSL.field("id").eq(room.modelId.toUuid()))
+                .update(DSL.table(tableName).`as`("old"))
+                .set(DSL.field("old.handle"), "new.handle")
+                .set(DSL.field("old.date_created"), "new.date_created")
+                .set(DSL.field("old.date_updated"), "new.date_updated")
+                .from(
+                    DSL.values(*valueRows.toTypedArray())
+                        .`as`("new", listOf("handle", "date_created", "date_updated"))
+                )
+                .where(DSL.field("old.id").eq(DSL.field("new.id")))
 
             val modifiedRowCount = statement.execute()
-            if (modifiedRowCount == 0) error("Unable to update room")
+            if (modifiedRowCount != rooms.size) error("Unable to update all specified rooms")
         }
     }
 
-    override fun delete(room: Room) {
+    override fun deleteAll(rooms: List<Room>) {
         dataSource.connection.use { connection ->
             val statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .delete(DSL.table(tableName))
-                .where(DSL.field("id").eq(room.modelId.toUuid()))
+                .where(DSL.field("id").`in`(*rooms.map { room -> room.modelId.toUuid() }.toTypedArray()))
 
             val modifiedRowCount = statement.execute()
-            if (modifiedRowCount == 0) error("Unable to delete room")
+            if (modifiedRowCount != rooms.size) error("Unable to delete all specified rooms")
         }
     }
 }

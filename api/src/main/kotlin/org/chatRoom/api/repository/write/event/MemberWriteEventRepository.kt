@@ -18,9 +18,18 @@ class MemberWriteEventRepository(
         }
     }
 
-    override fun create(member: Member) = createAllEvents(member.events)
+    override fun createAll(members: List<Member>) {
+        val events = members.map { member -> member.events }.flatten()
+        createAllEvents(events)
+    }
 
-    override fun update(member: Member) = persistAllEvents(member.events)
+    override fun updateAll(members: List<Member>) {
+        val events = members.map { member -> member.events }.flatten()
+        persistAllEvents(events)
+    }
 
-    override fun delete(member: Member) = createEvent(DeleteMember(modelId = member.modelId))
+    override fun deleteAll(members: List<Member>) {
+        val events = members.map { member -> DeleteMember(modelId = member.modelId) }
+        createAllEvents(events)
+    }
 }

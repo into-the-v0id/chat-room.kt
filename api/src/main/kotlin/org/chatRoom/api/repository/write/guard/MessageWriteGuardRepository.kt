@@ -8,21 +8,30 @@ class MessageWriteGuardRepository(
     private val repository: MessageWriteRepository,
     private val messageReadRepository: MessageReadRepository,
 ) : MessageWriteRepository {
-    override fun create(message: Message) {
-        if (messageReadRepository.getById(message.modelId) != null) error("Unable to create message: Message already exists")
+    override fun createAll(messages: List<Message>) {
+        val messageIds = messages.map { message -> message.modelId }
+        if (messageReadRepository.getAll(ids = messageIds).isNotEmpty()) error("Unable to create all specified messages: Message already exists")
 
-        repository.create(message)
+        repository.createAll(messages)
     }
 
-    override fun update(message: Message) {
-        if (messageReadRepository.getById(message.modelId) == null) error("Unable to update message: Message not found")
+    override fun updateAll(messages: List<Message>) {
+        val messageIds = messages.map { message -> message.modelId }
+        val allIdsExist = messageReadRepository.getAll(ids = messageIds)
+            .map { message -> message.modelId }
+            .containsAll(messageIds)
+        if (! allIdsExist) error("Unable to update all specified messages: Message not found")
 
-        repository.update(message)
+        repository.updateAll(messages)
     }
 
-    override fun delete(message: Message) {
-        if (messageReadRepository.getById(message.modelId) == null) error("Unable to delete message: Message not found")
+    override fun deleteAll(messages: List<Message>) {
+        val messageIds = messages.map { message -> message.modelId }
+        val allIdsExist = messageReadRepository.getAll(ids = messageIds)
+            .map { message -> message.modelId }
+            .containsAll(messageIds)
+        if (! allIdsExist) error("Unable to delete all specified messages: Message not found")
 
-        repository.delete(message)
+        repository.deleteAll(messages)
     }
 }

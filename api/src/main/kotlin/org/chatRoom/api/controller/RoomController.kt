@@ -12,6 +12,9 @@ import org.chatRoom.core.payload.room.UpdateRoom
 import org.chatRoom.api.resource.Rooms
 import org.chatRoom.core.repository.read.RoomReadRepository
 import org.chatRoom.core.repository.write.RoomWriteRepository
+import org.chatRoom.core.repository.write.create
+import org.chatRoom.core.repository.write.delete
+import org.chatRoom.core.repository.write.update
 import org.chatRoom.core.aggreagte.Room as RoomAggregate
 
 class RoomController(

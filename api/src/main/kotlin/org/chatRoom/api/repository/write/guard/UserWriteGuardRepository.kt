@@ -8,22 +8,33 @@ class UserWriteGuardRepository(
     private val repository: UserWriteRepository,
     private val userReadRepository: UserReadRepository,
 ) : UserWriteRepository {
-    override fun create(user: User) {
-        if (userReadRepository.getById(user.modelId) != null) error("Unable to create user: User already exists")
-        if (userReadRepository.getAll(handles = listOf(user.handle)).isNotEmpty()) error("Unable to create user: Handle already exists")
+    override fun createAll(users: List<User>) {
+        val userIds = users.map { user -> user.modelId }
+        if (userReadRepository.getAll(ids = userIds).isNotEmpty()) error("Unable to create all specified users: User already exists")
 
-        repository.create(user)
+        val userHandles = users.map { user -> user.handle }
+        if (userReadRepository.getAll(handles = userHandles).isNotEmpty()) error("Unable to create all specified users: Handle already exists")
+
+        repository.createAll(users)
     }
 
-    override fun update(user: User) {
-        if (userReadRepository.getById(user.modelId) == null) error("Unable to update user: User not found")
+    override fun updateAll(users: List<User>) {
+        val userIds = users.map { user -> user.modelId }
+        val allIdsExist = userReadRepository.getAll(ids = userIds)
+            .map { user -> user.modelId }
+            .containsAll(userIds)
+        if (! allIdsExist) error("Unable to update all specified users: User not found")
 
-        repository.update(user)
+        repository.updateAll(users)
     }
 
-    override fun delete(user: User) {
-        if (userReadRepository.getById(user.modelId) == null) error("Unable to delete user: User not found")
+    override fun deleteAll(users: List<User>) {
+        val userIds = users.map { user -> user.modelId }
+        val allIdsExist = userReadRepository.getAll(ids = userIds)
+            .map { user -> user.modelId }
+            .containsAll(userIds)
+        if (! allIdsExist) error("Unable to delete all specified users: User not found")
 
-        repository.delete(user)
+        repository.deleteAll(users)
     }
 }

@@ -13,6 +13,8 @@ import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.repository.read.RoomReadRepository
 import org.chatRoom.core.repository.read.UserReadRepository
 import org.chatRoom.core.repository.write.MemberWriteRepository
+import org.chatRoom.core.repository.write.create
+import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.aggreagte.Member as MemberAggregate
 
 class MemberController(

@@ -6,9 +6,9 @@ import org.chatRoom.core.repository.write.UserWriteRepository
 class UserWriteChainRepository(
     private val repositories: List<UserWriteRepository>,
 ) : UserWriteRepository {
-    override fun create(user: User) = repositories.forEach { repository -> repository.create(user) }
+    override fun createAll(users: List<User>) = repositories.forEach { repository -> repository.createAll(users) }
 
-    override fun update(user: User) = repositories.forEach { repository -> repository.update(user) }
+    override fun updateAll(users: List<User>) = repositories.forEach { repository -> repository.updateAll(users) }
 
-    override fun delete(user: User) = repositories.forEach { repository -> repository.delete(user) }
+    override fun deleteAll(users: List<User>) = repositories.forEach { repository -> repository.deleteAll(users) }
 }

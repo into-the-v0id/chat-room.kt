@@ -6,9 +6,9 @@ import org.chatRoom.core.repository.write.RoomWriteRepository
 class RoomWriteChainRepository(
     private val repositories: List<RoomWriteRepository>,
 ) : RoomWriteRepository {
-    override fun create(room: Room) = repositories.forEach { repository -> repository.create(room) }
+    override fun createAll(rooms: List<Room>) = repositories.forEach { repository -> repository.createAll(rooms) }
 
-    override fun update(room: Room) = repositories.forEach { repository -> repository.update(room) }
+    override fun updateAll(rooms: List<Room>) = repositories.forEach { repository -> repository.updateAll(rooms) }
 
-    override fun delete(room: Room) = repositories.forEach { repository -> repository.delete(room) }
+    override fun deleteAll(rooms: List<Room>) = repositories.forEach { repository -> repository.deleteAll(rooms) }
 }

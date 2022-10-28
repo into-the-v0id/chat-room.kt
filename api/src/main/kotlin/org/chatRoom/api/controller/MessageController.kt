@@ -13,6 +13,9 @@ import org.chatRoom.api.resource.Messages
 import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.repository.read.MessageReadRepository
 import org.chatRoom.core.repository.write.MessageWriteRepository
+import org.chatRoom.core.repository.write.create
+import org.chatRoom.core.repository.write.delete
+import org.chatRoom.core.repository.write.update
 import org.chatRoom.core.aggreagte.Message as MessageAggregate
 
 class MessageController(

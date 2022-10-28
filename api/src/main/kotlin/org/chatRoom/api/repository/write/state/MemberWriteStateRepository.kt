@@ -11,7 +11,7 @@ class MemberWriteStateRepository(
 ) : MemberWriteRepository {
     private val tableName = "member_state"
 
-    override fun create(member: Member) {
+    override fun createAll(members: List<Member>) {
         dataSource.connection.use { connection ->
             var statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .insertInto(
@@ -24,42 +24,56 @@ class MemberWriteStateRepository(
                         DSL.field("date_updated"),
                     ),
                 )
-                .values(listOf(
+
+            members.forEach { member ->
+                statement = statement.values(listOf(
                     member.modelId.toUuid(),
                     member.userId.toUuid(),
                     member.roomId.toUuid(),
                     member.dateCreated,
                     member.dateUpdated,
                 ))
+            }
 
             val modifiedRowCount = statement.execute()
-            if (modifiedRowCount == 0) error("Unable to insert member")
+            if (modifiedRowCount != members.size) error("Unable to insert all specified members")
         }
     }
 
-    override fun update(member: Member) {
+    override fun updateAll(members: List<Member>) {
         dataSource.connection.use { connection ->
+            val valueRows = members.map { member -> DSL.row(
+                member.userId.toUuid(),
+                member.roomId.toUuid(),
+                member.dateCreated,
+                member.dateUpdated,
+            ) }
+
             val statement = DSL.using(connection, SQLDialect.POSTGRES)
-                .update(DSL.table(tableName))
-                .set(DSL.field("user_id"), member.userId.toUuid())
-                .set(DSL.field("room_id"), member.roomId.toUuid())
-                .set(DSL.field("date_created"), member.dateCreated)
-                .set(DSL.field("date_updated"), member.dateUpdated)
-                .where(DSL.field("id").eq(member.modelId.toUuid()))
+                .update(DSL.table(tableName).`as`("old"))
+                .set(DSL.field("old.user_id"), "new.user_id")
+                .set(DSL.field("old.room_id"), "new.room_id")
+                .set(DSL.field("old.date_created"), "new.date_created")
+                .set(DSL.field("old.date_updated"), "new.date_updated")
+                .from(
+                    DSL.values(*valueRows.toTypedArray())
+                        .`as`("new", listOf("user_id", "room_id", "date_created", "date_updated"))
+                )
+                .where(DSL.field("old.id").eq(DSL.field("new.id")))
 
             val modifiedRowCount = statement.execute()
-            if (modifiedRowCount == 0) error("Unable to update member")
+            if (modifiedRowCount != members.size) error("Unable to update all specified members")
         }
     }
 
-    override fun delete(member: Member) {
+    override fun deleteAll(members: List<Member>) {
         dataSource.connection.use { connection ->
             val statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .delete(DSL.table(tableName))
-                .where(DSL.field("id").eq(member.modelId.toUuid()))
+                .where(DSL.field("id").`in`(*members.map { member -> member.modelId.toUuid() }.toTypedArray()))
 
             val modifiedRowCount = statement.execute()
-            if (modifiedRowCount == 0) error("Unable to delete member")
+            if (modifiedRowCount != members.size) error("Unable to delete all specified members")
         }
     }
 }

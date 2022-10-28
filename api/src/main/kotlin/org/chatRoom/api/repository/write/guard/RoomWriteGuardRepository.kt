@@ -8,22 +8,33 @@ class RoomWriteGuardRepository(
     private val repository: RoomWriteRepository,
     private val roomReadRepository: RoomReadRepository,
 ) : RoomWriteRepository {
-    override fun create(room: Room) {
-        if (roomReadRepository.getById(room.modelId) != null) error("Unable to create room: Room already exists")
-        if (roomReadRepository.getAll(handles = listOf(room.handle)).isNotEmpty()) error("Unable to create room: Handle already exists")
+    override fun createAll(rooms: List<Room>) {
+        val roomIds = rooms.map { room -> room.modelId }
+        if (roomReadRepository.getAll(ids = roomIds).isNotEmpty()) error("Unable to create all specified rooms: Room already exists")
 
-        repository.create(room)
+        val roomHandles = rooms.map { room -> room.handle }
+        if (roomReadRepository.getAll(handles = roomHandles).isNotEmpty()) error("Unable to create all specified rooms: Handle already exists")
+
+        repository.createAll(rooms)
     }
 
-    override fun update(room: Room) {
-        if (roomReadRepository.getById(room.modelId) == null) error("Unable to update room: Room not found")
+    override fun updateAll(rooms: List<Room>) {
+        val roomIds = rooms.map { room -> room.modelId }
+        val allIdsExist = roomReadRepository.getAll(ids = roomIds)
+            .map { room -> room.modelId }
+            .containsAll(roomIds)
+        if (! allIdsExist) error("Unable to update all specified rooms: Room not found")
 
-        repository.update(room)
+        repository.updateAll(rooms)
     }
 
-    override fun delete(room: Room) {
-        if (roomReadRepository.getById(room.modelId) == null) error("Unable to delete room: Room not found")
+    override fun deleteAll(rooms: List<Room>) {
+        val roomIds = rooms.map { room -> room.modelId }
+        val allIdsExist = roomReadRepository.getAll(ids = roomIds)
+            .map { room -> room.modelId }
+            .containsAll(roomIds)
+        if (! allIdsExist) error("Unable to delete all specified rooms: Room not found")
 
-        repository.delete(room)
+        repository.deleteAll(rooms)
     }
 }

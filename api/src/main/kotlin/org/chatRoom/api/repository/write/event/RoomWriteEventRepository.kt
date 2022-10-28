@@ -20,9 +20,18 @@ class RoomWriteEventRepository(
         }
     }
 
-    override fun create(room: Room) = createAllEvents(room.events)
+    override fun createAll(rooms: List<Room>) {
+        val events = rooms.map { room -> room.events }.flatten()
+        createAllEvents(events)
+    }
 
-    override fun update(room: Room) = persistAllEvents(room.events)
+    override fun updateAll(rooms: List<Room>) {
+        val events = rooms.map { room -> room.events }.flatten()
+        persistAllEvents(events)
+    }
 
-    override fun delete(room: Room) = createEvent(DeleteRoom(modelId = room.modelId))
+    override fun deleteAll(rooms: List<Room>) {
+        val events = rooms.map { room -> DeleteRoom(modelId = room.modelId) }
+        createAllEvents(events)
+    }
 }
