@@ -44,6 +44,12 @@ class MemberController(
     suspend fun create(call: ApplicationCall) {
         val payload = call.receive<CreateMember>()
 
+        val existingMembers = memberReadRepository.getAll(
+            userIds = listOf(payload.userId),
+            roomIds = listOf(payload.roomId),
+        )
+        if (existingMembers.isNotEmpty()) throw BadRequestException("Already a member")
+
         val userAggregate = userReadRepository.getById(payload.userId) ?: throw BadRequestException("Unknown user")
         val roomAggregate = roomReadRepository.getById(payload.roomId) ?: throw BadRequestException("Unknown room")
 
