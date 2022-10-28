@@ -1,4 +1,4 @@
-package org.chatRoom.api.payload.user
+package org.chatRoom.core.payload.user
 
 import kotlinx.serialization.Serializable
 import org.apache.commons.validator.routines.EmailValidator

@@ -1,7 +1,7 @@
-package org.chatRoom.api.model
+package org.chatRoom.core.model
 
 import kotlinx.serialization.Serializable
-import org.chatRoom.api.serializer.OffsetDateTimeSerializer
+import org.chatRoom.core.serializer.OffsetDateTimeSerializer
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.aggreagte.User as UserAggregate
 import org.chatRoom.core.valueObject.Id

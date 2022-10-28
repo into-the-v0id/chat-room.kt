@@ -1,4 +1,4 @@
-package org.chatRoom.api.payload.message
+package org.chatRoom.core.payload.message
 
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.valueObject.Id

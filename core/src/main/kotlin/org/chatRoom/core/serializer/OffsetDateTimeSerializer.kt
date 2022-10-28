@@ -1,4 +1,4 @@
-package org.chatRoom.api.serializer
+package org.chatRoom.core.serializer
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

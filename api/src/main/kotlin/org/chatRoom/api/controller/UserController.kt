@@ -6,9 +6,9 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.response.*
-import org.chatRoom.api.model.User
-import org.chatRoom.api.payload.user.CreateUser
-import org.chatRoom.api.payload.user.UpdateUser
+import org.chatRoom.core.model.User
+import org.chatRoom.core.payload.user.CreateUser
+import org.chatRoom.core.payload.user.UpdateUser
 import org.chatRoom.api.resource.Users
 import org.chatRoom.core.repository.read.UserReadRepository
 import org.chatRoom.core.repository.write.UserWriteRepository

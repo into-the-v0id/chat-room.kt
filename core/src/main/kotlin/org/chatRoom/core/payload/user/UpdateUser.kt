@@ -1,8 +1,8 @@
-package org.chatRoom.api.payload.user
+package org.chatRoom.core.payload.user
 
 import kotlinx.serialization.Serializable
 import org.apache.commons.validator.routines.EmailValidator
-import org.chatRoom.api.serializer.OffsetDateTimeSerializer
+import org.chatRoom.core.serializer.OffsetDateTimeSerializer
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.time.OffsetDateTime

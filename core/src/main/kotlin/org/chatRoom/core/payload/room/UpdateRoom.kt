@@ -1,7 +1,7 @@
-package org.chatRoom.api.payload.room
+package org.chatRoom.core.payload.room
 
 import kotlinx.serialization.Serializable
-import org.chatRoom.api.serializer.OffsetDateTimeSerializer
+import org.chatRoom.core.serializer.OffsetDateTimeSerializer
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.time.OffsetDateTime

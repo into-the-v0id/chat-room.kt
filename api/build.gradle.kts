@@ -40,7 +40,6 @@ dependencies {
     implementation("org.postgresql:postgresql:42.5.0")
     implementation("io.insert-koin:koin-core:$koin_version")
     implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
-    implementation("commons-validator:commons-validator:1.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-hocon:1.4.1")
     implementation("com.typesafe:config:1.4.2")
     implementation("org.jooq:jooq:3.17.4")
