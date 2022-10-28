@@ -7,6 +7,7 @@ import org.chatRoom.core.event.member.DeleteMember
 import org.chatRoom.core.event.member.MemberEvent
 import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.valueObject.Id
+import org.jooq.Condition
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import javax.sql.DataSource
@@ -41,13 +42,22 @@ class MemberReadEventRepository(
 
     override fun getAll(ids: List<Id>?, userIds: List<Id>?, roomIds: List<Id>?): Collection<Member> {
         val allEvents = dataSource.connection.use { connection ->
-            if (ids != null) error("Unsupported filter")
+            val conditions = mutableListOf<Condition>()
+
+            if (ids != null) {
+                conditions.add(
+                    DSL.field("id")
+                        .`in`(*ids.map { id -> id.toUuid() }.toTypedArray())
+                )
+            }
+
             if (roomIds != null) error("Unsupported filter")
             if (userIds != null) error("Unsupported filter")
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()
                 .from(DSL.table(tableName))
+                .where(conditions)
                 .orderBy(DSL.field("date_issued").asc())
 
             val result = query.fetch()
