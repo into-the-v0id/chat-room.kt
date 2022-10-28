@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     implementation("org.jooq:jooq:3.17.4")
     implementation("org.flywaydb:flyway-core:9.3.1")
