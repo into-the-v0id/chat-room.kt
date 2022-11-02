@@ -29,7 +29,7 @@ abstract class Aggregate<E>(
             var newEvents = newAggregate?.events?.toMutableList() ?: mutableListOf()
 
             for (event in events) {
-                logger.trace("Event: ${event::class.java.name}")
+                logger.trace("Event: ${event.eventType}")
 
                 if (aggregate != null && event.modelId != aggregate.modelId) error("Model ID mismatch (Aggregate / Event)")
 
