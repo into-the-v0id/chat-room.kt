@@ -58,7 +58,7 @@ abstract class WriteEventRepository<E: Event>(
             events.forEach { event -> statement = prepareStatementWithEvent(statement, event) }
 
             val modifiedRowCount = statement.execute()
-            if (modifiedRowCount == 0) error("Unable to insert events")
+            if (modifiedRowCount != events.size) error("Unable to insert events")
         }
     }
 
