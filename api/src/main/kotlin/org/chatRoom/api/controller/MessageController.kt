@@ -38,8 +38,12 @@ class MessageController(
                 .toList()
         }
 
-        val messageModels = messageReadRepository.getAll(ids = ids, memberIds = memberIds)
-            .map { messageAggregate -> Message(messageAggregate) }
+        val messageModels = messageReadRepository.getAll(
+            ids = ids,
+            memberIds = memberIds,
+            offset = resource.offset,
+            limit = resource.limit,
+        ).map { messageAggregate -> Message(messageAggregate) }
 
         call.respond(messageModels)
     }

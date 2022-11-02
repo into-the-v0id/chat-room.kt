@@ -28,8 +28,13 @@ class MemberController(
         val userIds = resource.userIds.ifEmpty { null }
         val roomIds = resource.roomIds.ifEmpty { null }
 
-        val memberModels = memberReadRepository.getAll(ids = ids, userIds = userIds, roomIds = roomIds)
-            .map { memberAggregate -> Member(memberAggregate) }
+        val memberModels = memberReadRepository.getAll(
+            ids = ids,
+            userIds = userIds,
+            roomIds = roomIds,
+            offset = resource.offset,
+            limit = resource.limit,
+        ).map { memberAggregate -> Member(memberAggregate) }
 
         call.respond(memberModels)
     }

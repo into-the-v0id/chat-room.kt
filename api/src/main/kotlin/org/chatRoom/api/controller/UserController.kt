@@ -25,8 +25,12 @@ class UserController(
         val ids = resource.ids.ifEmpty { null }
         val handles = resource.handles.ifEmpty { null }
 
-        val userModels = userReadRepository.getAll(ids = ids, handles = handles)
-            .map { userAggregate -> User(userAggregate) }
+        val userModels = userReadRepository.getAll(
+            ids = ids,
+            handles = handles,
+            offset = resource.offset,
+            limit = resource.limit,
+        ).map { userAggregate -> User(userAggregate) }
 
         call.respond(userModels)
     }

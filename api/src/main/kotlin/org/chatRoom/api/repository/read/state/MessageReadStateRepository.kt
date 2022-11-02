@@ -3,6 +3,8 @@ package org.chatRoom.api.repository.read.state
 import org.chatRoom.core.aggreagte.Message
 import org.chatRoom.core.repository.read.MessageReadRepository
 import org.chatRoom.core.valueObject.Id
+import org.chatRoom.core.valueObject.Limit
+import org.chatRoom.core.valueObject.Offset
 import org.jooq.Condition
 import org.jooq.Record
 import org.jooq.Result
@@ -41,7 +43,12 @@ class MessageReadStateRepository(
         return aggregates.firstOrNull()
     }
 
-    override fun getAll(ids: List<Id>?, memberIds: List<Id>?): List<Message>{
+    override fun getAll(
+        ids: List<Id>?,
+        memberIds: List<Id>?,
+        offset: Offset?,
+        limit: Limit?,
+    ): List<Message>{
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 
@@ -64,6 +71,8 @@ class MessageReadStateRepository(
                 .from(DSL.table(tableName))
                 .where(conditions)
                 .orderBy(DSL.field("date_created").asc())
+                .let { query -> if (offset != null) { query.offset(offset.toInt()) } else { query } }
+                .let { query -> if (limit != null) { query.maxRows(limit.toInt()) } else { query } }
 
             val result = query.fetch()
             parseAllAggregates(result)

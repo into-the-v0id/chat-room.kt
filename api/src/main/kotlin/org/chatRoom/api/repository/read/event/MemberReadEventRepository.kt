@@ -7,6 +7,8 @@ import org.chatRoom.core.event.member.DeleteMember
 import org.chatRoom.core.event.member.MemberEvent
 import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.valueObject.Id
+import org.chatRoom.core.valueObject.Limit
+import org.chatRoom.core.valueObject.Offset
 import org.jooq.Condition
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -41,7 +43,13 @@ class MemberReadEventRepository(
         return Member.applyAllEvents(null, events)
     }
 
-    override fun getAll(ids: List<Id>?, userIds: List<Id>?, roomIds: List<Id>?): List<Member> {
+    override fun getAll(
+        ids: List<Id>?,
+        userIds: List<Id>?,
+        roomIds: List<Id>?,
+        offset: Offset?,
+        limit: Limit?,
+    ): List<Member> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 
@@ -54,6 +62,8 @@ class MemberReadEventRepository(
 
             if (roomIds != null) error("Unsupported filter")
             if (userIds != null) error("Unsupported filter")
+            if (offset != null) error("Unsupported filter")
+            if (limit != null) error("Unsupported filter")
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()

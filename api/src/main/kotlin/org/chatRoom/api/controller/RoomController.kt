@@ -25,8 +25,15 @@ class RoomController(
         val ids = resource.ids.ifEmpty { null }
         val handles = resource.handles.ifEmpty { null }
 
-        val roomModels = roomReadRepository.getAll(ids = ids, handles = handles)
-            .map { roomAggregate -> Room(roomAggregate) }
+        println(resource.offset)
+        println(resource.limit)
+
+        val roomModels = roomReadRepository.getAll(
+            ids = ids,
+            handles = handles,
+            offset = resource.offset,
+            limit = resource.limit,
+        ).map { roomAggregate -> Room(roomAggregate) }
 
         call.respond(roomModels)
     }

@@ -4,6 +4,8 @@ import io.ktor.resources.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.valueObject.Id
+import org.chatRoom.core.valueObject.Limit
+import org.chatRoom.core.valueObject.Offset
 
 @Serializable
 @Resource("members")
@@ -14,6 +16,8 @@ class Members(
     val userIds: List<Id> = listOf(),
     @SerialName("room_id")
     val roomIds: List<Id> = listOf(),
+    val offset: Offset? = null,
+    val limit: Limit? = null,
 ) {
     @Serializable
     @Resource("{id}")

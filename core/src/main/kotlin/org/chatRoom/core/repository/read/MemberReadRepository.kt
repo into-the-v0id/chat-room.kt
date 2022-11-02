@@ -2,8 +2,16 @@ package org.chatRoom.core.repository.read
 
 import org.chatRoom.core.aggreagte.Member
 import org.chatRoom.core.valueObject.Id
+import org.chatRoom.core.valueObject.Limit
+import org.chatRoom.core.valueObject.Offset
 
 interface MemberReadRepository {
     fun getById(id: Id): Member?
-    fun getAll(ids: List<Id>? = null, userIds: List<Id>? = null, roomIds: List<Id>? = null): Collection<Member>
+    fun getAll(
+        ids: List<Id>? = null,
+        userIds: List<Id>? = null,
+        roomIds: List<Id>? = null,
+        offset: Offset? = null,
+        limit: Limit? = null,
+    ): Collection<Member>
 }
