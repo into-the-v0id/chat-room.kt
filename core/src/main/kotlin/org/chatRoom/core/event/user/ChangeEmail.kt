@@ -1,5 +1,7 @@
 package org.chatRoom.core.event.user
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.serializer.InstantSerializer
 import org.chatRoom.core.valueObject.Id
@@ -12,4 +14,16 @@ data class ChangeEmail(
     @Serializable(with = InstantSerializer::class)
     override val dateIssued: Instant = Instant.now(),
     val email: String,
-) : UserEvent
+) : UserEvent {
+    @OptIn(ExperimentalSerializationApi::class)
+    @EncodeDefault
+    override val eventType = Companion.eventType
+
+    companion object {
+        const val eventType = "user:change-email"
+    }
+
+    init {
+        if (eventType != Companion.eventType) error("Event type mismatch")
+    }
+}

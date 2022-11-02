@@ -15,12 +15,12 @@ import javax.sql.DataSource
 class UserReadEventRepository(
     dataSource: DataSource,
 ) : ReadEventRepository<UserEvent>(dataSource, "user_events"), UserReadRepository {
-    override fun deserializeEvent(type: String, data: JsonElement): UserEvent {
-        return when (type) {
-            CreateUser::class.java.name -> Json.decodeFromJsonElement<CreateUser>(data)
-            ChangeHandle::class.java.name -> Json.decodeFromJsonElement<ChangeHandle>(data)
-            ChangeEmail::class.java.name -> Json.decodeFromJsonElement<ChangeEmail>(data)
-            DeleteUser::class.java.name -> Json.decodeFromJsonElement<DeleteUser>(data)
+    override fun deserializeEvent(data: JsonElement): UserEvent {
+        return when (data.jsonObject["eventType"]?.jsonPrimitive?.content) {
+            CreateUser.eventType -> Json.decodeFromJsonElement<CreateUser>(data)
+            ChangeHandle.eventType -> Json.decodeFromJsonElement<ChangeHandle>(data)
+            ChangeEmail.eventType -> Json.decodeFromJsonElement<ChangeEmail>(data)
+            DeleteUser.eventType -> Json.decodeFromJsonElement<DeleteUser>(data)
             else -> throw IllegalArgumentException("Unknown event type")
         }
     }

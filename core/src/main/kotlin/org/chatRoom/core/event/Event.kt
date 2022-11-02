@@ -5,6 +5,7 @@ import java.time.Instant
 
 interface Event {
     val eventId: Id
+    val eventType: String
     val modelId: Id
     val dateIssued: Instant
 }

@@ -13,19 +13,20 @@ abstract class WriteEventRepository<E: Event>(
     protected val dataSource: DataSource,
     protected val tableName: String,
 ) {
-    protected abstract fun serializeEvent(event: E) : Pair<String, JsonElement>
+    protected abstract fun serializeEvent(event: E) : JsonElement
 
     private fun prepareStatementWithEvent(
         statement: InsertValuesStepN<Record>,
         event: E,
     ): InsertValuesStepN<Record> {
-        var (eventType, data) = serializeEvent(event)
+        var data = serializeEvent(event)
         if (data !is JsonObject) error("Expected JSON object")
 
         val dataMap = mutableMapOf<String, JsonElement>()
         data.entries.forEach { (key, value) -> dataMap[key] = value }
 
         dataMap.remove("eventId")
+        dataMap.remove("eventType")
         dataMap.remove("modelId")
         dataMap.remove("dateIssued")
 
@@ -34,7 +35,7 @@ abstract class WriteEventRepository<E: Event>(
         return statement.values(listOf(
             event.eventId.toUuid(),
             event.modelId.toUuid(),
-            eventType,
+            event.eventType,
             JSON.valueOf(data.toString()),
             event.dateIssued,
         ))

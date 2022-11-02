@@ -18,11 +18,11 @@ import javax.sql.DataSource
 class RoomReadEventRepository(
     dataSource: DataSource,
 ) : ReadEventRepository<RoomEvent>(dataSource, "room_events"), RoomReadRepository {
-    override fun deserializeEvent(type: String, data: JsonElement): RoomEvent {
-        return when (type) {
-            CreateRoom::class.java.name -> Json.decodeFromJsonElement<CreateRoom>(data)
-            ChangeHandle::class.java.name -> Json.decodeFromJsonElement<ChangeHandle>(data)
-            DeleteRoom::class.java.name -> Json.decodeFromJsonElement<DeleteRoom>(data)
+    override fun deserializeEvent(data: JsonElement): RoomEvent {
+        return when (data.jsonObject["eventType"]?.jsonPrimitive?.content) {
+            CreateRoom.eventType -> Json.decodeFromJsonElement<CreateRoom>(data)
+            ChangeHandle.eventType -> Json.decodeFromJsonElement<ChangeHandle>(data)
+            DeleteRoom.eventType -> Json.decodeFromJsonElement<DeleteRoom>(data)
             else -> throw IllegalArgumentException("Unknown event type")
         }
     }

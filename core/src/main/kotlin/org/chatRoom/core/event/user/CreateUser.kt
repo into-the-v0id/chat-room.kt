@@ -1,5 +1,7 @@
 package org.chatRoom.core.event.user
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.serializer.InstantSerializer
 import org.chatRoom.core.valueObject.Handle
@@ -14,4 +16,16 @@ data class CreateUser(
     override val dateIssued: Instant = Instant.now(),
     val email: String,
     val handle: Handle,
-) : UserEvent
+) : UserEvent {
+    @OptIn(ExperimentalSerializationApi::class)
+    @EncodeDefault
+    override val eventType = Companion.eventType
+
+    companion object {
+        const val eventType = "user:create"
+    }
+
+    init {
+        if (eventType != Companion.eventType) error("Event type mismatch")
+    }
+}

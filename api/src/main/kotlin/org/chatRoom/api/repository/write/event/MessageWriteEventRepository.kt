@@ -12,11 +12,11 @@ import javax.sql.DataSource
 class MessageWriteEventRepository(
     dataSource: DataSource,
 ) : WriteEventRepository<MessageEvent>(dataSource, "message_events"), MessageWriteRepository {
-    override fun serializeEvent(event: MessageEvent): Pair<String, JsonElement> {
+    override fun serializeEvent(event: MessageEvent): JsonElement {
         return when (event) {
-            is CreateMessage -> CreateMessage::class.java.name to Json.encodeToJsonElement(event)
-            is ChangeContent -> ChangeContent::class.java.name to Json.encodeToJsonElement(event)
-            is DeleteMessage -> DeleteMessage::class.java.name to Json.encodeToJsonElement(event)
+            is CreateMessage -> Json.encodeToJsonElement(event)
+            is ChangeContent -> Json.encodeToJsonElement(event)
+            is DeleteMessage -> Json.encodeToJsonElement(event)
         }
     }
 

@@ -12,11 +12,11 @@ import javax.sql.DataSource
 class RoomWriteEventRepository(
     dataSource: DataSource,
 ) : WriteEventRepository<RoomEvent>(dataSource, "room_events"), RoomWriteRepository {
-    override fun serializeEvent(event: RoomEvent): Pair<String, JsonElement> {
+    override fun serializeEvent(event: RoomEvent): JsonElement {
         return when (event) {
-            is CreateRoom -> CreateRoom::class.java.name to Json.encodeToJsonElement(event)
-            is ChangeHandle -> ChangeHandle::class.java.name to Json.encodeToJsonElement(event)
-            is DeleteRoom -> DeleteRoom::class.java.name to Json.encodeToJsonElement(event)
+            is CreateRoom -> Json.encodeToJsonElement(event)
+            is ChangeHandle -> Json.encodeToJsonElement(event)
+            is DeleteRoom -> Json.encodeToJsonElement(event)
         }
     }
 

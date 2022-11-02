@@ -9,12 +9,12 @@ import javax.sql.DataSource
 class UserWriteEventRepository(
     dataSource: DataSource,
 ) : WriteEventRepository<UserEvent>(dataSource, "user_events"), UserWriteRepository {
-    override fun serializeEvent(event: UserEvent): Pair<String, JsonElement> {
+    override fun serializeEvent(event: UserEvent): JsonElement {
         return when (event) {
-            is CreateUser -> CreateUser::class.java.name to Json.encodeToJsonElement(event)
-            is ChangeHandle -> ChangeHandle::class.java.name to Json.encodeToJsonElement(event)
-            is ChangeEmail -> ChangeEmail::class.java.name to Json.encodeToJsonElement(event)
-            is DeleteUser -> DeleteUser::class.java.name to Json.encodeToJsonElement(event)
+            is CreateUser -> Json.encodeToJsonElement(event)
+            is ChangeHandle -> Json.encodeToJsonElement(event)
+            is ChangeEmail -> Json.encodeToJsonElement(event)
+            is DeleteUser -> Json.encodeToJsonElement(event)
         }
     }
 

@@ -11,10 +11,10 @@ import javax.sql.DataSource
 class MemberWriteEventRepository(
     dataSource: DataSource,
 ) : WriteEventRepository<MemberEvent>(dataSource, "member_events"), MemberWriteRepository {
-    override fun serializeEvent(event: MemberEvent): Pair<String, JsonElement> {
+    override fun serializeEvent(event: MemberEvent): JsonElement {
         return when (event) {
-            is CreateMember -> CreateMember::class.java.name to Json.encodeToJsonElement(event)
-            is DeleteMember -> DeleteMember::class.java.name to Json.encodeToJsonElement(event)
+            is CreateMember -> Json.encodeToJsonElement(event)
+            is DeleteMember -> Json.encodeToJsonElement(event)
         }
     }
 

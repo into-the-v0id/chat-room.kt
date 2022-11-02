@@ -17,11 +17,11 @@ import javax.sql.DataSource
 class MessageReadEventRepository(
     dataSource: DataSource
 ) : ReadEventRepository<MessageEvent>(dataSource, "message_events"), MessageReadRepository {
-    override fun deserializeEvent(type: String, data: JsonElement): MessageEvent {
-        return when (type) {
-            CreateMessage::class.java.name -> Json.decodeFromJsonElement<CreateMessage>(data)
-            ChangeContent::class.java.name -> Json.decodeFromJsonElement<ChangeContent>(data)
-            DeleteMessage::class.java.name -> Json.decodeFromJsonElement<DeleteMessage>(data)
+    override fun deserializeEvent(data: JsonElement): MessageEvent {
+        return when (data.jsonObject["eventType"]?.jsonPrimitive?.content) {
+            CreateMessage.eventType -> Json.decodeFromJsonElement<CreateMessage>(data)
+            ChangeContent.eventType -> Json.decodeFromJsonElement<ChangeContent>(data)
+            DeleteMessage.eventType -> Json.decodeFromJsonElement<DeleteMessage>(data)
             else -> throw IllegalArgumentException("Unknown event type")
         }
     }
