@@ -42,7 +42,7 @@ class UserReadEventRepository(
         return User.applyAllEvents(null, events)
     }
 
-    override fun getAll(ids: List<Id>?, handles: List<Handle>?): Collection<User> {
+    override fun getAll(ids: List<Id>?, handles: List<Handle>?): List<User> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

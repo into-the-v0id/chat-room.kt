@@ -41,7 +41,7 @@ class MessageReadStateRepository(
         return aggregates.firstOrNull()
     }
 
-    override fun getAll(ids: List<Id>?, memberIds: List<Id>?): Collection<Message>{
+    override fun getAll(ids: List<Id>?, memberIds: List<Id>?): List<Message>{
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

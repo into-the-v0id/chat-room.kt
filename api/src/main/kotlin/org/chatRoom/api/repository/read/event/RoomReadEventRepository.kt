@@ -44,7 +44,7 @@ class RoomReadEventRepository(
         return Room.applyAllEvents(null, events)
     }
 
-    override fun getAll(ids: List<Id>?, handles: List<Handle>?): Collection<Room> {
+    override fun getAll(ids: List<Id>?, handles: List<Handle>?): List<Room> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

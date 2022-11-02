@@ -41,7 +41,7 @@ class RoomReadStateRepository(
         return aggregates.firstOrNull()
     }
 
-    override fun getAll(ids: List<Id>?, handles: List<Handle>?): Collection<Room> {
+    override fun getAll(ids: List<Id>?, handles: List<Handle>?): List<Room> {
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

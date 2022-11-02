@@ -12,8 +12,6 @@ import org.chatRoom.api.repository.write.state.MemberWriteStateRepository
 import org.chatRoom.api.repository.write.state.MessageWriteStateRepository
 import org.chatRoom.api.repository.write.state.RoomWriteStateRepository
 import org.chatRoom.api.repository.write.state.UserWriteStateRepository
-import org.chatRoom.core.repository.write.create
-import org.chatRoom.core.repository.write.delete
 import org.slf4j.LoggerFactory
 
 class StateManager(
@@ -44,10 +42,8 @@ class StateManager(
     private fun replayUserEvents() {
         logger.info("Replaying user events ...")
 
-        userReadStateRepository.getAll()
-            .forEach { aggregate -> userWriteStateRepository.delete(aggregate) }
-        userReadEventRepository.getAll()
-            .forEach { aggregate -> userWriteStateRepository.create(aggregate) }
+        userWriteStateRepository.deleteAll(userReadStateRepository.getAll())
+        userWriteStateRepository.createAll(userReadEventRepository.getAll())
 
         logger.info("Successfully replayed user events")
     }
@@ -55,10 +51,8 @@ class StateManager(
     private fun replayRoomEvents() {
         logger.info("Replaying room events ...")
 
-        roomReadStateRepository.getAll()
-            .forEach { aggregate -> roomWriteStateRepository.delete(aggregate) }
-        roomReadEventRepository.getAll()
-            .forEach { aggregate -> roomWriteStateRepository.create(aggregate) }
+        roomWriteStateRepository.deleteAll(roomReadStateRepository.getAll())
+        roomWriteStateRepository.createAll(roomReadEventRepository.getAll())
 
         logger.info("Successfully replayed room events")
     }
@@ -66,10 +60,8 @@ class StateManager(
     private fun replayMemberEvents() {
         logger.info("Replaying member events ...")
 
-        memberReadStateRepository.getAll()
-            .forEach { aggregate -> memberWriteStateRepository.delete(aggregate) }
-        memberReadEventRepository.getAll()
-            .forEach { aggregate -> memberWriteStateRepository.create(aggregate) }
+        memberWriteStateRepository.deleteAll(memberReadStateRepository.getAll())
+        memberWriteStateRepository.createAll(memberReadEventRepository.getAll())
 
         logger.info("Successfully replayed member events")
     }
@@ -77,10 +69,8 @@ class StateManager(
     private fun replayMessageEvents() {
         logger.info("Replaying message events ...")
 
-        messageReadStateRepository.getAll()
-            .forEach { aggregate -> messageWriteStateRepository.delete(aggregate) }
-        messageReadEventRepository.getAll()
-            .forEach { aggregate -> messageWriteStateRepository.create(aggregate) }
+        messageWriteStateRepository.deleteAll(messageReadStateRepository.getAll())
+        messageWriteStateRepository.createAll(messageReadEventRepository.getAll())
 
         logger.info("Successfully replayed message events")
     }
