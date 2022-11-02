@@ -49,7 +49,7 @@ class MessageReadEventRepository(
 
             if (ids != null) {
                 conditions.add(
-                    DSL.field("id")
+                    DSL.field("model_id")
                         .`in`(*ids.map { id -> id.toUuid() }.toTypedArray())
                 )
             }
