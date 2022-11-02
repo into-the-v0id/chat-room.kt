@@ -72,8 +72,8 @@ class UserReadStateRepository(
                 .from(DSL.table(tableName))
                 .where(conditions)
                 .orderBy(DSL.field("date_created").asc())
-                .let { query -> if (offset != null) { query.offset(offset.toInt()) } else { query } }
-                .let { query -> if (limit != null) { query.maxRows(limit.toInt()) } else { query } }
+                .offset(offset?.toInt())
+                .limit(limit?.toInt())
 
             val result = query.fetch()
             parseAllAggregates(result)
