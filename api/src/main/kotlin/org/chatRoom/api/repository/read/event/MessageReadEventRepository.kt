@@ -11,6 +11,7 @@ import org.chatRoom.core.valueObject.Id
 import org.jooq.Condition
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
+import java.lang.IllegalArgumentException
 import javax.sql.DataSource
 
 class MessageReadEventRepository(
@@ -21,7 +22,7 @@ class MessageReadEventRepository(
             CreateMessage::class.java.name -> Json.decodeFromJsonElement<CreateMessage>(data)
             ChangeContent::class.java.name -> Json.decodeFromJsonElement<ChangeContent>(data)
             DeleteMessage::class.java.name -> Json.decodeFromJsonElement<DeleteMessage>(data)
-            else -> error("Unknown event type")
+            else -> throw IllegalArgumentException("Unknown event type")
         }
     }
 

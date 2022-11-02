@@ -10,6 +10,6 @@ data class CreateUser(
     val handle: Handle,
 ) {
     init {
-        if (! EmailValidator.getInstance().isValid(email)) error("Invalid email")
+        require(EmailValidator.getInstance().isValid(email)) { "Invalid email" }
     }
 }

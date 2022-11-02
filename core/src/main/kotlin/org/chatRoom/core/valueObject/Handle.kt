@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 @JvmInline
 value class Handle(private val handle: String) {
     init {
-        if (! handle.matches(Regex("^[a-zA-Z0-9\\-_]+\$"))) error("Invalid handle")
-        if (handle.length > 50) error("Invalid handle")
+        require(handle.matches(Regex("^[a-zA-Z0-9\\-_]+\$"))) { "Invalid handle" }
+        require(handle.length <= 50) { "Invalid handle" }
     }
 
     override fun toString(): String = handle
