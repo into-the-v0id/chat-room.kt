@@ -37,11 +37,9 @@ class Message(
             return applyEvent(null, event) ?: error("Expected message")
         }
 
-        fun applyEvent(message: Message?, event: MessageEvent): Message? = applyEvent(message, event, Companion::applyEventInternal)
+        fun applyEvent(message: Message?, event: MessageEvent): Message? = applyAllEvents(message, listOf(event))
 
-        fun applyAllEvents(message: Message?, events: List<MessageEvent>): Message? = applyAllEvents(message, events, Companion::applyEventInternal)
-
-        private fun applyEventInternal(message: Message?, event: MessageEvent): Message? {
+        fun applyAllEvents(message: Message?, events: List<MessageEvent>): Message? = applyAllEvents(message, events) { message, event ->
             var message = message
 
             when (event) {
@@ -65,7 +63,7 @@ class Message(
                 }
             }
 
-            return message
+            message
         }
     }
 

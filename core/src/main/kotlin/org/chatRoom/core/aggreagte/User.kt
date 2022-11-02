@@ -35,11 +35,9 @@ class User(
             return applyEvent(null, event) ?: error("Expected user")
         }
 
-        fun applyEvent(user: User?, event: UserEvent): User? = applyEvent(user, event, Companion::applyEventInternal)
+        fun applyEvent(user: User?, event: UserEvent): User? = applyAllEvents(user, listOf(event))
 
-        fun applyAllEvents(user: User?, events: List<UserEvent>): User? = applyAllEvents(user, events, Companion::applyEventInternal)
-
-        private fun applyEventInternal(user: User?, event: UserEvent): User? {
+        fun applyAllEvents(user: User?, events: List<UserEvent>): User? = applyAllEvents(user, events) { user, event ->
             var user = user
 
             when (event) {
@@ -68,7 +66,7 @@ class User(
                 }
             }
 
-            return user
+            user
         }
     }
 

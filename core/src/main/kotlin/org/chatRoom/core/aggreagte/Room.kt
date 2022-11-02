@@ -33,11 +33,9 @@ class Room(
             return applyEvent(null, event) ?: error("Expected room")
         }
 
-        fun applyEvent(room: Room?, event: RoomEvent): Room? = applyEvent(room, event, Companion::applyEventInternal)
+        fun applyEvent(room: Room?, event: RoomEvent): Room? = applyAllEvents(room, listOf(event))
 
-        fun applyAllEvents(room: Room?, events: List<RoomEvent>): Room? = applyAllEvents(room, events, Companion::applyEventInternal)
-
-        private fun applyEventInternal(room: Room?, event: RoomEvent): Room? {
+        fun applyAllEvents(room: Room?, events: List<RoomEvent>): Room? = applyAllEvents(room, events) { room, event ->
             var room = room
 
             when (event) {
@@ -60,7 +58,7 @@ class Room(
                 }
             }
 
-            return room
+            room
         }
     }
 

@@ -36,11 +36,9 @@ class Member(
             return applyEvent(null, event) ?: error("Expected member")
         }
 
-        fun applyEvent(member: Member?, event: MemberEvent): Member? = applyEvent(member, event, Companion::applyEventInternal)
+        fun applyEvent(member: Member?, event: MemberEvent): Member? = applyAllEvents(member, listOf(event))
 
-        fun applyAllEvents(member: Member?, events: List<MemberEvent>): Member? = applyAllEvents(member, events, Companion::applyEventInternal)
-
-        private fun applyEventInternal(member: Member?, event: MemberEvent): Member? {
+        fun applyAllEvents(member: Member?, events: List<MemberEvent>): Member? = applyAllEvents(member, events) { member, event ->
             var member = member
 
             when (event) {
@@ -59,7 +57,7 @@ class Member(
                 }
             }
 
-            return member
+            member
         }
     }
 }

@@ -18,30 +18,6 @@ abstract class Aggregate<E>(
         private val logger = LoggerFactory.getLogger(Aggregate::class.java)
 
         @JvmStatic
-        protected fun <A: Aggregate<E>, E: Event> applyEvent(
-            aggregate: A?,
-            event: E,
-            handler: (aggregate: A?, event: E) -> A?,
-        ): A? {
-            logger.debug("Applying event to ${if (aggregate == null) "null" else aggregate::class.java.name}")
-            logger.trace("Event: ${event::class.java.name}")
-
-            if (aggregate != null && event.modelId != aggregate.modelId) error("Model ID mismatch (Aggregate / Event)")
-
-            var newAggregate = aggregate?.clone() as A?
-            newAggregate = handler(newAggregate, event)
-
-            if (newAggregate != null) {
-                newAggregate.events = newAggregate.events
-                    .toMutableList()
-                    .also { it.add(event) }
-                    .toList()
-            }
-
-            return newAggregate
-        }
-
-        @JvmStatic
         protected fun <A: Aggregate<E>, E: Event> applyAllEvents(
             aggregate: A?,
             events: List<E>,
