@@ -41,8 +41,6 @@ abstract class WriteEventRepository<E: Event>(
         ))
     }
 
-    protected fun createEvent(event: E) = createAllEvents(listOf(event))
-
     protected fun createAllEvents(events: List<E>) {
         dataSource.connection.use { connection ->
             var statement = DSL.using(connection, SQLDialect.POSTGRES)
