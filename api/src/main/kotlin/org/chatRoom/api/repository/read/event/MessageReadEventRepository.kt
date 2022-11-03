@@ -56,12 +56,10 @@ class MessageReadEventRepository(
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 
-            if (ids != null) {
-                conditions.add(
-                    DSL.field("model_id")
-                        .`in`(*ids.map { id -> id.toUuid() }.toTypedArray())
-                )
-            }
+            if (ids != null) conditions.add(
+                DSL.field("model_id")
+                    .`in`(*ids.map { id -> id.toUuid() }.toTypedArray())
+            )
 
             if (memberIds != null) error("Unsupported filter")
             if (offset != null) error("Unsupported filter")

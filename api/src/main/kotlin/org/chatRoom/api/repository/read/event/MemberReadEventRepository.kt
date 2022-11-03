@@ -55,12 +55,10 @@ class MemberReadEventRepository(
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 
-            if (ids != null) {
-                conditions.add(
-                    DSL.field("model_id")
-                        .`in`(*ids.map { id -> id.toUuid() }.toTypedArray())
-                )
-            }
+            if (ids != null) conditions.add(
+                DSL.field("model_id")
+                    .`in`(*ids.map { id -> id.toUuid() }.toTypedArray())
+            )
 
             if (roomIds != null) error("Unsupported filter")
             if (userIds != null) error("Unsupported filter")
