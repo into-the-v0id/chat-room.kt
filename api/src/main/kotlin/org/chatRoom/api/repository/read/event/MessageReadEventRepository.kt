@@ -10,6 +10,8 @@ import org.chatRoom.core.repository.read.MessageReadRepository
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.valueObject.Limit
 import org.chatRoom.core.valueObject.Offset
+import org.chatRoom.core.valueObject.OrderDirection
+import org.chatRoom.core.valueObject.message.OrderBy
 import org.jooq.Condition
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -50,6 +52,8 @@ class MessageReadEventRepository(
         memberIds: List<Id>?,
         offset: Offset?,
         limit: Limit?,
+        orderBy: OrderBy?,
+        orderDirection: OrderDirection?,
     ): Collection<Message> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()

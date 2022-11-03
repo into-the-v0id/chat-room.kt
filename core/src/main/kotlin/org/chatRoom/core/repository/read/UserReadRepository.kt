@@ -1,10 +1,8 @@
 package org.chatRoom.core.repository.read
 
 import org.chatRoom.core.aggreagte.User
-import org.chatRoom.core.valueObject.Handle
-import org.chatRoom.core.valueObject.Id
-import org.chatRoom.core.valueObject.Limit
-import org.chatRoom.core.valueObject.Offset
+import org.chatRoom.core.valueObject.*
+import org.chatRoom.core.valueObject.user.OrderBy
 
 interface UserReadRepository {
     fun getById(id: Id): User?
@@ -13,5 +11,7 @@ interface UserReadRepository {
         handles: List<Handle>? = null,
         offset: Offset? = null,
         limit: Limit? = null,
+        orderBy: OrderBy? = null,
+        orderDirection: OrderDirection? = null,
     ): Collection<User>
 }

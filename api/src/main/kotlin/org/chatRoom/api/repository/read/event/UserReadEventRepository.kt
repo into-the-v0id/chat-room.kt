@@ -4,10 +4,8 @@ import kotlinx.serialization.json.*
 import org.chatRoom.core.aggreagte.User
 import org.chatRoom.core.event.user.*
 import org.chatRoom.core.repository.read.UserReadRepository
-import org.chatRoom.core.valueObject.Handle
-import org.chatRoom.core.valueObject.Id
-import org.chatRoom.core.valueObject.Limit
-import org.chatRoom.core.valueObject.Offset
+import org.chatRoom.core.valueObject.*
+import org.chatRoom.core.valueObject.user.OrderBy
 import org.jooq.Condition
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -49,6 +47,8 @@ class UserReadEventRepository(
         handles: List<Handle>?,
         offset: Offset?,
         limit: Limit?,
+        orderBy: OrderBy?,
+        orderDirection: OrderDirection?,
     ): Collection<User> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
@@ -63,6 +63,8 @@ class UserReadEventRepository(
             if (handles != null) error("Unsupported filter")
             if (offset != null) error("Unsupported filter")
             if (limit != null) error("Unsupported filter")
+            if (orderBy != null) error("OrderBy not supported")
+            if (orderDirection != null) error("OrderDirection not supported")
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()

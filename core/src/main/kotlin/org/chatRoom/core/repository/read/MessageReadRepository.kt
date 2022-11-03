@@ -4,6 +4,8 @@ import org.chatRoom.core.aggreagte.Message
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.valueObject.Limit
 import org.chatRoom.core.valueObject.Offset
+import org.chatRoom.core.valueObject.OrderDirection
+import org.chatRoom.core.valueObject.message.OrderBy
 
 interface MessageReadRepository {
     fun getById(id: Id): Message?
@@ -12,5 +14,7 @@ interface MessageReadRepository {
         memberIds: List<Id>? = null,
         offset: Offset? = null,
         limit: Limit? = null,
+        orderBy: OrderBy? = null,
+        orderDirection: OrderDirection? = null,
     ): Collection<Message>
 }

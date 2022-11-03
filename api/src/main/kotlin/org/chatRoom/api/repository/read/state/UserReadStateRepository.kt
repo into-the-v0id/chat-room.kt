@@ -2,10 +2,8 @@ package org.chatRoom.api.repository.read.state
 
 import org.chatRoom.core.aggreagte.User
 import org.chatRoom.core.repository.read.UserReadRepository
-import org.chatRoom.core.valueObject.Handle
-import org.chatRoom.core.valueObject.Id
-import org.chatRoom.core.valueObject.Limit
-import org.chatRoom.core.valueObject.Offset
+import org.chatRoom.core.valueObject.*
+import org.chatRoom.core.valueObject.user.OrderBy
 import org.jooq.Condition
 import org.jooq.Record
 import org.jooq.Result
@@ -49,6 +47,8 @@ class UserReadStateRepository(
         handles: List<Handle>?,
         offset: Offset?,
         limit: Limit?,
+        orderBy: OrderBy?,
+        orderDirection: OrderDirection?,
     ): Collection<User> {
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
@@ -67,11 +67,20 @@ class UserReadStateRepository(
                 )
             }
 
+            val orderByField = when (orderBy) {
+                OrderBy.DATE_CREATED, null -> DSL.field("date_created")
+                OrderBy.DATE_UPDATED -> DSL.field("date_updated")
+            }
+            val order = when (orderDirection) {
+                OrderDirection.ASC, null -> orderByField.asc()
+                OrderDirection.DESC -> orderByField.desc()
+            }
+
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()
                 .from(DSL.table(tableName))
                 .where(conditions)
-                .orderBy(DSL.field("date_created").asc())
+                .orderBy(order)
                 .offset(offset?.toInt())
                 .limit(limit?.toInt())
 

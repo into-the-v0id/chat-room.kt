@@ -43,6 +43,8 @@ class MessageController(
             memberIds = memberIds,
             offset = resource.offset,
             limit = resource.limit,
+            orderBy = resource.orderBy,
+            orderDirection = resource.orderDirection,
         ).map { messageAggregate -> Message(messageAggregate) }
 
         call.respond(messageModels)

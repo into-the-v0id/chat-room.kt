@@ -5,6 +5,8 @@ import org.chatRoom.core.repository.read.MessageReadRepository
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.valueObject.Limit
 import org.chatRoom.core.valueObject.Offset
+import org.chatRoom.core.valueObject.OrderDirection
+import org.chatRoom.core.valueObject.message.OrderBy
 import org.jooq.Condition
 import org.jooq.Record
 import org.jooq.Result
@@ -48,7 +50,9 @@ class MessageReadStateRepository(
         memberIds: List<Id>?,
         offset: Offset?,
         limit: Limit?,
-    ): Collection<Message>{
+        orderBy: OrderBy?,
+        orderDirection: OrderDirection?,
+    ): Collection<Message> {
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 
@@ -66,11 +70,20 @@ class MessageReadStateRepository(
                 )
             }
 
+            val orderByField = when (orderBy) {
+                OrderBy.DATE_CREATED, null -> DSL.field("date_created")
+                OrderBy.DATE_UPDATED -> DSL.field("date_updated")
+            }
+            val order = when (orderDirection) {
+                OrderDirection.ASC, null -> orderByField.asc()
+                OrderDirection.DESC -> orderByField.desc()
+            }
+
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()
                 .from(DSL.table(tableName))
                 .where(conditions)
-                .orderBy(DSL.field("date_created").asc())
+                .orderBy(order)
                 .offset(offset?.toInt())
                 .limit(limit?.toInt())
 
