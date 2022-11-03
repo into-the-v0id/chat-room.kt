@@ -3,7 +3,7 @@ package org.chatRoom.api.repository.read.state
 import org.chatRoom.core.aggreagte.Room
 import org.chatRoom.core.repository.read.RoomReadRepository
 import org.chatRoom.core.valueObject.*
-import org.chatRoom.core.valueObject.room.OrderBy
+import org.chatRoom.core.valueObject.room.UserSortCriterion
 import org.jooq.Condition
 import org.jooq.Record
 import org.jooq.Result
@@ -46,8 +46,7 @@ class RoomReadStateRepository(
         handles: List<Handle>?,
         offset: Offset?,
         limit: Limit?,
-        orderBy: OrderBy?,
-        orderDirection: OrderDirection?,
+        sortCriteria: List<UserSortCriterion>,
     ): Collection<Room> {
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
@@ -66,14 +65,12 @@ class RoomReadStateRepository(
                 )
             }
 
-            val orderByField = when (orderBy) {
-                OrderBy.DATE_CREATED, null -> DSL.field("date_created")
-                OrderBy.DATE_UPDATED -> DSL.field("date_updated")
-            }
-            val order = when (orderDirection) {
-                OrderDirection.ASC, null -> orderByField.asc()
-                OrderDirection.DESC -> orderByField.desc()
-            }
+            val order = sortCriteria.map { criterion -> when (criterion) {
+                UserSortCriterion.DATE_CREATED_ASC -> DSL.field("date_created").asc()
+                UserSortCriterion.DATE_CREATED_DESC -> DSL.field("date_created").desc()
+                UserSortCriterion.DATE_UPDATED_ASC -> DSL.field("date_updated").asc()
+                UserSortCriterion.DATE_UPDATED_DESC -> DSL.field("date_updated").desc()
+            }}
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()

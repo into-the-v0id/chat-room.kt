@@ -2,7 +2,7 @@ package org.chatRoom.core.repository.read
 
 import org.chatRoom.core.aggreagte.User
 import org.chatRoom.core.valueObject.*
-import org.chatRoom.core.valueObject.user.OrderBy
+import org.chatRoom.core.valueObject.user.UserSortCriterion
 
 interface UserReadRepository {
     fun getById(id: Id): User?
@@ -11,7 +11,6 @@ interface UserReadRepository {
         handles: List<Handle>? = null,
         offset: Offset? = null,
         limit: Limit? = null,
-        orderBy: OrderBy? = null,
-        orderDirection: OrderDirection? = null,
+        sortCriteria: List<UserSortCriterion> = listOf(),
     ): Collection<User>
 }

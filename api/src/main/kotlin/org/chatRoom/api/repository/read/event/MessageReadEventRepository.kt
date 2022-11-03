@@ -10,8 +10,7 @@ import org.chatRoom.core.repository.read.MessageReadRepository
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.valueObject.Limit
 import org.chatRoom.core.valueObject.Offset
-import org.chatRoom.core.valueObject.OrderDirection
-import org.chatRoom.core.valueObject.message.OrderBy
+import org.chatRoom.core.valueObject.message.MessageSortCriterion
 import org.jooq.Condition
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -52,8 +51,7 @@ class MessageReadEventRepository(
         memberIds: List<Id>?,
         offset: Offset?,
         limit: Limit?,
-        orderBy: OrderBy?,
-        orderDirection: OrderDirection?,
+        sortCriteria: List<MessageSortCriterion>,
     ): Collection<Message> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
@@ -68,6 +66,7 @@ class MessageReadEventRepository(
             if (memberIds != null) error("Unsupported filter")
             if (offset != null) error("Unsupported filter")
             if (limit != null) error("Unsupported filter")
+            if (sortCriteria.isNotEmpty()) error("Custom sort criteria not supported")
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()

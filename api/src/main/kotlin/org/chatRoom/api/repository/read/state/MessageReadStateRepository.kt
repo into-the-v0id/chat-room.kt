@@ -5,8 +5,7 @@ import org.chatRoom.core.repository.read.MessageReadRepository
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.valueObject.Limit
 import org.chatRoom.core.valueObject.Offset
-import org.chatRoom.core.valueObject.OrderDirection
-import org.chatRoom.core.valueObject.message.OrderBy
+import org.chatRoom.core.valueObject.message.MessageSortCriterion
 import org.jooq.Condition
 import org.jooq.Record
 import org.jooq.Result
@@ -50,8 +49,7 @@ class MessageReadStateRepository(
         memberIds: List<Id>?,
         offset: Offset?,
         limit: Limit?,
-        orderBy: OrderBy?,
-        orderDirection: OrderDirection?,
+        sortCriteria: List<MessageSortCriterion>,
     ): Collection<Message> {
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
@@ -70,14 +68,12 @@ class MessageReadStateRepository(
                 )
             }
 
-            val orderByField = when (orderBy) {
-                OrderBy.DATE_CREATED, null -> DSL.field("date_created")
-                OrderBy.DATE_UPDATED -> DSL.field("date_updated")
-            }
-            val order = when (orderDirection) {
-                OrderDirection.ASC, null -> orderByField.asc()
-                OrderDirection.DESC -> orderByField.desc()
-            }
+            val order = sortCriteria.map { criterion -> when (criterion) {
+                MessageSortCriterion.DATE_CREATED_ASC -> DSL.field("date_created").asc()
+                MessageSortCriterion.DATE_CREATED_DESC -> DSL.field("date_created").desc()
+                MessageSortCriterion.DATE_UPDATED_ASC -> DSL.field("date_updated").asc()
+                MessageSortCriterion.DATE_UPDATED_DESC -> DSL.field("date_updated").desc()
+            }}
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()

@@ -34,8 +34,7 @@ class MemberController(
             roomIds = roomIds,
             offset = resource.offset,
             limit = resource.limit,
-            orderBy = resource.orderBy,
-            orderDirection = resource.orderDirection,
+            sortCriteria = resource.sortCriteria,
         ).map { memberAggregate -> Member(memberAggregate) }
 
         call.respond(memberModels)

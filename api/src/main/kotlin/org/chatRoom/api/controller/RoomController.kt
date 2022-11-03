@@ -33,8 +33,7 @@ class RoomController(
             handles = handles,
             offset = resource.offset,
             limit = resource.limit,
-            orderBy = resource.orderBy,
-            orderDirection = resource.orderDirection,
+            sortCriteria = resource.sortCriteria,
         ).map { roomAggregate -> Room(roomAggregate) }
 
         call.respond(roomModels)

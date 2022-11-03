@@ -4,7 +4,7 @@ import io.ktor.resources.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.valueObject.*
-import org.chatRoom.core.valueObject.user.OrderBy
+import org.chatRoom.core.valueObject.user.UserSortCriterion
 
 @Serializable
 @Resource("users")
@@ -15,15 +15,9 @@ class Users(
     val handles: List<Handle> = listOf(),
     val offset: Offset? = null,
     val limit: Limit? = null,
-    @SerialName("order_by")
-    val orderBy: OrderBy? = null,
-    @SerialName("order_direction")
-    val orderDirection: OrderDirection? = null,
+    @SerialName("sort_criteria")
+    val sortCriteria: List<UserSortCriterion> = listOf(),
 ) {
-    init {
-        if (orderDirection != null) require(orderBy != null) { "Incomplete order" }
-    }
-
     @Serializable
     @Resource("{id}")
     class Detail(val id: Id) {

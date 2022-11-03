@@ -4,8 +4,7 @@ import org.chatRoom.core.aggreagte.Member
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.valueObject.Limit
 import org.chatRoom.core.valueObject.Offset
-import org.chatRoom.core.valueObject.OrderDirection
-import org.chatRoom.core.valueObject.member.OrderBy
+import org.chatRoom.core.valueObject.member.MemberSortCriterion
 
 interface MemberReadRepository {
     fun getById(id: Id): Member?
@@ -15,7 +14,6 @@ interface MemberReadRepository {
         roomIds: List<Id>? = null,
         offset: Offset? = null,
         limit: Limit? = null,
-        orderBy: OrderBy? = null,
-        orderDirection: OrderDirection? = null,
+        sortCriteria: List<MemberSortCriterion> = listOf(),
     ): Collection<Member>
 }
