@@ -18,17 +18,17 @@ class MessageWriteEventRepository(
         is DeleteMessage -> Json.encodeToJsonElement(event)
     }
 
-    override fun createAll(messages: List<Message>) {
+    override fun createAll(messages: Collection<Message>) {
         val events = messages.map { message -> message.events }.flatten()
         createAllEvents(events)
     }
 
-    override fun updateAll(messages: List<Message>) {
+    override fun updateAll(messages: Collection<Message>) {
         val events = messages.map { message -> message.events }.flatten()
         persistAllEvents(events)
     }
 
-    override fun deleteAll(messages: List<Message>) {
+    override fun deleteAll(messages: Collection<Message>) {
         val events = messages.map { message -> DeleteMessage(modelId = message.modelId) }
         createAllEvents(events)
     }

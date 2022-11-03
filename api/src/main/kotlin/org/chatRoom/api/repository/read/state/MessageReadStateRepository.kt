@@ -48,7 +48,7 @@ class MessageReadStateRepository(
         memberIds: List<Id>?,
         offset: Offset?,
         limit: Limit?,
-    ): List<Message>{
+    ): Collection<Message>{
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

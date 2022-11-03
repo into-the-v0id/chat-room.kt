@@ -49,7 +49,7 @@ class UserReadStateRepository(
         handles: List<Handle>?,
         offset: Offset?,
         limit: Limit?,
-    ): List<User> {
+    ): Collection<User> {
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

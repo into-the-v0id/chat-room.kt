@@ -41,7 +41,7 @@ abstract class WriteEventRepository<E: Event>(
         ))
     }
 
-    protected fun createAllEvents(events: List<E>) {
+    protected fun createAllEvents(events: Collection<E>) {
         dataSource.connection.use { connection ->
             var statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .insertInto(
@@ -62,7 +62,7 @@ abstract class WriteEventRepository<E: Event>(
         }
     }
 
-    protected fun persistAllEvents(events: List<E>) {
+    protected fun persistAllEvents(events: Collection<E>) {
         dataSource.connection.use { connection ->
             val statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .insertInto(

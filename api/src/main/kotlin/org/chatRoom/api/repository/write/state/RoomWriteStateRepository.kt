@@ -11,7 +11,7 @@ class RoomWriteStateRepository(
 ) : RoomWriteRepository {
     private val tableName = "room_state"
 
-    override fun createAll(rooms: List<Room>) {
+    override fun createAll(rooms: Collection<Room>) {
         dataSource.connection.use { connection ->
             var statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .insertInto(
@@ -38,7 +38,7 @@ class RoomWriteStateRepository(
         }
     }
 
-    override fun updateAll(rooms: List<Room>) {
+    override fun updateAll(rooms: Collection<Room>) {
         dataSource.connection.use { connection ->
             val valueRows = rooms.map { room -> DSL.row(
                 room.handle.toString(),
@@ -62,7 +62,7 @@ class RoomWriteStateRepository(
         }
     }
 
-    override fun deleteAll(rooms: List<Room>) {
+    override fun deleteAll(rooms: Collection<Room>) {
         dataSource.connection.use { connection ->
             val statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .delete(DSL.table(tableName))

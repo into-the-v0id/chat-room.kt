@@ -8,14 +8,14 @@ class MessageWriteGuardRepository(
     private val repository: MessageWriteRepository,
     private val messageReadRepository: MessageReadRepository,
 ) : MessageWriteRepository {
-    override fun createAll(messages: List<Message>) {
+    override fun createAll(messages: Collection<Message>) {
         val messageIds = messages.map { message -> message.modelId }
         if (messageReadRepository.getAll(ids = messageIds).isNotEmpty()) error("Unable to create all specified messages: Message already exists")
 
         repository.createAll(messages)
     }
 
-    override fun updateAll(messages: List<Message>) {
+    override fun updateAll(messages: Collection<Message>) {
         val messageIds = messages.map { message -> message.modelId }
         val allIdsExist = messageReadRepository.getAll(ids = messageIds)
             .map { message -> message.modelId }
@@ -25,7 +25,7 @@ class MessageWriteGuardRepository(
         repository.updateAll(messages)
     }
 
-    override fun deleteAll(messages: List<Message>) {
+    override fun deleteAll(messages: Collection<Message>) {
         val messageIds = messages.map { message -> message.modelId }
         val allIdsExist = messageReadRepository.getAll(ids = messageIds)
             .map { message -> message.modelId }

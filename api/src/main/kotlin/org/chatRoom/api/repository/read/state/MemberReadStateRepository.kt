@@ -49,7 +49,7 @@ class MemberReadStateRepository(
         roomIds: List<Id>?,
         offset: Offset?,
         limit: Limit?,
-    ): List<Member> {
+    ): Collection<Member> {
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

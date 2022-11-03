@@ -48,7 +48,7 @@ class RoomReadStateRepository(
         handles: List<Handle>?,
         offset: Offset?,
         limit: Limit?,
-    ): List<Room> {
+    ): Collection<Room> {
         val aggregates = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

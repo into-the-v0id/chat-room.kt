@@ -16,11 +16,11 @@ class RoomWriteCascadeRepository(
         private val logger = LoggerFactory.getLogger(RoomWriteCascadeRepository::class.java)
     }
 
-    override fun createAll(rooms: List<Room>) = repository.createAll(rooms)
+    override fun createAll(rooms: Collection<Room>) = repository.createAll(rooms)
 
-    override fun updateAll(rooms: List<Room>) = repository.updateAll(rooms)
+    override fun updateAll(rooms: Collection<Room>) = repository.updateAll(rooms)
 
-    override fun deleteAll(rooms: List<Room>) {
+    override fun deleteAll(rooms: Collection<Room>) {
         logger.info("Cascading deletion of all specified rooms to members")
         val members = memberReadRepository.getAll(roomIds = rooms.map { room -> room.modelId })
         members.forEach { member -> memberWriteRepository.delete(member) }

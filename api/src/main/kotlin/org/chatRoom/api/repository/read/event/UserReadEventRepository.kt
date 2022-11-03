@@ -49,7 +49,7 @@ class UserReadEventRepository(
         handles: List<Handle>?,
         offset: Offset?,
         limit: Limit?,
-    ): List<User> {
+    ): Collection<User> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

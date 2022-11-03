@@ -11,7 +11,7 @@ class MessageWriteStateRepository(
 ) : MessageWriteRepository {
     private val tableName = "message_state"
 
-    override fun createAll(messages: List<Message>) {
+    override fun createAll(messages: Collection<Message>) {
         dataSource.connection.use { connection ->
             var statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .insertInto(
@@ -40,7 +40,7 @@ class MessageWriteStateRepository(
         }
     }
 
-    override fun updateAll(messages: List<Message>) {
+    override fun updateAll(messages: Collection<Message>) {
         dataSource.connection.use { connection ->
             val valueRows = messages.map { message -> DSL.row(
                 message.memberId.toUuid(),
@@ -66,7 +66,7 @@ class MessageWriteStateRepository(
         }
     }
 
-    override fun deleteAll(messages: List<Message>) {
+    override fun deleteAll(messages: Collection<Message>) {
         dataSource.connection.use { connection ->
             val statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .delete(DSL.table(tableName))

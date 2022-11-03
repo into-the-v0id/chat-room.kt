@@ -51,7 +51,7 @@ class RoomReadEventRepository(
         handles: List<Handle>?,
         offset: Offset?,
         limit: Limit?,
-    ): List<Room> {
+    ): Collection<Room> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

@@ -8,14 +8,14 @@ class MemberWriteGuardRepository(
     private val repository: MemberWriteRepository,
     private val memberReadRepository: MemberReadRepository,
 ) : MemberWriteRepository {
-    override fun createAll(members: List<Member>) {
+    override fun createAll(members: Collection<Member>) {
         val memberIds = members.map { member -> member.modelId }
         if (memberReadRepository.getAll(ids = memberIds).isNotEmpty()) error("Unable to create all specified members: Member already exists")
 
         repository.createAll(members)
     }
 
-    override fun updateAll(members: List<Member>) {
+    override fun updateAll(members: Collection<Member>) {
         val memberIds = members.map { member -> member.modelId }
         val allIdsExist = memberReadRepository.getAll(ids = memberIds)
             .map { member -> member.modelId }
@@ -25,7 +25,7 @@ class MemberWriteGuardRepository(
         repository.updateAll(members)
     }
 
-    override fun deleteAll(members: List<Member>) {
+    override fun deleteAll(members: Collection<Member>) {
         val memberIds = members.map { member -> member.modelId }
         val allIdsExist = memberReadRepository.getAll(ids = memberIds)
             .map { member -> member.modelId }

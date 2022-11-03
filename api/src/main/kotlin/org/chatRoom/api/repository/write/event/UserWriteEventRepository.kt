@@ -16,17 +16,17 @@ class UserWriteEventRepository(
         is DeleteUser -> Json.encodeToJsonElement(event)
     }
 
-    override fun createAll(users: List<User>) {
+    override fun createAll(users: Collection<User>) {
         val events = users.map { user -> user.events }.flatten()
         createAllEvents(events)
     }
 
-    override fun updateAll(users: List<User>) {
+    override fun updateAll(users: Collection<User>) {
         val events = users.map { user -> user.events }.flatten()
         persistAllEvents(events)
     }
 
-    override fun deleteAll(users: List<User>) {
+    override fun deleteAll(users: Collection<User>) {
         val events = users.map { user -> DeleteUser(modelId = user.modelId) }
         createAllEvents(events)
     }

@@ -49,7 +49,7 @@ class MemberReadEventRepository(
         roomIds: List<Id>?,
         offset: Offset?,
         limit: Limit?,
-    ): List<Member> {
+    ): Collection<Member> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

@@ -18,17 +18,17 @@ class RoomWriteEventRepository(
         is DeleteRoom -> Json.encodeToJsonElement(event)
     }
 
-    override fun createAll(rooms: List<Room>) {
+    override fun createAll(rooms: Collection<Room>) {
         val events = rooms.map { room -> room.events }.flatten()
         createAllEvents(events)
     }
 
-    override fun updateAll(rooms: List<Room>) {
+    override fun updateAll(rooms: Collection<Room>) {
         val events = rooms.map { room -> room.events }.flatten()
         persistAllEvents(events)
     }
 
-    override fun deleteAll(rooms: List<Room>) {
+    override fun deleteAll(rooms: Collection<Room>) {
         val events = rooms.map { room -> DeleteRoom(modelId = room.modelId) }
         createAllEvents(events)
     }

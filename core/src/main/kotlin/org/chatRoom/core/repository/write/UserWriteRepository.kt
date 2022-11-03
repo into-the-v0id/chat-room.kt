@@ -3,9 +3,9 @@ package org.chatRoom.core.repository.write
 import org.chatRoom.core.aggreagte.User
 
 interface UserWriteRepository {
-    fun createAll(users: List<User>)
-    fun updateAll(users: List<User>)
-    fun deleteAll(users: List<User>)
+    fun createAll(users: Collection<User>)
+    fun updateAll(users: Collection<User>)
+    fun deleteAll(users: Collection<User>)
 }
 
 fun UserWriteRepository.create(user: User) = createAll(listOf(user))

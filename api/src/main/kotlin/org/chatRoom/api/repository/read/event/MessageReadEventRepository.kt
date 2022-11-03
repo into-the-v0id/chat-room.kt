@@ -50,7 +50,7 @@ class MessageReadEventRepository(
         memberIds: List<Id>?,
         offset: Offset?,
         limit: Limit?,
-    ): List<Message> {
+    ): Collection<Message> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 

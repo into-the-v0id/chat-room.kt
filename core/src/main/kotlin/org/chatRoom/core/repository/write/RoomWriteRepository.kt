@@ -3,9 +3,9 @@ package org.chatRoom.core.repository.write
 import org.chatRoom.core.aggreagte.Room
 
 interface RoomWriteRepository {
-    fun createAll(rooms: List<Room>)
-    fun updateAll(rooms: List<Room>)
-    fun deleteAll(rooms: List<Room>)
+    fun createAll(rooms: Collection<Room>)
+    fun updateAll(rooms: Collection<Room>)
+    fun deleteAll(rooms: Collection<Room>)
 }
 
 fun RoomWriteRepository.create(room: Room) = createAll(listOf(room))

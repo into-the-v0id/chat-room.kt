@@ -11,7 +11,7 @@ class UserWriteStateRepository(
 ) : UserWriteRepository {
     private val tableName = "user_state"
 
-    override fun createAll(users: List<User>) {
+    override fun createAll(users: Collection<User>) {
         dataSource.connection.use { connection ->
             var statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .insertInto(
@@ -40,7 +40,7 @@ class UserWriteStateRepository(
         }
     }
 
-    override fun updateAll(users: List<User>) {
+    override fun updateAll(users: Collection<User>) {
         dataSource.connection.use { connection ->
             val valueRows = users.map { user -> DSL.row(
                 user.handle.toString(),
@@ -66,7 +66,7 @@ class UserWriteStateRepository(
         }
     }
 
-    override fun deleteAll(users: List<User>) {
+    override fun deleteAll(users: Collection<User>) {
         dataSource.connection.use { connection ->
             val statement = DSL.using(connection, SQLDialect.POSTGRES)
                 .delete(DSL.table(tableName))
