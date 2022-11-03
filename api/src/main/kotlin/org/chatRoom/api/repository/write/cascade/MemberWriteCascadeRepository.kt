@@ -23,7 +23,7 @@ class MemberWriteCascadeRepository(
     override fun deleteAll(members: Collection<Member>) {
         logger.info("Cascading deletion of all specified members to messages")
         val messages = messageReadRepository.getAll(memberIds = members.map { member -> member.modelId })
-        messages.forEach { message -> messageWriteRepository.delete(message) }
+        messageWriteRepository.deleteAll(messages)
 
         repository.deleteAll(members)
     }
