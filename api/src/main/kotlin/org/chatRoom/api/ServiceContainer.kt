@@ -76,7 +76,12 @@ object ServiceContainer {
         single<ApplicationEngine> {
             val config = get<ServerConfiguration>()
 
-            embeddedServer(Netty, host = config.host, port = config.port.toInt()) {
+            embeddedServer(
+                Netty,
+                host = config.host,
+                port = config.port.toInt(),
+                watchPaths = listOf(),
+            ) {
                 configureHTTP()
                 configureMonitoring()
                 configureSerialization()
