@@ -7,10 +7,9 @@ import org.jooq.JSON
 import org.jooq.Record
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import javax.sql.DataSource
+import java.sql.Connection
 
 abstract class WriteEventRepository<E: Event>(
-    protected val dataSource: DataSource,
     protected val tableName: String,
 ) {
     protected abstract fun serializeEvent(event: E) : JsonElement
@@ -41,52 +40,48 @@ abstract class WriteEventRepository<E: Event>(
         ))
     }
 
-    protected fun createAllEvents(events: Collection<E>) {
-        dataSource.connection.use { connection ->
-            var statement = DSL.using(connection, SQLDialect.POSTGRES)
-                .insertInto(
-                    DSL.table(tableName),
-                    listOf(
-                        DSL.field("event_id"),
-                        DSL.field("model_id"),
-                        DSL.field("event_type"),
-                        DSL.field("event_data"),
-                        DSL.field("date_issued"),
-                    ),
-                )
+    protected fun createAllEvents(events: Collection<E>, connection: Connection) {
+        var statement = DSL.using(connection, SQLDialect.POSTGRES)
+            .insertInto(
+                DSL.table(tableName),
+                listOf(
+                    DSL.field("event_id"),
+                    DSL.field("model_id"),
+                    DSL.field("event_type"),
+                    DSL.field("event_data"),
+                    DSL.field("date_issued"),
+                ),
+            )
 
-            events.forEach { event -> statement = prepareStatementWithEvent(statement, event) }
+        events.forEach { event -> statement = prepareStatementWithEvent(statement, event) }
 
-            val modifiedRowCount = statement.execute()
-            if (modifiedRowCount != events.size) error("Unable to insert events")
-        }
+        val modifiedRowCount = statement.execute()
+        if (modifiedRowCount != events.size) error("Unable to insert events")
     }
 
-    protected fun persistAllEvents(events: Collection<E>) {
-        dataSource.connection.use { connection ->
-            val statement = DSL.using(connection, SQLDialect.POSTGRES)
-                .insertInto(
-                    DSL.table(tableName),
-                    listOf(
-                        DSL.field("event_id"),
-                        DSL.field("model_id"),
-                        DSL.field("event_type"),
-                        DSL.field("event_data"),
-                        DSL.field("date_issued"),
-                    ),
-                )
-                .run {
-                    var statement = this
+    protected fun persistAllEvents(events: Collection<E>, connection: Connection) {
+        val statement = DSL.using(connection, SQLDialect.POSTGRES)
+            .insertInto(
+                DSL.table(tableName),
+                listOf(
+                    DSL.field("event_id"),
+                    DSL.field("model_id"),
+                    DSL.field("event_type"),
+                    DSL.field("event_data"),
+                    DSL.field("date_issued"),
+                ),
+            )
+            .run {
+                var statement = this
 
-                    events.forEach { event -> statement = prepareStatementWithEvent(statement, event) }
+                events.forEach { event -> statement = prepareStatementWithEvent(statement, event) }
 
-                    statement
-                }
-                .onConflict(DSL.field("event_id"))
-                .doNothing()
+                statement
+            }
+            .onConflict(DSL.field("event_id"))
+            .doNothing()
 
-            val modifiedRowCount = statement.execute()
-            if (modifiedRowCount == 0) { /* do nothing */ }
-        }
+        val modifiedRowCount = statement.execute()
+        if (modifiedRowCount == 0) { /* do nothing */ }
     }
 }

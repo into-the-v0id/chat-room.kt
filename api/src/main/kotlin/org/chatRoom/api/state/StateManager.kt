@@ -12,6 +12,8 @@ import org.chatRoom.api.repository.write.state.MemberWriteStateRepository
 import org.chatRoom.api.repository.write.state.MessageWriteStateRepository
 import org.chatRoom.api.repository.write.state.RoomWriteStateRepository
 import org.chatRoom.api.repository.write.state.UserWriteStateRepository
+import org.chatRoom.core.repository.write.createAll
+import org.chatRoom.core.repository.write.deleteAll
 import org.slf4j.LoggerFactory
 
 class StateManager(

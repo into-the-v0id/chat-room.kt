@@ -1,6 +1,8 @@
 package org.chatRoom.api.repository.write.state
 
 import org.chatRoom.core.aggreagte.Room
+import org.chatRoom.core.repository.Transaction
+import org.chatRoom.core.repository.subscribeSqlConnection
 import org.chatRoom.core.repository.write.RoomWriteRepository
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -11,7 +13,10 @@ class RoomWriteStateRepository(
 ) : RoomWriteRepository {
     private val tableName = "room_state"
 
-    override fun createAll(rooms: Collection<Room>) = dataSource.connection.use { connection ->
+    override fun createAll(rooms: Collection<Room>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         var statement = DSL.using(connection, SQLDialect.POSTGRES)
             .insertInto(
                 DSL.table(tableName),
@@ -36,7 +41,10 @@ class RoomWriteStateRepository(
         if (modifiedRowCount != rooms.size) error("Unable to insert all specified rooms")
     }
 
-    override fun updateAll(rooms: Collection<Room>) = dataSource.connection.use { connection ->
+    override fun updateAll(rooms: Collection<Room>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val valueRows = rooms.map { room -> DSL.row(
             room.handle.toString(),
             room.dateCreated,
@@ -58,7 +66,10 @@ class RoomWriteStateRepository(
         if (modifiedRowCount != rooms.size) error("Unable to update all specified rooms")
     }
 
-    override fun deleteAll(rooms: Collection<Room>) = dataSource.connection.use { connection ->
+    override fun deleteAll(rooms: Collection<Room>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val statement = DSL.using(connection, SQLDialect.POSTGRES)
             .delete(DSL.table(tableName))
             .where(DSL.field("id").`in`(*rooms.map { room -> room.modelId.toUuid() }.toTypedArray()))

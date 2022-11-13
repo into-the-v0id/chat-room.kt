@@ -1,6 +1,8 @@
 package org.chatRoom.api.repository.write.state
 
 import org.chatRoom.core.aggreagte.Message
+import org.chatRoom.core.repository.Transaction
+import org.chatRoom.core.repository.subscribeSqlConnection
 import org.chatRoom.core.repository.write.MessageWriteRepository
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -11,7 +13,10 @@ class MessageWriteStateRepository(
 ) : MessageWriteRepository {
     private val tableName = "message_state"
 
-    override fun createAll(messages: Collection<Message>) = dataSource.connection.use { connection ->
+    override fun createAll(messages: Collection<Message>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         var statement = DSL.using(connection, SQLDialect.POSTGRES)
             .insertInto(
                 DSL.table(tableName),
@@ -38,7 +43,10 @@ class MessageWriteStateRepository(
         if (modifiedRowCount != messages.size) error("Unable to insert all specified messages")
     }
 
-    override fun updateAll(messages: Collection<Message>) = dataSource.connection.use { connection ->
+    override fun updateAll(messages: Collection<Message>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val valueRows = messages.map { message -> DSL.row(
             message.memberId.toUuid(),
             message.content,
@@ -62,7 +70,10 @@ class MessageWriteStateRepository(
         if (modifiedRowCount != messages.size) error("Unable to update all specified messages")
     }
 
-    override fun deleteAll(messages: Collection<Message>) = dataSource.connection.use { connection ->
+    override fun deleteAll(messages: Collection<Message>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val statement = DSL.using(connection, SQLDialect.POSTGRES)
             .delete(DSL.table(tableName))
             .where(DSL.field("id").`in`(*messages.map { message -> message.modelId.toUuid() }.toTypedArray()))

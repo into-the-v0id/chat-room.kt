@@ -1,6 +1,7 @@
 package org.chatRoom.api.repository.write.cascade
 
 import org.chatRoom.core.aggreagte.Member
+import org.chatRoom.core.repository.Transaction
 import org.chatRoom.core.repository.read.MessageReadRepository
 import org.chatRoom.core.repository.write.MemberWriteRepository
 import org.chatRoom.core.repository.write.MessageWriteRepository
@@ -16,15 +17,15 @@ class MemberWriteCascadeRepository(
         private val logger = LoggerFactory.getLogger(MemberWriteCascadeRepository::class.java)
     }
 
-    override fun createAll(members: Collection<Member>) = repository.createAll(members)
+    override fun createAll(members: Collection<Member>, transaction: Transaction) = repository.createAll(members, transaction)
 
-    override fun updateAll(members: Collection<Member>) = repository.updateAll(members)
+    override fun updateAll(members: Collection<Member>, transaction: Transaction) = repository.updateAll(members, transaction)
 
-    override fun deleteAll(members: Collection<Member>) {
+    override fun deleteAll(members: Collection<Member>, transaction: Transaction) {
         logger.info("Cascading deletion of all specified members to messages")
         val messages = messageReadRepository.getAll(memberIds = members.map { member -> member.modelId })
-        messageWriteRepository.deleteAll(messages)
+        messageWriteRepository.deleteAll(messages, transaction)
 
-        repository.deleteAll(members)
+        repository.deleteAll(members, transaction)
     }
 }

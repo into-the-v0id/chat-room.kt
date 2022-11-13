@@ -5,29 +5,40 @@ import org.chatRoom.core.aggreagte.Member
 import org.chatRoom.core.event.member.CreateMember
 import org.chatRoom.core.event.member.DeleteMember
 import org.chatRoom.core.event.member.MemberEvent
+import org.chatRoom.core.repository.Transaction
+import org.chatRoom.core.repository.subscribeSqlConnection
 import org.chatRoom.core.repository.write.MemberWriteRepository
 import javax.sql.DataSource
 
 class MemberWriteEventRepository(
-    dataSource: DataSource,
-) : WriteEventRepository<MemberEvent>(dataSource, "member_events"), MemberWriteRepository {
+    private val dataSource: DataSource,
+) : WriteEventRepository<MemberEvent>("member_events"), MemberWriteRepository {
     override fun serializeEvent(event: MemberEvent): JsonElement = when (event) {
         is CreateMember -> Json.encodeToJsonElement(event)
         is DeleteMember -> Json.encodeToJsonElement(event)
     }
 
-    override fun createAll(members: Collection<Member>) {
+    override fun createAll(members: Collection<Member>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val events = members.map { member -> member.events }.flatten()
-        createAllEvents(events)
+        createAllEvents(events, connection)
     }
 
-    override fun updateAll(members: Collection<Member>) {
+    override fun updateAll(members: Collection<Member>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val events = members.map { member -> member.events }.flatten()
-        persistAllEvents(events)
+        persistAllEvents(events, connection)
     }
 
-    override fun deleteAll(members: Collection<Member>) {
+    override fun deleteAll(members: Collection<Member>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val events = members.map { member -> DeleteMember(modelId = member.modelId) }
-        createAllEvents(events)
+        createAllEvents(events, connection)
     }
 }

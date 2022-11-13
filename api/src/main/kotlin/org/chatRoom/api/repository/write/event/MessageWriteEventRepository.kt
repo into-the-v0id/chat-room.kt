@@ -6,30 +6,41 @@ import org.chatRoom.core.event.message.ChangeContent
 import org.chatRoom.core.event.message.CreateMessage
 import org.chatRoom.core.event.message.DeleteMessage
 import org.chatRoom.core.event.message.MessageEvent
+import org.chatRoom.core.repository.Transaction
+import org.chatRoom.core.repository.subscribeSqlConnection
 import org.chatRoom.core.repository.write.MessageWriteRepository
 import javax.sql.DataSource
 
 class MessageWriteEventRepository(
-    dataSource: DataSource,
-) : WriteEventRepository<MessageEvent>(dataSource, "message_events"), MessageWriteRepository {
+    private val dataSource: DataSource,
+) : WriteEventRepository<MessageEvent>("message_events"), MessageWriteRepository {
     override fun serializeEvent(event: MessageEvent): JsonElement = when (event) {
         is CreateMessage -> Json.encodeToJsonElement(event)
         is ChangeContent -> Json.encodeToJsonElement(event)
         is DeleteMessage -> Json.encodeToJsonElement(event)
     }
 
-    override fun createAll(messages: Collection<Message>) {
+    override fun createAll(messages: Collection<Message>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val events = messages.map { message -> message.events }.flatten()
-        createAllEvents(events)
+        createAllEvents(events, connection)
     }
 
-    override fun updateAll(messages: Collection<Message>) {
+    override fun updateAll(messages: Collection<Message>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val events = messages.map { message -> message.events }.flatten()
-        persistAllEvents(events)
+        persistAllEvents(events, connection)
     }
 
-    override fun deleteAll(messages: Collection<Message>) {
+    override fun deleteAll(messages: Collection<Message>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val events = messages.map { message -> DeleteMessage(modelId = message.modelId) }
-        createAllEvents(events)
+        createAllEvents(events, connection)
     }
 }

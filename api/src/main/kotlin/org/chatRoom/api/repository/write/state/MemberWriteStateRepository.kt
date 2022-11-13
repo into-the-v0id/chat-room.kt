@@ -1,6 +1,8 @@
 package org.chatRoom.api.repository.write.state
 
 import org.chatRoom.core.aggreagte.Member
+import org.chatRoom.core.repository.Transaction
+import org.chatRoom.core.repository.subscribeSqlConnection
 import org.chatRoom.core.repository.write.MemberWriteRepository
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -11,7 +13,10 @@ class MemberWriteStateRepository(
 ) : MemberWriteRepository {
     private val tableName = "member_state"
 
-    override fun createAll(members: Collection<Member>) = dataSource.connection.use { connection ->
+    override fun createAll(members: Collection<Member>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         var statement = DSL.using(connection, SQLDialect.POSTGRES)
             .insertInto(
                 DSL.table(tableName),
@@ -38,7 +43,10 @@ class MemberWriteStateRepository(
         if (modifiedRowCount != members.size) error("Unable to insert all specified members")
     }
 
-    override fun updateAll(members: Collection<Member>) = dataSource.connection.use { connection ->
+    override fun updateAll(members: Collection<Member>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val valueRows = members.map { member -> DSL.row(
             member.userId.toUuid(),
             member.roomId.toUuid(),
@@ -62,7 +70,10 @@ class MemberWriteStateRepository(
         if (modifiedRowCount != members.size) error("Unable to update all specified members")
     }
 
-    override fun deleteAll(members: Collection<Member>) = dataSource.connection.use { connection ->
+    override fun deleteAll(members: Collection<Member>, transaction: Transaction) {
+        val connection = dataSource.connection
+        transaction.subscribeSqlConnection(connection)
+
         val statement = DSL.using(connection, SQLDialect.POSTGRES)
             .delete(DSL.table(tableName))
             .where(DSL.field("id").`in`(*members.map { member -> member.modelId.toUuid() }.toTypedArray()))
