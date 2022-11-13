@@ -39,10 +39,10 @@ import org.chatRoom.core.repository.write.UserWriteRepository
 import org.chatRoom.api.repository.write.cascade.MemberWriteCascadeRepository
 import org.chatRoom.api.repository.write.cascade.RoomWriteCascadeRepository
 import org.chatRoom.api.repository.write.cascade.UserWriteCascadeRepository
-import org.chatRoom.api.repository.write.chain.MemberWriteChainRepository
-import org.chatRoom.api.repository.write.chain.MessageWriteChainRepository
-import org.chatRoom.api.repository.write.chain.RoomWriteChainRepository
-import org.chatRoom.api.repository.write.chain.UserWriteChainRepository
+import org.chatRoom.api.repository.write.concurrent.MemberWriteConcurrentRepository
+import org.chatRoom.api.repository.write.concurrent.MessageWriteConcurrentRepository
+import org.chatRoom.api.repository.write.concurrent.RoomWriteConcurrentRepository
+import org.chatRoom.api.repository.write.concurrent.UserWriteConcurrentRepository
 import org.chatRoom.api.repository.write.event.MemberWriteEventRepository
 import org.chatRoom.api.repository.write.event.MessageWriteEventRepository
 import org.chatRoom.api.repository.write.event.RoomWriteEventRepository
@@ -118,7 +118,7 @@ object ServiceContainer {
         singleOf(::UserWriteStateRepository)
         single<UserWriteRepository> { UserWriteGuardRepository(
             UserWriteCascadeRepository(
-                UserWriteChainRepository(listOf(
+                UserWriteConcurrentRepository(listOf(
                     get<UserWriteEventRepository>(),
                     get<UserWriteStateRepository>(),
                 )),
@@ -136,7 +136,7 @@ object ServiceContainer {
         singleOf(::RoomWriteStateRepository)
         single<RoomWriteRepository> { RoomWriteGuardRepository(
             RoomWriteCascadeRepository(
-                RoomWriteChainRepository(listOf(
+                RoomWriteConcurrentRepository(listOf(
                     get<RoomWriteEventRepository>(),
                     get<RoomWriteStateRepository>(),
                 )),
@@ -154,7 +154,7 @@ object ServiceContainer {
         singleOf(::MemberWriteStateRepository)
         single<MemberWriteRepository> { MemberWriteGuardRepository(
             MemberWriteCascadeRepository(
-                MemberWriteChainRepository(listOf(
+                MemberWriteConcurrentRepository(listOf(
                     get<MemberWriteEventRepository>(),
                     get<MemberWriteStateRepository>(),
                 )),
@@ -171,7 +171,7 @@ object ServiceContainer {
         singleOf(::MessageReadStateRepository) { bind<MessageReadRepository>() }
         singleOf(::MessageWriteStateRepository)
         single<MessageWriteRepository> { MessageWriteGuardRepository(
-            MessageWriteChainRepository(listOf(
+            MessageWriteConcurrentRepository(listOf(
                 get<MessageWriteEventRepository>(),
                 get<MessageWriteStateRepository>(),
             )),

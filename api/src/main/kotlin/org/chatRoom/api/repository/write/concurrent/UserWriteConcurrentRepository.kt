@@ -1,4 +1,4 @@
-package org.chatRoom.api.repository.write.chain
+package org.chatRoom.api.repository.write.concurrent
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -7,7 +7,7 @@ import org.chatRoom.core.aggreagte.User
 import org.chatRoom.core.repository.Transaction
 import org.chatRoom.core.repository.write.UserWriteRepository
 
-class UserWriteChainRepository(
+class UserWriteConcurrentRepository(
     private val repositories: Collection<UserWriteRepository>,
 ) : UserWriteRepository {
     override suspend fun createAll(users: Collection<User>, transaction: Transaction) = withContext(Dispatchers.Default) {
