@@ -25,9 +25,6 @@ class RoomController(
         val ids = resource.ids.ifEmpty { null }
         val handles = resource.handles.ifEmpty { null }
 
-        println(resource.offset)
-        println(resource.limit)
-
         val roomModels = roomReadRepository.getAll(
             ids = ids,
             handles = handles,
