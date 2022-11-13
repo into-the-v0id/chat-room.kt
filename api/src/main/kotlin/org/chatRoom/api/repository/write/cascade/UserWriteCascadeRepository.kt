@@ -1,13 +1,13 @@
 package org.chatRoom.api.repository.write.cascade
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.chatRoom.core.aggreagte.User
 import org.chatRoom.core.repository.Transaction
 import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.repository.write.MemberWriteRepository
 import org.chatRoom.core.repository.write.UserWriteRepository
-import org.chatRoom.core.repository.write.delete
 import org.slf4j.LoggerFactory
 
 class UserWriteCascadeRepository(
@@ -25,9 +25,16 @@ class UserWriteCascadeRepository(
 
     override suspend fun deleteAll(users: Collection<User>, transaction: Transaction) {
         logger.info("Cascading deletion of all specified users to members")
-        val members = memberReadRepository.getAll(userIds = users.map { user -> user.modelId })
-        memberWriteRepository.deleteAll(members, transaction)
 
-        repository.deleteAll(users, transaction)
+        withContext(Dispatchers.Default) {
+            launch {
+                val members = memberReadRepository.getAll(userIds = users.map { user -> user.modelId })
+                memberWriteRepository.deleteAll(members, transaction)
+            }
+
+            launch {
+                repository.deleteAll(users, transaction)
+            }
+        }
     }
 }
