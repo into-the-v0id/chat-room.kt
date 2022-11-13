@@ -1,6 +1,8 @@
 package org.chatRoom.core.repository
 
 import org.chatRoom.core.valueObject.Id
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.sql.Connection
 
 private typealias Subscriber = (Transaction) -> Unit
@@ -14,12 +16,18 @@ class Transaction(
     var isClosed = false
         private set
 
+    companion object {
+        val logger: Logger = LoggerFactory.getLogger(Transaction::class.java)
+    }
+
     fun subscribeToCommit(subscriber: Subscriber) = commitSubscribers.add(subscriber)
     fun subscribeToRollback(subscriber: Subscriber) = rollbackSubscribers.add(subscriber)
     fun subscribeToClose(subscriber: Subscriber) = closeSubscribers.add(subscriber)
 
     fun commit() {
         if (isClosed) error("Unable to commit transaction: Transaction is closed")
+
+        logger.debug("Committing Transaction with ID $id")
 
         this.use {
             commitSubscribers.forEach { subscriber -> subscriber(this) }
@@ -29,6 +37,8 @@ class Transaction(
     fun rollback() {
         if (isClosed) error("Unable to rollback transaction: Transaction is closed")
 
+        logger.debug("Rolling back Transaction with ID $id")
+
         this.use {
             rollbackSubscribers.forEach { subscriber -> subscriber(this) }
         }
@@ -37,6 +47,8 @@ class Transaction(
     override fun close() {
         if (isClosed) error("Unable to close transaction: Transaction is already closed")
 
+        logger.debug("Closing Transaction with ID $id")
+
         isClosed = true
         closeSubscribers.forEachCatching { subscriber -> subscriber(this) }
     }
@@ -44,6 +56,8 @@ class Transaction(
 
 inline fun <R> Transaction.execute(block: (Transaction) -> R): R {
     if (isClosed) error("Unable to use transaction: Transaction is closed")
+
+    Transaction.logger.debug("Executing Transaction with ID $id")
 
     val response = try {
         block(this)
