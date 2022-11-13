@@ -20,7 +20,7 @@ class RoomWriteEventRepository(
         is DeleteRoom -> Json.encodeToJsonElement(event)
     }
 
-    override fun createAll(rooms: Collection<Room>, transaction: Transaction) {
+    override suspend fun createAll(rooms: Collection<Room>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -28,7 +28,7 @@ class RoomWriteEventRepository(
         createAllEvents(events, connection)
     }
 
-    override fun updateAll(rooms: Collection<Room>, transaction: Transaction) {
+    override suspend fun updateAll(rooms: Collection<Room>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -36,7 +36,7 @@ class RoomWriteEventRepository(
         persistAllEvents(events, connection)
     }
 
-    override fun deleteAll(rooms: Collection<Room>, transaction: Transaction) {
+    override suspend fun deleteAll(rooms: Collection<Room>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 

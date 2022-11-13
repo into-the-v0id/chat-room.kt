@@ -13,7 +13,7 @@ class MessageWriteStateRepository(
 ) : MessageWriteRepository {
     private val tableName = "message_state"
 
-    override fun createAll(messages: Collection<Message>, transaction: Transaction) {
+    override suspend fun createAll(messages: Collection<Message>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -43,7 +43,7 @@ class MessageWriteStateRepository(
         if (modifiedRowCount != messages.size) error("Unable to insert all specified messages")
     }
 
-    override fun updateAll(messages: Collection<Message>, transaction: Transaction) {
+    override suspend fun updateAll(messages: Collection<Message>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -70,7 +70,7 @@ class MessageWriteStateRepository(
         if (modifiedRowCount != messages.size) error("Unable to update all specified messages")
     }
 
-    override fun deleteAll(messages: Collection<Message>, transaction: Transaction) {
+    override suspend fun deleteAll(messages: Collection<Message>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 

@@ -13,7 +13,7 @@ class UserWriteStateRepository(
 ) : UserWriteRepository {
     private val tableName = "user_state"
 
-    override fun createAll(users: Collection<User>, transaction: Transaction) {
+    override suspend fun createAll(users: Collection<User>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -43,7 +43,7 @@ class UserWriteStateRepository(
         if (modifiedRowCount != users.size) error("Unable to insert all specified users")
     }
 
-    override fun updateAll(users: Collection<User>, transaction: Transaction) {
+    override suspend fun updateAll(users: Collection<User>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -70,7 +70,7 @@ class UserWriteStateRepository(
         if (modifiedRowCount != users.size) error("Unable to update all specified users")
     }
 
-    override fun deleteAll(users: Collection<User>, transaction: Transaction) {
+    override suspend fun deleteAll(users: Collection<User>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 

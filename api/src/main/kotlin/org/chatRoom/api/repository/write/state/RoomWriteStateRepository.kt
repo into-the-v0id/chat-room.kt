@@ -13,7 +13,7 @@ class RoomWriteStateRepository(
 ) : RoomWriteRepository {
     private val tableName = "room_state"
 
-    override fun createAll(rooms: Collection<Room>, transaction: Transaction) {
+    override suspend fun createAll(rooms: Collection<Room>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -41,7 +41,7 @@ class RoomWriteStateRepository(
         if (modifiedRowCount != rooms.size) error("Unable to insert all specified rooms")
     }
 
-    override fun updateAll(rooms: Collection<Room>, transaction: Transaction) {
+    override suspend fun updateAll(rooms: Collection<Room>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -66,7 +66,7 @@ class RoomWriteStateRepository(
         if (modifiedRowCount != rooms.size) error("Unable to update all specified rooms")
     }
 
-    override fun deleteAll(rooms: Collection<Room>, transaction: Transaction) {
+    override suspend fun deleteAll(rooms: Collection<Room>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 

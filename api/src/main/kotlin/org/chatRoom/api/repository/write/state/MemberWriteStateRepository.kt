@@ -13,7 +13,7 @@ class MemberWriteStateRepository(
 ) : MemberWriteRepository {
     private val tableName = "member_state"
 
-    override fun createAll(members: Collection<Member>, transaction: Transaction) {
+    override suspend fun createAll(members: Collection<Member>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -43,7 +43,7 @@ class MemberWriteStateRepository(
         if (modifiedRowCount != members.size) error("Unable to insert all specified members")
     }
 
-    override fun updateAll(members: Collection<Member>, transaction: Transaction) {
+    override suspend fun updateAll(members: Collection<Member>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -70,7 +70,7 @@ class MemberWriteStateRepository(
         if (modifiedRowCount != members.size) error("Unable to update all specified members")
     }
 
-    override fun deleteAll(members: Collection<Member>, transaction: Transaction) {
+    override suspend fun deleteAll(members: Collection<Member>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 

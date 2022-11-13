@@ -18,7 +18,7 @@ class MemberWriteEventRepository(
         is DeleteMember -> Json.encodeToJsonElement(event)
     }
 
-    override fun createAll(members: Collection<Member>, transaction: Transaction) {
+    override suspend fun createAll(members: Collection<Member>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -26,7 +26,7 @@ class MemberWriteEventRepository(
         createAllEvents(events, connection)
     }
 
-    override fun updateAll(members: Collection<Member>, transaction: Transaction) {
+    override suspend fun updateAll(members: Collection<Member>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -34,7 +34,7 @@ class MemberWriteEventRepository(
         persistAllEvents(events, connection)
     }
 
-    override fun deleteAll(members: Collection<Member>, transaction: Transaction) {
+    override suspend fun deleteAll(members: Collection<Member>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 

@@ -35,14 +35,14 @@ class StateManager(
         private val logger = LoggerFactory.getLogger(StateManager::class.java)
     }
 
-    fun replayAllEvents() {
+    suspend fun replayAllEvents() {
         replayUserEvents()
         replayRoomEvents()
         replayMemberEvents()
         replayMessageEvents()
     }
 
-    private fun replayUserEvents() {
+    private suspend fun replayUserEvents() {
         logger.info("Replaying user events ...")
 
         Transaction(id = Id()).execute { transaction ->
@@ -53,7 +53,7 @@ class StateManager(
         logger.info("Successfully replayed user events")
     }
 
-    private fun replayRoomEvents() {
+    private suspend fun replayRoomEvents() {
         logger.info("Replaying room events ...")
 
         Transaction(id = Id()).execute { transaction ->
@@ -64,7 +64,7 @@ class StateManager(
         logger.info("Successfully replayed room events")
     }
 
-    private fun replayMemberEvents() {
+    private suspend fun replayMemberEvents() {
         logger.info("Replaying member events ...")
 
         Transaction(id = Id()).execute { transaction ->
@@ -75,7 +75,7 @@ class StateManager(
         logger.info("Successfully replayed member events")
     }
 
-    private fun replayMessageEvents() {
+    private suspend fun replayMessageEvents() {
         logger.info("Replaying message events ...")
 
         Transaction(id = Id()).execute { transaction ->

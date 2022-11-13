@@ -20,7 +20,7 @@ class MessageWriteEventRepository(
         is DeleteMessage -> Json.encodeToJsonElement(event)
     }
 
-    override fun createAll(messages: Collection<Message>, transaction: Transaction) {
+    override suspend fun createAll(messages: Collection<Message>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -28,7 +28,7 @@ class MessageWriteEventRepository(
         createAllEvents(events, connection)
     }
 
-    override fun updateAll(messages: Collection<Message>, transaction: Transaction) {
+    override suspend fun updateAll(messages: Collection<Message>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -36,7 +36,7 @@ class MessageWriteEventRepository(
         persistAllEvents(events, connection)
     }
 
-    override fun deleteAll(messages: Collection<Message>, transaction: Transaction) {
+    override suspend fun deleteAll(messages: Collection<Message>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 

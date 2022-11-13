@@ -9,7 +9,7 @@ class RoomWriteGuardRepository(
     private val repository: RoomWriteRepository,
     private val roomReadRepository: RoomReadRepository,
 ) : RoomWriteRepository {
-    override fun createAll(rooms: Collection<Room>, transaction: Transaction) {
+    override suspend fun createAll(rooms: Collection<Room>, transaction: Transaction) {
         val roomIds = rooms.map { room -> room.modelId }
         if (roomReadRepository.getAll(ids = roomIds).isNotEmpty()) error("Unable to create all specified rooms: Room already exists")
 
@@ -19,7 +19,7 @@ class RoomWriteGuardRepository(
         repository.createAll(rooms, transaction)
     }
 
-    override fun updateAll(rooms: Collection<Room>, transaction: Transaction) {
+    override suspend fun updateAll(rooms: Collection<Room>, transaction: Transaction) {
         val roomIds = rooms.map { room -> room.modelId }
         val allIdsExist = roomReadRepository.getAll(ids = roomIds)
             .map { room -> room.modelId }
@@ -29,7 +29,7 @@ class RoomWriteGuardRepository(
         repository.updateAll(rooms, transaction)
     }
 
-    override fun deleteAll(rooms: Collection<Room>, transaction: Transaction) {
+    override suspend fun deleteAll(rooms: Collection<Room>, transaction: Transaction) {
         val roomIds = rooms.map { room -> room.modelId }
         val allIdsExist = roomReadRepository.getAll(ids = roomIds)
             .map { room -> room.modelId }

@@ -7,15 +7,15 @@ import org.chatRoom.core.repository.write.MessageWriteRepository
 class MessageWriteChainRepository(
     private val repositories: Collection<MessageWriteRepository>,
 ) : MessageWriteRepository {
-    override fun createAll(messages: Collection<Message>, transaction: Transaction) = repositories.forEach { repository ->
+    override suspend fun createAll(messages: Collection<Message>, transaction: Transaction) = repositories.forEach { repository ->
         repository.createAll(messages, transaction)
     }
 
-    override fun updateAll(messages: Collection<Message>, transaction: Transaction) = repositories.forEach { repository ->
+    override suspend fun updateAll(messages: Collection<Message>, transaction: Transaction) = repositories.forEach { repository ->
         repository.updateAll(messages, transaction)
     }
 
-    override fun deleteAll(messages: Collection<Message>, transaction: Transaction) = repositories.forEach { repository ->
+    override suspend fun deleteAll(messages: Collection<Message>, transaction: Transaction) = repositories.forEach { repository ->
         repository.deleteAll(messages, transaction)
     }
 }

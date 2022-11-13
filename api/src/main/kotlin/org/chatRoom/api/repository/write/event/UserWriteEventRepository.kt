@@ -18,7 +18,7 @@ class UserWriteEventRepository(
         is DeleteUser -> Json.encodeToJsonElement(event)
     }
 
-    override fun createAll(users: Collection<User>, transaction: Transaction) {
+    override suspend fun createAll(users: Collection<User>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -26,7 +26,7 @@ class UserWriteEventRepository(
         createAllEvents(events, connection)
     }
 
-    override fun updateAll(users: Collection<User>, transaction: Transaction) {
+    override suspend fun updateAll(users: Collection<User>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
@@ -34,7 +34,7 @@ class UserWriteEventRepository(
         persistAllEvents(events, connection)
     }
 
-    override fun deleteAll(users: Collection<User>, transaction: Transaction) {
+    override suspend fun deleteAll(users: Collection<User>, transaction: Transaction) {
         val connection = dataSource.connection
         transaction.subscribeSqlConnection(connection)
 
