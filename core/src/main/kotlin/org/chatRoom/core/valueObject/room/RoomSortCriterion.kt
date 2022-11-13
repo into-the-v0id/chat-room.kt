@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class UserSortCriterion {
+enum class RoomSortCriterion {
     @SerialName("dateCreatedAsc")
     DATE_CREATED_ASC,
     @SerialName("dateCreatedDesc")

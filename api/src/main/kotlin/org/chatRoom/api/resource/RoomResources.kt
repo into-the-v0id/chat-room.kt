@@ -4,7 +4,7 @@ import io.ktor.resources.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.valueObject.*
-import org.chatRoom.core.valueObject.room.UserSortCriterion
+import org.chatRoom.core.valueObject.room.RoomSortCriterion
 
 @Serializable
 @Resource("rooms")
@@ -16,7 +16,7 @@ class Rooms(
     val offset: Offset? = null,
     val limit: Limit? = null,
     @SerialName("sort_criteria")
-    val sortCriteria: List<UserSortCriterion> = listOf(),
+    val sortCriteria: List<RoomSortCriterion> = listOf(),
 ) {
     @Serializable
     @Resource("{id}")

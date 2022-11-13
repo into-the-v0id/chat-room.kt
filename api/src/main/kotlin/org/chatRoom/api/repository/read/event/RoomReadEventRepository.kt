@@ -8,7 +8,7 @@ import org.chatRoom.core.event.room.DeleteRoom
 import org.chatRoom.core.event.room.RoomEvent
 import org.chatRoom.core.repository.read.RoomReadRepository
 import org.chatRoom.core.valueObject.*
-import org.chatRoom.core.valueObject.room.UserSortCriterion
+import org.chatRoom.core.valueObject.room.RoomSortCriterion
 import org.jooq.Condition
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -49,7 +49,7 @@ class RoomReadEventRepository(
         handles: List<Handle>?,
         offset: Offset?,
         limit: Limit?,
-        sortCriteria: List<UserSortCriterion>,
+        sortCriteria: List<RoomSortCriterion>,
     ): Collection<Room> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
