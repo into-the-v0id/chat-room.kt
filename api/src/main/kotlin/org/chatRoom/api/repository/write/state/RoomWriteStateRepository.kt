@@ -46,6 +46,7 @@ class RoomWriteStateRepository(
         transaction.subscribeSqlConnection(connection)
 
         val valueRows = rooms.map { room -> DSL.row(
+            room.modelId.toUuid(),
             room.handle.toString(),
             room.dateCreated,
             room.dateUpdated,
@@ -53,12 +54,14 @@ class RoomWriteStateRepository(
 
         val statement = DSL.using(connection, SQLDialect.POSTGRES)
             .update(DSL.table(tableName).`as`("old"))
-            .set(DSL.field("old.handle"), "new.handle")
-            .set(DSL.field("old.date_created"), "new.date_created")
-            .set(DSL.field("old.date_updated"), "new.date_updated")
+            .set(mapOf(
+                DSL.field("handle") to DSL.field("new.handle"),
+                DSL.field("date_created") to DSL.field("new.date_created"),
+                DSL.field("date_updated") to DSL.field("new.date_updated"),
+            ))
             .from(
                 DSL.values(*valueRows.toTypedArray())
-                    .`as`("new", listOf("handle", "date_created", "date_updated"))
+                    .`as`("new", listOf("id", "handle", "date_created", "date_updated"))
             )
             .where(DSL.field("old.id").eq(DSL.field("new.id")))
 

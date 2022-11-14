@@ -48,6 +48,7 @@ class MemberWriteStateRepository(
         transaction.subscribeSqlConnection(connection)
 
         val valueRows = members.map { member -> DSL.row(
+            member.modelId.toUuid(),
             member.userId.toUuid(),
             member.roomId.toUuid(),
             member.dateCreated,
@@ -56,13 +57,15 @@ class MemberWriteStateRepository(
 
         val statement = DSL.using(connection, SQLDialect.POSTGRES)
             .update(DSL.table(tableName).`as`("old"))
-            .set(DSL.field("old.user_id"), "new.user_id")
-            .set(DSL.field("old.room_id"), "new.room_id")
-            .set(DSL.field("old.date_created"), "new.date_created")
-            .set(DSL.field("old.date_updated"), "new.date_updated")
+            .set(mapOf(
+                DSL.field("user_id") to DSL.field("new.user_id"),
+                DSL.field("room_id") to DSL.field("new.room_id"),
+                DSL.field("date_created") to DSL.field("new.date_created"),
+                DSL.field("date_updated") to DSL.field("new.date_updated"),
+            ))
             .from(
                 DSL.values(*valueRows.toTypedArray())
-                    .`as`("new", listOf("user_id", "room_id", "date_created", "date_updated"))
+                    .`as`("new", listOf("id", "user_id", "room_id", "date_created", "date_updated"))
             )
             .where(DSL.field("old.id").eq(DSL.field("new.id")))
 
