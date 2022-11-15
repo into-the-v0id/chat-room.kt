@@ -24,10 +24,9 @@ class MemberWriteCascadeRepository(
     override suspend fun updateAll(members: Collection<Member>, transaction: Transaction) = repository.updateAll(members, transaction)
 
     override suspend fun deleteAll(members: Collection<Member>, transaction: Transaction) {
-        logger.info("Cascading deletion of all specified members to messages")
-
         withContext(Dispatchers.Default) {
             launch {
+                logger.info("Cascading deletion of all specified members to messages")
                 val messages = messageReadRepository.getAll(memberIds = members.map { member -> member.modelId })
                 messageWriteRepository.deleteAll(messages, transaction)
             }

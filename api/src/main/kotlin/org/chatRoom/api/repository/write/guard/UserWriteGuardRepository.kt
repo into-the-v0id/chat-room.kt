@@ -1,6 +1,7 @@
 package org.chatRoom.api.repository.write.guard
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.chatRoom.core.aggreagte.User
@@ -13,23 +14,20 @@ class UserWriteGuardRepository(
     private val userReadRepository: UserReadRepository,
 ) : UserWriteRepository {
     override suspend fun createAll(users: Collection<User>, transaction: Transaction) {
-        var isUserIdAvailable: Boolean? = null
-        var isUserHandleAvailable: Boolean? = null
-
         withContext(Dispatchers.Default) {
-            launch {
+            val areUserIdsAvailable = async {
                 val userIds = users.map { user -> user.modelId }
-                isUserIdAvailable = userReadRepository.getAll(ids = userIds).isEmpty()
+                userReadRepository.getAll(ids = userIds).isEmpty()
             }
 
-            launch {
+            val areUserHandlesAvailable = async {
                 val userHandles = users.map { user -> user.handle }
-                isUserHandleAvailable = userReadRepository.getAll(handles = userHandles).isEmpty()
+                userReadRepository.getAll(handles = userHandles).isEmpty()
             }
-        }
 
-        if (! isUserIdAvailable!!) error("Unable to create all specified users: User already exists")
-        if (! isUserHandleAvailable!!) error("Unable to create all specified users: Handle already exists")
+            if (! areUserIdsAvailable.await()) error("Unable to create all specified users: User already exists")
+            if (! areUserHandlesAvailable.await()) error("Unable to create all specified users: Handle already exists")
+        }
 
         repository.createAll(users, transaction)
     }

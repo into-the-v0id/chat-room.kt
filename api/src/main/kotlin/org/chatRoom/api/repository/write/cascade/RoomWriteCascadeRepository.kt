@@ -24,10 +24,9 @@ class RoomWriteCascadeRepository(
     override suspend fun updateAll(rooms: Collection<Room>, transaction: Transaction) = repository.updateAll(rooms, transaction)
 
     override suspend fun deleteAll(rooms: Collection<Room>, transaction: Transaction) {
-        logger.info("Cascading deletion of all specified rooms to members")
-
         withContext(Dispatchers.Default) {
             launch {
+                logger.info("Cascading deletion of all specified rooms to members")
                 val members = memberReadRepository.getAll(roomIds = rooms.map { room -> room.modelId })
                 memberWriteRepository.deleteAll(members, transaction)
             }

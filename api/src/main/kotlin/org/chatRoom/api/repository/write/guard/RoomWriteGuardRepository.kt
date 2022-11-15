@@ -1,6 +1,7 @@
 package org.chatRoom.api.repository.write.guard
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.chatRoom.core.aggreagte.Room
@@ -13,23 +14,20 @@ class RoomWriteGuardRepository(
     private val roomReadRepository: RoomReadRepository,
 ) : RoomWriteRepository {
     override suspend fun createAll(rooms: Collection<Room>, transaction: Transaction) {
-        var isRoomIdAvailable: Boolean? = null
-        var isRoomHandleAvailable: Boolean? = null
-
         withContext(Dispatchers.Default) {
-            launch {
+            val areRoomIdsAvailable = async {
                 val roomIds = rooms.map { room -> room.modelId }
-                isRoomIdAvailable = roomReadRepository.getAll(ids = roomIds).isEmpty()
+                roomReadRepository.getAll(ids = roomIds).isEmpty()
             }
 
-            launch {
+            val areRoomHandlesAvailable = async {
                 val roomHandles = rooms.map { room -> room.handle }
-                isRoomHandleAvailable = roomReadRepository.getAll(handles = roomHandles).isEmpty()
+                roomReadRepository.getAll(handles = roomHandles).isEmpty()
             }
-        }
 
-        if (! isRoomIdAvailable!!) error("Unable to create all specified rooms: Room already exists")
-        if (! isRoomHandleAvailable!!) error("Unable to create all specified rooms: Handle already exists")
+            if (! areRoomIdsAvailable.await()) error("Unable to create all specified rooms: Room already exists")
+            if (! areRoomHandlesAvailable.await()) error("Unable to create all specified rooms: Handle already exists")
+        }
 
         repository.createAll(rooms, transaction)
     }
