@@ -7,11 +7,12 @@ import java.time.OffsetDateTime
 
 @Serializable
 data class UpdateMessage(
-    val id: Id,
-    val memberId: Id,
     val content: String,
+) {
+    val id: Id? = null
+    val memberId: Id? = null
     @Serializable(with = OffsetDateTimeSerializer::class)
-    val dateCreated: OffsetDateTime,
+    private val dateCreated: OffsetDateTime? = null
     @Serializable(with = OffsetDateTimeSerializer::class)
-    val dateUpdated: OffsetDateTime,
-)
+    private val dateUpdated: OffsetDateTime? = null
+}

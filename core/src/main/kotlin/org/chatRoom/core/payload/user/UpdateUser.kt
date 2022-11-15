@@ -9,14 +9,15 @@ import java.time.OffsetDateTime
 
 @Serializable
 data class UpdateUser(
-    val id: Id,
     val handle: Handle,
     val email: String,
-    @Serializable(with = OffsetDateTimeSerializer::class)
-    val dateCreated: OffsetDateTime,
-    @Serializable(with = OffsetDateTimeSerializer::class)
-    val dateUpdated: OffsetDateTime,
 ) {
+    val id: Id? = null
+    @Serializable(with = OffsetDateTimeSerializer::class)
+    private val dateCreated: OffsetDateTime? = null
+    @Serializable(with = OffsetDateTimeSerializer::class)
+    private val dateUpdated: OffsetDateTime? = null
+
     init {
         require(EmailValidator.getInstance().isValid(email)) { "Invalid email" }
     }

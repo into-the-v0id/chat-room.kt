@@ -66,7 +66,7 @@ class RoomController(
 
         val payload = call.receive<UpdateRoom>()
 
-        if (payload.id != roomAggregate.modelId) throw BadRequestException("Mismatching IDs")
+        if (payload.id != null && payload.id != roomAggregate.modelId) throw BadRequestException("Mismatching IDs")
         if (payload.handle != roomAggregate.handle) {
             val existingRooms = roomReadRepository.getAll(handles = listOf(payload.handle))
             if (existingRooms.isNotEmpty()) throw BadRequestException("Handle in use")

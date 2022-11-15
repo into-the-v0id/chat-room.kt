@@ -8,10 +8,11 @@ import java.time.OffsetDateTime
 
 @Serializable
 data class UpdateRoom(
-    val id: Id,
     val handle: Handle,
+) {
+    val id: Id? = null
     @Serializable(with = OffsetDateTimeSerializer::class)
-    val dateCreated: OffsetDateTime,
+    private val dateCreated: OffsetDateTime? = null
     @Serializable(with = OffsetDateTimeSerializer::class)
-    val dateUpdated: OffsetDateTime,
-)
+    private val dateUpdated: OffsetDateTime? = null
+}
