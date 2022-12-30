@@ -33,21 +33,21 @@ $ ../gradlew :api:run
 ## Example
 
 ```bash
-$ curl 'http://localhost:8080/messages?room_id=e516ba91-cef8-4dd2-ba93-e7afe82c6226'
+$ curl 'http://localhost:8080/messages?room_id=018562c4-fb64-7a84-b187-aec860bcbff8'
 [
     {
-        "id": "fd6cab76-890e-4b0e-a5e1-5bfa35ef091e",
-        "memberId": "ded57fd7-4dc0-44a7-9e37-6bc9ad05dbc6",
+        "id": "018562ef-631c-74eb-aadb-22b5a63ad507",
+        "memberId": "018562ea-de2d-70d1-b39b-e058a13dc967",
         "content": "Hello",
-        "dateCreated": "2022-10-16T08:28:43.979Z",
-        "dateUpdated": "2022-10-16T08:28:43.979Z"
+        "dateCreated": "2022-12-30T12:08:53.788369Z",
+        "dateUpdated": "2022-12-30T12:08:53.788369Z"
     },
     {
-        "id": "6ffb6e22-872a-4322-b4b1-b287eaedfaf4",
-        "memberId": "ded57fd7-4dc0-44a7-9e37-6bc9ad05dbc6",
+        "id": "018562ef-89b0-7284-be73-329a16c397aa",
+        "memberId": "018562ea-de2d-70d1-b39b-e058a13dc967",
         "content": "World",
-        "dateCreated": "2022-10-16T08:29:05.953Z",
-        "dateUpdated": "2022-10-16T08:29:05.953Z"
+        "dateCreated": "2022-12-30T12:09:03.664871Z",
+        "dateUpdated": "2022-12-30T12:09:03.664871Z"
     }
 ]
 ```
