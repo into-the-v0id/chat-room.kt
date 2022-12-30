@@ -53,7 +53,7 @@ abstract class Aggregate<E>(
         }
     }
 
-    override fun equals(other: Any?): Boolean = other is Aggregate<*> && events == other.events
+    override fun equals(other: Any?): Boolean = other is Aggregate<*> && modelId == other.modelId
 
-    override fun hashCode(): Int = events.hashCode()
+    override fun hashCode(): Int = modelId.hashCode()
 }
