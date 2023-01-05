@@ -8,7 +8,7 @@ This is the primary server backing Chat Room. For now, it only offers a simple H
 
 The Data Model is built around a concept called Event Sourcing. Basically, every create/update/delete operation is represented as one or more events. The Database contains only those events. In order to get the current state, all events need to be layered on top of each other (aka. aggregated).
 
-## Usage
+## Setup
 
 ### With Docker Compose
 
