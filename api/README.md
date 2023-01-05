@@ -6,6 +6,8 @@ Chat Room API Server
 
 This is the primary server backing Chat Room. For now, it only offers a simple HTTP JSON API.
 
+The Data Model is built around a concept called Event Sourcing. Basically, every create/update/delete operation is represented as one or more events. The Database contains only those events. In order to get the current state, all events need to be layered on top of each other (aka. aggregated).
+
 ## Usage
 
 ### With Docker Compose
@@ -21,13 +23,13 @@ If you want to compile and run Kotlin manually or via your IDE, only start the D
 ```bash
 $ docker compose up db
 ```
-Also, make sure you've set the relevant environment variables (See [application.conf](./src/main/resources/application.conf)).
+Also, make sure you've set the relevant environment variables (See [application.conf](./api/src/main/resources/application.conf)).
 
 ### On Bare Metal
 
-First start your Postgres Database. Ensure you've set the relevant environment variables (See [application.conf](./src/main/resources/application.conf)). Then run the following command in order to build and start the API Server:
+First start your Postgres Database. Ensure you've set the relevant environment variables (See [application.conf](./api/src/main/resources/application.conf)). Then run the following command in order to build and start the API Server:
 ```bash
-$ ../gradlew :api:run
+$ ./gradlew :api:run
 ```
 
 ## Example
@@ -62,4 +64,4 @@ $ curl 'http://localhost:8080/messages?room_id=018562c4-fb64-7a84-b187-aec860bcb
 
 Copyright (C) Oliver Amann
 
-This project is licensed under the GNU Affero General Public License Version 3 (AGPL-3.0-only). Please see [LICENSE](../LICENSE) for more information.
+This project is licensed under the GNU Affero General Public License Version 3 (AGPL-3.0-only). Please see [LICENSE](./LICENSE) for more information.

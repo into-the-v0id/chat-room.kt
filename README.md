@@ -6,12 +6,5 @@ Simple Messaging Application
 
 This project was created as an experiment around Event Sourcing. It aims to provide a simple platform for communication.
 
-Chat Room consists of several modules:
-- [Core](./core/README.md)
+For now Chat Room only consists of the following module:
 - [API](./api/README.md)
-
-## License
-
-Copyright (C) Oliver Amann
-
-This project is licensed under the GNU Affero General Public License Version 3 (AGPL-3.0-only). Please see [LICENSE](./LICENSE) for more information.
