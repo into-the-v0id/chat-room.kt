@@ -1,0 +1,50 @@
+:{$PORT:80} {
+    root * /var/www/html
+
+    header {
+        Permissions-Policy "interest-cohort=()"
+        X-XSS-Protection "1; mode=block"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Content-Security-Policy "frame-ancestors 'self'"
+        Referrer-Policy "strict-origin"
+        Strict-Transport-Security "max-age=31536000;"
+    }
+    header ?Cache-Control "public, max-age=0, must-revalidate"
+    header -Server
+
+    @nuxt_asset {
+        path /_nuxt /_nuxt/*
+        file {path}
+    }
+    handle @nuxt_asset {
+        header Cache-Control "public, max-age=31556952, immutable"
+
+        file_server
+    }
+
+    @static_asset {
+        not path /200.html /404.html /index.html */index.html /_nuxt /_nuxt/*
+        file {path}
+    }
+    handle @static_asset {
+        file_server
+    }
+
+    @prerendered_html {
+        not path /_nuxt /_nuxt/*
+        file {path}/index.html
+    }
+    handle @prerendered_html {
+        rewrite * {path}/index.html
+
+        file_server
+    }
+
+    # fallback
+    handle {
+        rewrite * /200.html
+
+        file_server
+    }
+}

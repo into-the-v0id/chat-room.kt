@@ -1,0 +1,38 @@
+<template>
+    <div class="error-indicator">
+        <a href="#" @click.prevent="showDetails">
+            Error
+        </a>
+    </div>
+</template>
+
+<script setup>
+    const { error } = defineProps(['error'])
+
+    const showDetails = () => {
+        alert(errorToString(error))
+    }
+
+    const errorToString = error => {
+        if (typeof(error) === 'object') {
+            if ('toString' in error) {
+                return error.toString()
+            }
+
+            return JSON.stringify(error)
+        }
+
+        return String(error)
+    }
+</script>
+
+<style>
+    .error-indicator {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+</style>
