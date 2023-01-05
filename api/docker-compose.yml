@@ -16,9 +16,7 @@ services:
     <<: *default-service
     <<: *as-current-user
     image: chat-room/api
-    build:
-      context: ..
-      dockerfile: ./api/Dockerfile
+    build: .
     container_name: chat-room-api-app
     depends_on:
       - db
