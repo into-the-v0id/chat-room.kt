@@ -1,5 +1,6 @@
 {
   "private": true,
+  "name": "@chat-room/web",
   "author": {
     "name": "Oliver Amann"
   },
