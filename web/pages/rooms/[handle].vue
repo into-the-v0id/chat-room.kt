@@ -17,7 +17,7 @@
         baseURL: useRuntimeConfig().public.api.baseUrl,
         query: { handle: useRoute().params.handle },
     })
-        .then(rooms => rooms ? rooms[0] : null)
+        .then(rooms => rooms.length ? rooms[0] : null)
 
     if (! room) {
         throw createError({

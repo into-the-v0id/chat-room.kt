@@ -14,7 +14,7 @@
         baseURL: useRuntimeConfig().public.api.baseUrl,
         query: { handle: useRoute().params.handle },
     })
-        .then(users => users ? users[0] : null)
+        .then(users => users.length ? users[0] : null)
 
     if (! user) {
         throw createError({
