@@ -26,7 +26,7 @@
     const membersQuery = usePromise()
     const usersQuery = usePromise()
 
-    onBeforeMount(async () => {
+    onMounted(async () => {
         if (roomIds !== undefined) {
             await membersQuery.use($fetch('members', {
                 baseURL: useRuntimeConfig().public.api.baseUrl,

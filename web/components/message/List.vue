@@ -28,7 +28,7 @@
     const membersQuery = usePromise()
     const usersQuery = usePromise()
 
-    onBeforeMount(async () => {
+    onMounted(async () => {
         if ((ids && ! ids.length) || (memberIds && ! memberIds.length) || (roomIds && ! roomIds.length)) {
             messagesQuery.resolve([])
         } else {

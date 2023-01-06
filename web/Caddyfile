@@ -31,19 +31,8 @@
         file_server
     }
 
-    @prerendered_html {
-        not path /_nuxt /_nuxt/*
-        file {path}/index.html
-    }
-    handle @prerendered_html {
-        rewrite * {path}/index.html
-
-        file_server
-    }
-
-    # fallback
     handle {
-        rewrite * /200.html
+        rewrite * /index.html
 
         file_server
     }
