@@ -3,10 +3,10 @@
         &lt;- Users
     </NuxtLink>
 
-    <h1>User @{{ userQuery.data.handle }}</h1>
+    <h1>User @{{ user.handle }}</h1>
 
     <h2>Rooms</h2>
-    <RoomList :userIds="[userQuery.data.id]" />
+    <RoomList :userIds="[user.id]" />
 </template>
 
 <script setup>
