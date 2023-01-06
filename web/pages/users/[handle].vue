@@ -9,24 +9,12 @@
         <h1>User @{{ userQuery.data.handle }}</h1>
 
         <h2>Rooms</h2>
-        <ErrorIndicator v-if="membersQuery.isFailiure || memberRoomsQuery.isFailiure" :error="membersQuery.error ?? memberRoomsQuery.error" />
-        <LoadingIndicator v-else-if="membersQuery.isPending || memberRoomsQuery.isPending" />
-        <div v-else>
-            <ul>
-                <li v-for="room in memberRoomsQuery.data">
-                    <NuxtLink :to="{ name: 'rooms-handle', params: { handle: room.handle } }">
-                        #{{ room.handle }}
-                    </NuxtLink>
-                </li>
-            </ul>
-        </div>
+        <RoomList :userIds="[userQuery.data.id]" />
     </div>
 </template>
 
 <script setup>
     const userQuery = usePromise()
-    const membersQuery = usePromise()
-    const memberRoomsQuery = usePromise()
 
     onBeforeMount(async () => {
         const user = await $fetch('users', {
@@ -47,19 +35,5 @@
             })
         }
         userQuery.resolve(user)
-
-        await membersQuery.use($fetch('members', {
-            baseURL: useRuntimeConfig().public.api.baseUrl,
-            query: { user_id: userQuery.value.data.id },
-        }))
-
-        if (membersQuery.value.data.length) {
-            await memberRoomsQuery.use($fetch('rooms', {
-                baseURL: useRuntimeConfig().public.api.baseUrl,
-                query: { id: membersQuery.value.data.map(member => member.roomId) },
-            }))
-        } else {
-            memberRoomsQuery.resolve([])
-        }
     })
 </script>
