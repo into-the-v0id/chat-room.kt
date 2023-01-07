@@ -1,7 +1,7 @@
 <template>
-    <ErrorIndicator v-if="membersQuery.isFailure || usersQuery.isFailure"
+    <PromiseErrorIndicator v-if="membersQuery.isFailure || usersQuery.isFailure"
         :error="membersQuery.error ?? usersQuery.error" />
-    <LoadingIndicator v-else-if="membersQuery.isPending || usersQuery.isPending" />
+    <PromiseLoadingIndicator v-else-if="membersQuery.isPending || usersQuery.isPending" />
     <div v-else>
         <ul>
             <li v-for="user in usersQuery.data">
