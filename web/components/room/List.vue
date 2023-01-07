@@ -14,6 +14,9 @@
 </template>
 
 <script setup>
+    import members from '~~/repositories/member'
+    import rooms from '~~/repositories/room'
+
     const props = defineProps({
         userIds: Array,
         ids: Array,
@@ -28,10 +31,7 @@
 
     onMounted(async () => {
         if (userIds !== undefined) {
-            await membersQuery.use($fetch('members', {
-                baseURL: useRuntimeConfig().public.api.baseUrl,
-                query: { user_id: userIds },
-            }))
+            await membersQuery.use(members.getAll({ userIds: userIds }))
 
             if ((ids && ids.length) || (handles && handles.length)) {
                 throw new Error('"userIds" filter cannot be used in conjunction with other filters')
@@ -46,12 +46,9 @@
         if ((ids && ! ids.length) || (handles && ! handles.length)) {
             roomsQuery.resolve([])
         } else {
-            await roomsQuery.use($fetch('rooms', {
-                baseURL: useRuntimeConfig().public.api.baseUrl,
-                query: {
-                    id: ids,
-                    handle: handles,
-                },
+            await roomsQuery.use(rooms.getAll({
+                ids: ids,
+                handles: handles,
             }))
         }
     })

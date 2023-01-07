@@ -13,10 +13,9 @@
 </template>
 
 <script setup>
-    const room = await $fetch('rooms', {
-        baseURL: useRuntimeConfig().public.api.baseUrl,
-        query: { handle: useRoute().params.handle },
-    })
+    import rooms from '~~/repositories/room'
+
+    const room = await rooms.getAll({ handles: useRoute().params.handle })
         .then(rooms => rooms.length ? rooms[0] : null)
 
     if (! room) {

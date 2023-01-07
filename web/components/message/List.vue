@@ -18,6 +18,10 @@
 </template>
 
 <script setup>
+    import messages from '~~/repositories/message'
+    import members from '~~/repositories/member'
+    import users from '~~/repositories/user'
+
     const { ids, memberIds, roomIds } = defineProps({
         ids: Array,
         memberIds: Array,
@@ -32,31 +36,26 @@
         if ((ids && ! ids.length) || (memberIds && ! memberIds.length) || (roomIds && ! roomIds.length)) {
             messagesQuery.resolve([])
         } else {
-            await messagesQuery.use($fetch('messages', {
-                baseURL: useRuntimeConfig().public.api.baseUrl,
-                query: {
-                    id: ids,
-                    member_id: memberIds,
-                    room_id: roomIds,
-                },
+            await messagesQuery.use(messages.getAll({
+                ids: ids,
+                memberIds: memberIds,
+                roomIds: roomIds,
             }))
         }
 
         if (!messagesQuery.data.length) {
             membersQuery.resolve([])
         } else {
-            await membersQuery.use($fetch('members', {
-                baseURL: useRuntimeConfig().public.api.baseUrl,
-                query: { id: messagesQuery.data.map(message => message.memberId) },
+            await membersQuery.use(members.getAll({
+                ids: messagesQuery.data.map(message => message.memberId)
             }))
         }
 
         if (!membersQuery.data.length) {
             usersQuery.resolve([])
         } else {
-            await usersQuery.use($fetch('users', {
-                baseURL: useRuntimeConfig().public.api.baseUrl,
-                query: { id: membersQuery.data.map(member => member.userId) },
+            await usersQuery.use(users.getAll({
+                ids: membersQuery.data.map(member => member.userId)
             }))
         }
     })
