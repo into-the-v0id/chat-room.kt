@@ -12,19 +12,7 @@
     }>()
 
     const showDetails = () => {
-        alert(errorToString(error))
-    }
-
-    const errorToString = (error: any): string => {
-        if (typeof(error) === 'object') {
-            if ('toString' in error) {
-                return error.toString()
-            }
-
-            return JSON.stringify(error)
-        }
-
-        return String(error)
+        alert(convertToString(error))
     }
 </script>
 
