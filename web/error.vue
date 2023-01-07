@@ -4,10 +4,10 @@
     </NuxtLayout>
 </template>
 
-<script setup lang="ts">
-    const props = defineProps({
-        error: Object
-    })
+<script lang="ts" setup>
+    const { error } = defineProps<{
+        error: any
+    }>()
 
     useHead({
         meta: [
