@@ -1,6 +1,7 @@
 <template>
-    <ErrorIndicator v-if="roomsQuery.isFailure" :error="roomsQuery.error" />
-    <LoadingIndicator v-else-if="roomsQuery.isPending" />
+    <ErrorIndicator v-if="membersQuery.isFailure || roomsQuery.isFailure"
+        :error="membersQuery.error ?? roomsQuery.error" />
+    <LoadingIndicator v-else-if="membersQuery.isPending || roomsQuery.isPending" />
     <div v-else>
         <ul>
             <li v-for="room in roomsQuery.data">
