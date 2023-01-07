@@ -17,6 +17,10 @@ class UserRepository {
 
     async getAll(query: UserQuery): Promise<User[]>
     {
+        if ((query.ids && ! query.ids.length) || (query.handles && ! query.handles.length)) {
+            return []
+        }
+
         const fetchedRawUsers = await $fetch<any[]>('users', {
             baseURL: this.apiBaseUrl,
             query: {

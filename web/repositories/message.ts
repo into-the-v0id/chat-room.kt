@@ -18,6 +18,14 @@ class MessageRepository {
 
     async getAll(query: MessageQuery): Promise<Message[]>
     {
+        if (
+            (query.ids && ! query.ids.length)
+            || (query.memberIds && ! query.memberIds.length)
+            || (query.roomIds && ! query.roomIds.length)
+        ) {
+            return []
+        }
+
         const fetchedRawMessages = await $fetch<any[]>('messages', {
             baseURL: this.apiBaseUrl,
             query: {

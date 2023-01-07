@@ -18,6 +18,14 @@ class MemberRepository {
 
     async getAll(query: MemberQuery): Promise<Member[]>
     {
+        if (
+            (query.ids && ! query.ids.length)
+            || (query.userIds && ! query.userIds.length)
+            || (query.roomIds && ! query.roomIds.length)
+        ) {
+            return []
+        }
+
         const fetchedRawMembers = await $fetch<any[]>('members', {
             baseURL: this.apiBaseUrl,
             query: {

@@ -45,14 +45,10 @@
             membersQuery.resolve([])
         }
 
-        if ((ids && ! ids.length) || (handles && ! handles.length)) {
-            usersQuery.resolve([])
-        } else {
-            await usersQuery.use(users.getAll({
-                ids: ids,
-                handles: handles,
-                sortCriteria: ['dateCreatedAsc'],
-            }))
-        }
+        await usersQuery.use(users.getAll({
+            ids: ids,
+            handles: handles,
+            sortCriteria: ['dateCreatedAsc'],
+        }))
     })
 </script>

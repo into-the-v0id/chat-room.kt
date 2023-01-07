@@ -36,32 +36,20 @@
     const usersQuery = usePromise<User[]>()
 
     onMounted(async () => {
-        if ((ids && ! ids.length) || (memberIds && ! memberIds.length) || (roomIds && ! roomIds.length)) {
-            messagesQuery.resolve([])
-        } else {
-            await messagesQuery.use(messages.getAll({
-                ids: ids,
-                memberIds: memberIds,
-                roomIds: roomIds,
-                sortCriteria: ['dateCreatedDesc'],
-            }))
-        }
+        await messagesQuery.use(messages.getAll({
+            ids: ids,
+            memberIds: memberIds,
+            roomIds: roomIds,
+            sortCriteria: ['dateCreatedDesc'],
+        }))
 
-        if (!messagesQuery.data!.length) {
-            membersQuery.resolve([])
-        } else {
-            await membersQuery.use(members.getAll({
-                ids: messagesQuery.data!.map(message => message.memberId)
-            }))
-        }
+        await membersQuery.use(members.getAll({
+            ids: messagesQuery.data!.map(message => message.memberId)
+        }))
 
-        if (!membersQuery.data!.length) {
-            usersQuery.resolve([])
-        } else {
-            await usersQuery.use(users.getAll({
-                ids: membersQuery.data!.map(member => member.userId)
-            }))
-        }
+        await usersQuery.use(users.getAll({
+            ids: membersQuery.data!.map(member => member.userId)
+        }))
     })
 
     const getUserForMessage = (message: Message): User|null => {

@@ -45,14 +45,10 @@
             membersQuery.resolve([])
         }
 
-        if ((ids && ! ids.length) || (handles && ! handles.length)) {
-            roomsQuery.resolve([])
-        } else {
-            await roomsQuery.use(rooms.getAll({
-                ids: ids,
-                handles: handles,
-                sortCriteria: ['dateCreatedAsc'],
-            }))
-        }
+        await roomsQuery.use(rooms.getAll({
+            ids: ids,
+            handles: handles,
+            sortCriteria: ['dateCreatedAsc'],
+        }))
     })
 </script>

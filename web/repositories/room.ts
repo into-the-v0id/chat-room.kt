@@ -17,6 +17,10 @@ class RoomRepository {
 
     async getAll(query: RoomQuery): Promise<Room[]>
     {
+        if ((query.ids && ! query.ids.length) || (query.handles && ! query.handles.length)) {
+            return []
+        }
+
         const fetchedRawRooms = await $fetch<any[]>('rooms', {
             baseURL: this.apiBaseUrl,
             query: {
