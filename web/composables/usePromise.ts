@@ -64,9 +64,9 @@ class PromiseQuery<T> {
     }
 }
 
-export const usePromise = <T> (promise?: Promise<T>, query?: PromiseQuery<T>) => {
+export const usePromise = <T> (promise?: Promise<T>, query?: PromiseQuery<T>) : PromiseQuery<T> => {
     if (! query) {
-        query = new PromiseQuery()
+        query = new PromiseQuery<T>()
     }
 
     if (promise) {
