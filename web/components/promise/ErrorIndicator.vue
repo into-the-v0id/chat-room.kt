@@ -11,7 +11,7 @@
         error: any
     }>()
 
-    const showDetails = () => {
+    function showDetails() {
         alert(convertToString(error))
     }
 </script>
