@@ -21,9 +21,9 @@ class MessageRepository {
         const fetchedRawMessages = await $fetch<any[]>('messages', {
             baseURL: this.apiBaseUrl,
             query: {
-                id: query.ids ?? undefined,
-                member_id: query.memberIds ?? undefined,
-                room_id: query.roomIds ?? undefined,
+                id: removeDuplicates(query.ids ?? []),
+                member_id: removeDuplicates(query.memberIds ?? []),
+                room_id: removeDuplicates(query.roomIds ?? []),
                 offset: query.offset ?? undefined,
                 limit: query.limit ?? undefined,
                 sort_criteria: query.sortCriteria ?? undefined,

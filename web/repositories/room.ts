@@ -20,8 +20,8 @@ class RoomRepository {
         const fetchedRawRooms = await $fetch<any[]>('rooms', {
             baseURL: this.apiBaseUrl,
             query: {
-                id: query.ids ?? undefined,
-                handle: query.handles ?? undefined,
+                id: removeDuplicates(query.ids ?? []),
+                handle: removeDuplicates(query.handles ?? []),
                 offset: query.offset ?? undefined,
                 limit: query.limit ?? undefined,
                 sort_criteria: query.sortCriteria ?? undefined,

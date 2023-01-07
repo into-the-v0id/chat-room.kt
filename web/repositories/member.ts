@@ -21,9 +21,9 @@ class MemberRepository {
         const fetchedRawMembers = await $fetch<any[]>('members', {
             baseURL: this.apiBaseUrl,
             query: {
-                id: query.ids ?? undefined,
-                user_id: query.userIds ?? undefined,
-                room_id: query.roomIds ?? undefined,
+                id: removeDuplicates(query.ids ?? []),
+                user_id: removeDuplicates(query.userIds ?? []),
+                room_id: removeDuplicates(query.roomIds ?? []),
                 offset: query.offset ?? undefined,
                 limit: query.limit ?? undefined,
                 sort_criteria: query.sortCriteria ?? undefined,
