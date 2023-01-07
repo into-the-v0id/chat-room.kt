@@ -6,7 +6,7 @@
         <ul>
             <li v-for="room in roomsQuery.data">
                 <NuxtLink :to="{ name: 'rooms-handle', params: { handle: room.handle } }">
-                    #{{ room.handle }}
+                    <RoomHandle :handle="room.handle" />
                 </NuxtLink>
             </li>
         </ul>

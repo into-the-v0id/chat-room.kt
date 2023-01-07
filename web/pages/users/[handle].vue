@@ -3,7 +3,7 @@
         &lt;- Users
     </NuxtLink>
 
-    <h1>User @{{ user.handle }}</h1>
+    <h1>User <UserHandle :handle="user.handle" /></h1>
 
     <h2>Rooms</h2>
     <RoomList :userIds="[user.id]" />

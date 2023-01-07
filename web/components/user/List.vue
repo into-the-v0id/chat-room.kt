@@ -6,7 +6,7 @@
         <ul>
             <li v-for="user in usersQuery.data">
                 <NuxtLink :to="{ name: 'users-handle', params: { handle: user.handle } }">
-                    @{{ user.handle }}
+                    <UserHandle :handle="user.handle" />
                 </NuxtLink>
             </li>
         </ul>

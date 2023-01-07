@@ -6,7 +6,7 @@
         <ul>
             <li v-for="message in messagesQuery.data">
                 <div style="font-size: 0.75em;">
-                    @{{ getUserForMessage(message)!.handle }}
+                    <UserHandle :handle="getUserForMessage(message)!.handle" />
                 </div>
                 {{ message.content }}
                 <div style="font-size: 0.75em;">
