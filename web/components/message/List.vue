@@ -43,6 +43,7 @@
                 ids: ids,
                 memberIds: memberIds,
                 roomIds: roomIds,
+                sortCriteria: ['dateCreatedDesc'],
             }))
         }
 

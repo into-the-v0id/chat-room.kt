@@ -51,6 +51,7 @@
             await usersQuery.use(users.getAll({
                 ids: ids,
                 handles: handles,
+                sortCriteria: ['dateCreatedAsc'],
             }))
         }
     })

@@ -51,6 +51,7 @@
             await roomsQuery.use(rooms.getAll({
                 ids: ids,
                 handles: handles,
+                sortCriteria: ['dateCreatedAsc'],
             }))
         }
     })
