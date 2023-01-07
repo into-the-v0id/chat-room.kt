@@ -37,7 +37,7 @@
                 throw new Error('"roomIds" filter cannot be used in conjunction with other filters')
             }
 
-            ids = membersQuery.value.data.map(member => member.userId)
+            ids = membersQuery.data.map(member => member.userId)
             roomIds = []
         } else {
             membersQuery.resolve(null)

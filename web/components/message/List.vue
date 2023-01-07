@@ -42,32 +42,32 @@
             }))
         }
 
-        if (! messagesQuery.value.data.length) {
+        if (!messagesQuery.data.length) {
             membersQuery.resolve([])
         } else {
             await membersQuery.use($fetch('members', {
                 baseURL: useRuntimeConfig().public.api.baseUrl,
-                query: { id: messagesQuery.value.data.map(message => message.memberId) },
+                query: { id: messagesQuery.data.map(message => message.memberId) },
             }))
         }
 
-        if (! membersQuery.value.data.length) {
+        if (!membersQuery.data.length) {
             usersQuery.resolve([])
         } else {
             await usersQuery.use($fetch('users', {
                 baseURL: useRuntimeConfig().public.api.baseUrl,
-                query: { id: membersQuery.value.data.map(member => member.userId) },
+                query: { id: membersQuery.data.map(member => member.userId) },
             }))
         }
     })
 
     const getUserForMessage = message => {
-        const member = membersQuery.value.data.find(member => member.id === message.memberId)
+        const member = membersQuery.data.find(member => member.id === message.memberId)
         if (! member) {
             return null
         }
 
-        const user = usersQuery.value.data.find(user => user.id === member.userId)
+        const user = usersQuery.data.find(user => user.id === member.userId)
 
         return user
     }
