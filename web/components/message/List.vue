@@ -6,7 +6,7 @@
         <ul>
             <li v-for="message in messagesQuery.data">
                 <div style="font-size: 0.75em;">
-                    @{{ getUserForMessage(message).handle }}
+                    @{{ getUserForMessage(message)!.handle }}
                 </div>
                 {{ message.content }}
                 <div style="font-size: 0.75em;">
@@ -17,20 +17,23 @@
     </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
     import messages from '~~/repositories/message'
     import members from '~~/repositories/member'
     import users from '~~/repositories/user'
+    import Message from '~~/models/message'
+    import Member from '~~/models/member'
+    import User from '~~/models/user'
 
-    const { ids, memberIds, roomIds } = defineProps({
-        ids: Array,
-        memberIds: Array,
-        roomIds: Array,
-    })
+    const { ids, memberIds, roomIds } = defineProps<{
+        ids?: string[]
+        memberIds?: string[]
+        roomIds?: string[]
+    }>()
 
-    const messagesQuery = usePromise()
-    const membersQuery = usePromise()
-    const usersQuery = usePromise()
+    const messagesQuery = usePromise<Message[]>()
+    const membersQuery = usePromise<Member[]>()
+    const usersQuery = usePromise<User[]>()
 
     onMounted(async () => {
         if ((ids && ! ids.length) || (memberIds && ! memberIds.length) || (roomIds && ! roomIds.length)) {
@@ -43,30 +46,30 @@
             }))
         }
 
-        if (!messagesQuery.data.length) {
+        if (!messagesQuery.data!.length) {
             membersQuery.resolve([])
         } else {
             await membersQuery.use(members.getAll({
-                ids: messagesQuery.data.map(message => message.memberId)
+                ids: messagesQuery.data!.map(message => message.memberId)
             }))
         }
 
-        if (!membersQuery.data.length) {
+        if (!membersQuery.data!.length) {
             usersQuery.resolve([])
         } else {
             await usersQuery.use(users.getAll({
-                ids: membersQuery.data.map(member => member.userId)
+                ids: membersQuery.data!.map(member => member.userId)
             }))
         }
     })
 
-    const getUserForMessage = message => {
-        const member = membersQuery.data.find(member => member.id === message.memberId)
+    const getUserForMessage = (message: Message): User|null => {
+        const member = membersQuery.data!.find(member => member.id === message.memberId)
         if (! member) {
             return null
         }
 
-        const user = usersQuery.data.find(user => user.id === member.userId)
+        const user = usersQuery.data!.find(user => user.id === member.userId) ?? null
 
         return user
     }

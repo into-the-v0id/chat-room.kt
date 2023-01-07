@@ -6,14 +6,16 @@
     </div>
 </template>
 
-<script setup>
-    const { error } = defineProps(['error'])
+<script lang="ts" setup>
+    const { error } = defineProps<{
+        error: any
+    }>()
 
     const showDetails = () => {
         alert(errorToString(error))
     }
 
-    const errorToString = error => {
+    const errorToString = (error: any): string => {
         if (typeof(error) === 'object') {
             if ('toString' in error) {
                 return error.toString()

@@ -12,10 +12,10 @@
     <MessageList :roomIds="[room.id]" />
 </template>
 
-<script setup>
+<script lang="ts" setup>
     import rooms from '~~/repositories/room'
 
-    const room = await rooms.getAll({ handles: useRoute().params.handle })
+    const room = await rooms.getAll({ handles: [useRoute().params.handle as string] })
         .then(rooms => rooms.length ? rooms[0] : null)
 
     if (! room) {

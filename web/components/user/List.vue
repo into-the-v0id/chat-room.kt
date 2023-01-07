@@ -13,21 +13,23 @@
     </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
     import members from '~~/repositories/member'
     import users from '~~/repositories/user'
+    import Member from '~~/models/member'
+    import User from '~~/models/user'
 
-    const props = defineProps({
-        roomIds: Array,
-        ids: Array,
-        handles: Array,
-    })
+    const props = defineProps<{
+        roomIds?: string[]
+        ids?: string[]
+        handles?: string[]
+    }>()
     let roomIds = props.roomIds
     let ids = props.ids
     const handles = props.handles
 
-    const membersQuery = usePromise()
-    const usersQuery = usePromise()
+    const membersQuery = usePromise<Member[]>()
+    const usersQuery = usePromise<User[]>()
 
     onMounted(async () => {
         if (roomIds !== undefined) {
@@ -37,10 +39,10 @@
                 throw new Error('"roomIds" filter cannot be used in conjunction with other filters')
             }
 
-            ids = membersQuery.data.map(member => member.userId)
+            ids = membersQuery.data!.map(member => member.userId)
             roomIds = []
         } else {
-            membersQuery.resolve(null)
+            membersQuery.resolve([])
         }
 
         if ((ids && ! ids.length) || (handles && ! handles.length)) {

@@ -9,10 +9,10 @@
     <RoomList :userIds="[user.id]" />
 </template>
 
-<script setup>
+<script lang="ts" setup>
     import users from '~~/repositories/user'
 
-    const user = await users.getAll({ handle: useRoute().params.handle })
+    const user = await users.getAll({ handles: [useRoute().params.handle as string] })
         .then(users => users.length ? users[0] : null)
 
     if (! user) {
