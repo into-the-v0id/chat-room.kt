@@ -1,5 +1,5 @@
 <template>
-    <ErrorIndicator v-if="membersQuery.isFailiure || usersQuery.isFailiure"
+    <ErrorIndicator v-if="membersQuery.isFailure || usersQuery.isFailure"
         :error="membersQuery.error ?? usersQuery.error" />
     <LoadingIndicator v-else-if="membersQuery.isPending || usersQuery.isPending" />
     <div v-else>

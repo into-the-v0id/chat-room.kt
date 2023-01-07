@@ -1,5 +1,5 @@
 <template>
-    <ErrorIndicator v-if="roomsQuery.isFailiure" :error="roomsQuery.error" />
+    <ErrorIndicator v-if="roomsQuery.isFailure" :error="roomsQuery.error" />
     <LoadingIndicator v-else-if="roomsQuery.isPending" />
     <div v-else>
         <ul>
