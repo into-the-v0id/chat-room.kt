@@ -43,12 +43,14 @@ fun Application.configureHTTP() {
         }
     }
     install(CORS) {
+        anyHost()
+
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Put)
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Patch)
 
-        anyHost()
+        allowHeader(HttpHeaders.ContentType)
     }
     install(Compression)
 }
