@@ -12,7 +12,10 @@ import java.util.Base64
 
 fun Application.configureHTTP() {
     install(DefaultHeaders) {
-        header("Server", "Ktor")
+        header("X-Content-Type-Options", "nosniff")
+        header("Referrer-Policy", "strict-origin")
+        header(HttpHeaders.StrictTransportSecurity, "max-age=31536000;")
+        header(HttpHeaders.Server, "Ktor")
     }
     install(ConditionalHeaders) {
         version { _, content ->
