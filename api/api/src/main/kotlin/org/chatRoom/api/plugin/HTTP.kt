@@ -8,6 +8,7 @@ import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.conditionalheaders.*
 import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.util.*
 import java.util.Base64
 
 fun Application.configureHTTP() {
@@ -21,7 +22,12 @@ fun Application.configureHTTP() {
         version { _, content ->
             when (content) {
                 is OutgoingContent.ByteArrayContent -> listOf(
-                    EntityTagVersion(Base64.getEncoder().encodeToString(content.bytes()).hashCode().toString()),
+                    EntityTagVersion(
+                        Base64.getEncoder()
+                            .encodeToString(content.bytes())
+                            .hashCode()
+                            .toString()
+                    ),
                 )
                 else -> emptyList()
             }
