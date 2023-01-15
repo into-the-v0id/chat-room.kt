@@ -9,6 +9,7 @@ import io.ktor.server.response.*
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.serialization.SerializationException
 import org.chatRoom.core.model.response.ErrorResponse
+import java.lang.IllegalArgumentException
 import java.util.concurrent.TimeoutException
 
 fun Application.configureErrorPage() {
@@ -28,7 +29,7 @@ fun Application.configureErrorPage() {
                     var code = "http_${ HttpStatusCode.BadRequest.value }"
 
                     val exceptionCause = exception.cause
-                    if (exceptionCause is SerializationException) {
+                    if (exceptionCause is SerializationException || exceptionCause is IllegalArgumentException) {
                         if (message != null) message += ": "
                         message += "${ exceptionCause.message }"
                         code = exceptionCause::class.qualifiedName ?: code
