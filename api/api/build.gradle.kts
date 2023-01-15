@@ -1,8 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktor_version: String by project
-val logback_version: String by project
-val koin_version: String by project
 
 plugins {
     application
@@ -21,7 +19,7 @@ repositories {
 dependencies {
     implementation(project(":core"))
 
-    implementation("org.slf4j:slf4j-api:1.7.36")
+    implementation("org.slf4j:slf4j-api:2.0.5")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
@@ -37,18 +35,18 @@ dependencies {
     implementation("io.ktor:ktor-server-call-logging:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-status-pages:$ktor_version")
-    implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("ch.qos.logback:logback-classic:1.4.5")
     implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("org.postgresql:postgresql:42.5.0")
-    implementation("io.insert-koin:koin-core:$koin_version")
-    implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
+    implementation("org.postgresql:postgresql:42.5.1")
+    implementation("io.insert-koin:koin-core:3.3.2")
+    implementation("io.insert-koin:koin-logger-slf4j:3.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-hocon:1.4.1")
     implementation("com.typesafe:config:1.4.2")
-    implementation("org.jooq:jooq:3.17.4")
-    implementation("org.flywaydb:flyway-core:9.3.1")
+    implementation("org.jooq:jooq:3.17.6")
+    implementation("org.flywaydb:flyway-core:9.11.0")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
-    testImplementation("io.insert-koin:koin-test:$koin_version")
+    testImplementation("io.insert-koin:koin-test:3.3.2")
     testImplementation(kotlin("test"))
 }
 
