@@ -82,9 +82,10 @@ object ServiceContainer {
                 port = config.port.toInt(),
                 watchPaths = listOf(),
             ) {
-                configureHTTP()
                 configureMonitoring()
+                configureHTTP()
                 configureSerialization()
+                configureErrorPage()
                 get<Routing>().apply { configureRouting() }
             }
         }
