@@ -59,10 +59,10 @@ class RoomReadEventRepository(
                     .`in`(*ids.map { id -> id.toUuid() }.toTypedArray())
             )
 
-            if (handles != null) error("Unsupported filter")
-            if (offset != null) error("Unsupported filter")
-            if (limit != null) error("Unsupported filter")
-            if (sortCriteria.isNotEmpty()) error("Custom sort criteria not supported")
+            require(handles == null) { "Unsupported filter" }
+            require(offset == null) { "Unsupported filter" }
+            require(limit == null) { "Unsupported filter" }
+            require(sortCriteria.isEmpty()) { "Custom sort criteria not supported" }
 
             val query = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()
