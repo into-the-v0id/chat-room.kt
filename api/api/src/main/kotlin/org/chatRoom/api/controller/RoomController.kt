@@ -10,11 +10,13 @@ import org.chatRoom.core.model.Room
 import org.chatRoom.core.payload.room.CreateRoom
 import org.chatRoom.core.payload.room.UpdateRoom
 import org.chatRoom.api.resource.Rooms
+import org.chatRoom.core.repository.read.RoomQuery
 import org.chatRoom.core.repository.read.RoomReadRepository
 import org.chatRoom.core.repository.write.RoomWriteRepository
 import org.chatRoom.core.repository.write.create
 import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.repository.write.update
+import org.chatRoom.core.response.ListResponse
 import org.chatRoom.core.aggreagte.Room as RoomAggregate
 
 class RoomController(
@@ -22,18 +24,28 @@ class RoomController(
     private val roomWriteRepository: RoomWriteRepository,
 ) {
     suspend fun list(call: ApplicationCall, resource: Rooms) {
-        val ids = resource.ids.ifEmpty { null }
-        val handles = resource.handles.ifEmpty { null }
-
-        val roomModels = roomReadRepository.getAll(
-            ids = ids,
-            handles = handles,
+        val query = RoomQuery(
+            ids = resource.ids.ifEmpty { null },
+            handles = resource.handles.ifEmpty { null },
             offset = resource.offset,
             limit = resource.limit,
             sortCriteria = resource.sortCriteria,
-        ).map { roomAggregate -> Room(roomAggregate) }
+        )
 
-        call.respond(roomModels)
+        val roomModels = roomReadRepository.getAll(query)
+            .map { roomAggregate -> Room(roomAggregate) }
+
+        val listResponse = ListResponse(
+            data = roomModels,
+            list = ListResponse.ListInfo(
+                offset = resource.offset,
+                limit = resource.limit,
+                currentItemCount = roomModels.size,
+                totalItemCount = roomReadRepository.count(query.copy(offset = null, limit = null)),
+            )
+        )
+
+        call.respond(listResponse)
     }
 
     suspend fun detail(call: ApplicationCall, resource: Rooms.Detail) {
@@ -46,7 +58,7 @@ class RoomController(
     suspend fun create(call: ApplicationCall) {
         val payload = call.receive<CreateRoom>()
 
-        val existingRooms = roomReadRepository.getAll(handles = listOf(payload.handle))
+        val existingRooms = roomReadRepository.getAll(RoomQuery(handles = listOf(payload.handle)))
         if (existingRooms.isNotEmpty()) throw BadRequestException("Handle in use")
 
         val roomAggregate = RoomAggregate.create(handle = payload.handle)
@@ -68,7 +80,7 @@ class RoomController(
 
         if (payload.id != null && payload.id != roomAggregate.modelId) throw BadRequestException("Mismatching IDs")
         if (payload.handle != roomAggregate.handle) {
-            val existingRooms = roomReadRepository.getAll(handles = listOf(payload.handle))
+            val existingRooms = roomReadRepository.getAll(RoomQuery(handles = listOf(payload.handle)))
             if (existingRooms.isNotEmpty()) throw BadRequestException("Handle in use")
 
             roomAggregate = roomAggregate.changeHandle(payload.handle)

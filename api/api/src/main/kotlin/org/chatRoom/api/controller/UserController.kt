@@ -10,11 +10,13 @@ import org.chatRoom.core.model.User
 import org.chatRoom.core.payload.user.CreateUser
 import org.chatRoom.core.payload.user.UpdateUser
 import org.chatRoom.api.resource.Users
+import org.chatRoom.core.repository.read.UserQuery
 import org.chatRoom.core.repository.read.UserReadRepository
 import org.chatRoom.core.repository.write.UserWriteRepository
 import org.chatRoom.core.repository.write.create
 import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.repository.write.update
+import org.chatRoom.core.response.ListResponse
 import org.chatRoom.core.aggreagte.User as UserAggregate
 
 class UserController(
@@ -22,18 +24,28 @@ class UserController(
     private val userWriteRepository: UserWriteRepository,
 ) {
     suspend fun list(call: ApplicationCall, resource: Users) {
-        val ids = resource.ids.ifEmpty { null }
-        val handles = resource.handles.ifEmpty { null }
-
-        val userModels = userReadRepository.getAll(
-            ids = ids,
-            handles = handles,
+        val query = UserQuery(
+            ids = resource.ids.ifEmpty { null },
+            handles = resource.handles.ifEmpty { null },
             offset = resource.offset,
             limit = resource.limit,
             sortCriteria = resource.sortCriteria,
-        ).map { userAggregate -> User(userAggregate) }
+        )
 
-        call.respond(userModels)
+        val userModels = userReadRepository.getAll(query)
+            .map { userAggregate -> User(userAggregate) }
+
+        val listResponse = ListResponse(
+            data = userModels,
+            list = ListResponse.ListInfo(
+                offset = resource.offset,
+                limit = resource.limit,
+                currentItemCount = userModels.size,
+                totalItemCount = userReadRepository.count(query.copy(offset = null, limit = null)),
+            )
+        )
+
+        call.respond(listResponse)
     }
 
     suspend fun detail(call: ApplicationCall, resource: Users.Detail) {
@@ -46,7 +58,7 @@ class UserController(
     suspend fun create(call: ApplicationCall) {
         val payload = call.receive<CreateUser>()
 
-        val existingUsers = userReadRepository.getAll(handles = listOf(payload.handle))
+        val existingUsers = userReadRepository.getAll(UserQuery(handles = listOf(payload.handle)))
         if (existingUsers.isNotEmpty()) throw BadRequestException("Handle in use")
 
         val userAggregate = UserAggregate.create(email = payload.email, handle = payload.handle)
@@ -68,7 +80,7 @@ class UserController(
 
         if (payload.id != null && payload.id != userAggregate.modelId) throw BadRequestException("Mismatching IDs")
         if (payload.handle != userAggregate.handle) {
-            val existingUsers = userReadRepository.getAll(handles = listOf(payload.handle))
+            val existingUsers = userReadRepository.getAll(UserQuery(handles = listOf(payload.handle)))
             if (existingUsers.isNotEmpty()) throw BadRequestException("Handle in use")
 
             userAggregate = userAggregate.changeHandle(payload.handle)

@@ -10,12 +10,15 @@ import org.chatRoom.core.model.Message
 import org.chatRoom.core.payload.message.CreateMessage
 import org.chatRoom.core.payload.message.UpdateMessage
 import org.chatRoom.api.resource.Messages
+import org.chatRoom.core.repository.read.MemberQuery
 import org.chatRoom.core.repository.read.MemberReadRepository
+import org.chatRoom.core.repository.read.MessageQuery
 import org.chatRoom.core.repository.read.MessageReadRepository
 import org.chatRoom.core.repository.write.MessageWriteRepository
 import org.chatRoom.core.repository.write.create
 import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.repository.write.update
+import org.chatRoom.core.response.ListResponse
 import org.chatRoom.core.aggreagte.Message as MessageAggregate
 
 class MessageController(
@@ -25,12 +28,11 @@ class MessageController(
 ) {
     suspend fun list(call: ApplicationCall, resource: Messages) {
         val ids = resource.ids.ifEmpty { null }
-
         var memberIds = resource.memberIds.ifEmpty { null }
 
         val roomIds = resource.roomIds
         if (roomIds.isNotEmpty()) {
-            val roomMemberAggregates = memberReadRepository.getAll(roomIds = roomIds)
+            val roomMemberAggregates = memberReadRepository.getAll(MemberQuery(roomIds = roomIds))
             val roomMemberIds = roomMemberAggregates.map { member -> member.modelId }
 
             memberIds = (memberIds ?: roomMemberIds)
@@ -38,15 +40,28 @@ class MessageController(
                 .toList()
         }
 
-        val messageModels = messageReadRepository.getAll(
+        val query = MessageQuery(
             ids = ids,
             memberIds = memberIds,
             offset = resource.offset,
             limit = resource.limit,
             sortCriteria = resource.sortCriteria,
-        ).map { messageAggregate -> Message(messageAggregate) }
+        )
 
-        call.respond(messageModels)
+        val messageModels = messageReadRepository.getAll(query)
+            .map { messageAggregate -> Message(messageAggregate) }
+
+        val listResponse = ListResponse(
+            data = messageModels,
+            list = ListResponse.ListInfo(
+                offset = resource.offset,
+                limit = resource.limit,
+                currentItemCount = messageModels.size,
+                totalItemCount = messageReadRepository.count(query.copy(offset = null, limit = null)),
+            )
+        )
+
+        call.respond(listResponse)
     }
 
     suspend fun detail(call: ApplicationCall, resource: Messages.Detail) {

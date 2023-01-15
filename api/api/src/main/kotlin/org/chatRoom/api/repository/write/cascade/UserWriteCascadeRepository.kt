@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.chatRoom.core.aggreagte.User
 import org.chatRoom.core.repository.Transaction
+import org.chatRoom.core.repository.read.MemberQuery
 import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.repository.write.MemberWriteRepository
 import org.chatRoom.core.repository.write.UserWriteRepository
@@ -27,7 +28,7 @@ class UserWriteCascadeRepository(
         withContext(Dispatchers.Default) {
             launch {
                 logger.info("Cascading deletion of all specified users to members")
-                val members = memberReadRepository.getAll(userIds = users.map { user -> user.modelId })
+                val members = memberReadRepository.getAll(MemberQuery(userIds = users.map { user -> user.modelId }))
                 memberWriteRepository.deleteAll(members, transaction)
             }
 

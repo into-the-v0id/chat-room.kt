@@ -8,7 +8,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.serialization.SerializationException
-import org.chatRoom.core.model.response.ErrorResponse
+import org.chatRoom.core.response.ErrorResponse
 import java.lang.IllegalArgumentException
 import java.util.concurrent.TimeoutException
 

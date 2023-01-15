@@ -1,15 +1,11 @@
 package org.chatRoom.api.repository.read.state
 
 import org.chatRoom.core.aggreagte.Member
+import org.chatRoom.core.repository.read.MemberQuery
 import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.valueObject.Id
-import org.chatRoom.core.valueObject.Limit
-import org.chatRoom.core.valueObject.Offset
 import org.chatRoom.core.valueObject.member.MemberSortCriterion
-import org.jooq.Condition
-import org.jooq.Record
-import org.jooq.Result
-import org.jooq.SQLDialect
+import org.jooq.*
 import org.jooq.impl.DSL
 import java.time.Instant
 import javax.sql.DataSource
@@ -30,57 +26,66 @@ class MemberReadStateRepository(
     private fun parseAllAggregates(result: Result<Record>): List<Member> = result.map { record -> parseAggregate(record) }
 
     override fun getById(id: Id): Member? = dataSource.connection.use { connection ->
-        val query = DSL.using(connection, SQLDialect.POSTGRES)
+        val fetch = DSL.using(connection, SQLDialect.POSTGRES)
             .select()
             .from(DSL.table(tableName))
             .where(DSL.field("id").eq(id.toUuid()))
             .orderBy(DSL.field("date_created").asc())
 
-        val result = query.fetch()
+        val result = fetch.fetch()
         parseAllAggregates(result).firstOrNull()
     }
 
-    override fun getAll(
-        ids: List<Id>?,
-        userIds: List<Id>?,
-        roomIds: List<Id>?,
-        offset: Offset?,
-        limit: Limit?,
-        sortCriteria: List<MemberSortCriterion>,
-    ): Collection<Member> = dataSource.connection.use { connection ->
+    private fun <R: Record> applyQuery(
+        fetch: SelectWhereStep<R>,
+        query: MemberQuery,
+    ): SelectLimitPercentAfterOffsetStep<R> {
         val conditions = mutableListOf<Condition>()
 
-        if (ids != null) conditions.add(
+        if (query.ids != null) conditions.add(
             DSL.field("id")
-                .`in`(*ids.map { id -> id.toUuid() }.toTypedArray())
+                .`in`(*query.ids!!.map { id -> id.toUuid() }.toTypedArray())
         )
 
-        if (userIds != null) conditions.add(
+        if (query.userIds != null) conditions.add(
             DSL.field("user_id")
-                .`in`(*userIds.map { id -> id.toUuid() }.toTypedArray())
+                .`in`(*query.userIds!!.map { id -> id.toUuid() }.toTypedArray())
         )
 
-        if (roomIds != null) conditions.add(
+        if (query.roomIds != null) conditions.add(
             DSL.field("room_id")
-                .`in`(*roomIds.map { id -> id.toUuid() }.toTypedArray())
+                .`in`(*query.roomIds!!.map { id -> id.toUuid() }.toTypedArray())
         )
 
-        val order = sortCriteria.map { criterion -> when (criterion) {
+        val order = query.sortCriteria.map { criterion -> when (criterion) {
             MemberSortCriterion.DATE_CREATED_ASC -> DSL.field("date_created").asc()
             MemberSortCriterion.DATE_CREATED_DESC -> DSL.field("date_created").desc()
             MemberSortCriterion.DATE_UPDATED_ASC -> DSL.field("date_updated").asc()
             MemberSortCriterion.DATE_UPDATED_DESC -> DSL.field("date_updated").desc()
         }}
 
-        val query = DSL.using(connection, SQLDialect.POSTGRES)
-            .select()
-            .from(DSL.table(tableName))
+        return fetch
             .where(conditions)
             .orderBy(order)
-            .offset(offset?.toInt())
-            .limit(limit?.toInt())
+            .offset(query.offset?.toInt())
+            .limit(query.limit?.toInt())
+    }
 
-        val result = query.fetch()
+    override fun getAll(query: MemberQuery): Collection<Member> = dataSource.connection.use { connection ->
+        val fetch = DSL.using(connection, SQLDialect.POSTGRES)
+            .select()
+            .from(DSL.table(tableName))
+
+        val result = applyQuery(fetch, query).fetch()
         parseAllAggregates(result)
+    }
+
+    override fun count(query: MemberQuery): Int = dataSource.connection.use { connection ->
+        val fetch = DSL.using(connection, SQLDialect.POSTGRES)
+            .select(DSL.count().`as`("count"))
+            .from(DSL.table(tableName))
+
+        val result = applyQuery(fetch, query).fetchOne()!!
+        result.get("count", Int::class.java)
     }
 }

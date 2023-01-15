@@ -14,6 +14,7 @@ import org.chatRoom.api.repository.write.state.RoomWriteStateRepository
 import org.chatRoom.api.repository.write.state.UserWriteStateRepository
 import org.chatRoom.core.repository.Transaction
 import org.chatRoom.core.repository.execute
+import org.chatRoom.core.repository.read.UserQuery
 import org.chatRoom.core.valueObject.Id
 import org.slf4j.LoggerFactory
 

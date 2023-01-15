@@ -1,6 +1,7 @@
-package org.chatRoom.core.model.response
+package org.chatRoom.core.response
 
 import kotlinx.serialization.Serializable
+import kotlin.collections.List
 
 @Serializable
 data class ErrorResponse(val errors: List<Error>) {

@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.chatRoom.core.aggreagte.Room
 import org.chatRoom.core.repository.Transaction
+import org.chatRoom.core.repository.read.MemberQuery
 import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.repository.write.MemberWriteRepository
 import org.chatRoom.core.repository.write.RoomWriteRepository
@@ -27,7 +28,7 @@ class RoomWriteCascadeRepository(
         withContext(Dispatchers.Default) {
             launch {
                 logger.info("Cascading deletion of all specified rooms to members")
-                val members = memberReadRepository.getAll(roomIds = rooms.map { room -> room.modelId })
+                val members = memberReadRepository.getAll(MemberQuery(roomIds = rooms.map { room -> room.modelId }))
                 memberWriteRepository.deleteAll(members, transaction)
             }
 

@@ -6,11 +6,9 @@ import org.chatRoom.core.event.message.ChangeContent
 import org.chatRoom.core.event.message.CreateMessage
 import org.chatRoom.core.event.message.DeleteMessage
 import org.chatRoom.core.event.message.MessageEvent
+import org.chatRoom.core.repository.read.MessageQuery
 import org.chatRoom.core.repository.read.MessageReadRepository
 import org.chatRoom.core.valueObject.Id
-import org.chatRoom.core.valueObject.Limit
-import org.chatRoom.core.valueObject.Offset
-import org.chatRoom.core.valueObject.message.MessageSortCriterion
 import org.jooq.Condition
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -31,13 +29,13 @@ class MessageReadEventRepository(
 
     override fun getById(id: Id): Message? {
         val events = dataSource.connection.use { connection ->
-            val query = DSL.using(connection, SQLDialect.POSTGRES)
+            val fetch = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()
                 .from(DSL.table(tableName))
                 .where(DSL.field("model_id").eq(id.toUuid()))
                 .orderBy(DSL.field("date_issued").asc())
 
-            val result = query.fetch()
+            val result = fetch.fetch()
             parseAllEvents(result)
         }
 
@@ -46,33 +44,27 @@ class MessageReadEventRepository(
         return Message.applyAllEvents(null, events)
     }
 
-    override fun getAll(
-        ids: List<Id>?,
-        memberIds: List<Id>?,
-        offset: Offset?,
-        limit: Limit?,
-        sortCriteria: List<MessageSortCriterion>,
-    ): Collection<Message> {
+    override fun getAll(query: MessageQuery): Collection<Message> {
         val allEvents = dataSource.connection.use { connection ->
             val conditions = mutableListOf<Condition>()
 
-            if (ids != null) conditions.add(
+            if (query.ids != null) conditions.add(
                 DSL.field("model_id")
-                    .`in`(*ids.map { id -> id.toUuid() }.toTypedArray())
+                    .`in`(*query.ids!!.map { id -> id.toUuid() }.toTypedArray())
             )
 
-            require(memberIds == null) { "Unsupported filter" }
-            require(offset == null) { "Unsupported filter" }
-            require(limit == null) { "Unsupported filter" }
-            require(sortCriteria.isEmpty()) { "Custom sort criteria not supported" }
+            require(query.memberIds == null) { "Unsupported filter" }
+            require(query.offset == null) { "Unsupported filter" }
+            require(query.limit == null) { "Unsupported filter" }
+            require(query.sortCriteria.isEmpty()) { "Custom sort criteria not supported" }
 
-            val query = DSL.using(connection, SQLDialect.POSTGRES)
+            val fetch = DSL.using(connection, SQLDialect.POSTGRES)
                 .select()
                 .from(DSL.table(tableName))
                 .where(conditions)
                 .orderBy(DSL.field("date_issued").asc())
 
-            val result = query.fetch()
+            val result = fetch.fetch()
             parseAllEvents(result)
         }
 
@@ -80,4 +72,6 @@ class MessageReadEventRepository(
             .map { (_, events) -> Message.applyAllEvents(null, events) }
             .filterNotNull()
     }
+
+    override fun count(query: MessageQuery): Int = getAll(query).size
 }

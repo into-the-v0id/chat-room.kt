@@ -9,12 +9,14 @@ import io.ktor.server.response.*
 import org.chatRoom.core.model.Member
 import org.chatRoom.core.payload.member.CreateMember
 import org.chatRoom.api.resource.Members
+import org.chatRoom.core.repository.read.MemberQuery
 import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.repository.read.RoomReadRepository
 import org.chatRoom.core.repository.read.UserReadRepository
 import org.chatRoom.core.repository.write.MemberWriteRepository
 import org.chatRoom.core.repository.write.create
 import org.chatRoom.core.repository.write.delete
+import org.chatRoom.core.response.ListResponse
 import org.chatRoom.core.aggreagte.Member as MemberAggregate
 
 class MemberController(
@@ -24,20 +26,29 @@ class MemberController(
     private val roomReadRepository: RoomReadRepository,
 ) {
     suspend fun list(call: ApplicationCall, resource: Members) {
-        val ids = resource.ids.ifEmpty { null }
-        val userIds = resource.userIds.ifEmpty { null }
-        val roomIds = resource.roomIds.ifEmpty { null }
-
-        val memberModels = memberReadRepository.getAll(
-            ids = ids,
-            userIds = userIds,
-            roomIds = roomIds,
+        val query = MemberQuery(
+            ids = resource.ids.ifEmpty { null },
+            userIds = resource.userIds.ifEmpty { null },
+            roomIds = resource.roomIds.ifEmpty { null },
             offset = resource.offset,
             limit = resource.limit,
             sortCriteria = resource.sortCriteria,
-        ).map { memberAggregate -> Member(memberAggregate) }
+        )
 
-        call.respond(memberModels)
+        val memberModels = memberReadRepository.getAll(query)
+            .map { memberAggregate -> Member(memberAggregate) }
+
+        val listResponse = ListResponse(
+            data = memberModels,
+            list = ListResponse.ListInfo(
+                offset = resource.offset,
+                limit = resource.limit,
+                currentItemCount = memberModels.size,
+                totalItemCount = memberReadRepository.count(query.copy(offset = null, limit = null)),
+            )
+        )
+
+        call.respond(listResponse)
     }
 
     suspend fun detail(call: ApplicationCall, resource: Members.Detail) {
@@ -50,10 +61,10 @@ class MemberController(
     suspend fun create(call: ApplicationCall) {
         val payload = call.receive<CreateMember>()
 
-        val existingMembers = memberReadRepository.getAll(
+        val existingMembers = memberReadRepository.getAll(MemberQuery(
             userIds = listOf(payload.userId),
             roomIds = listOf(payload.roomId),
-        )
+        ))
         if (existingMembers.isNotEmpty()) throw BadRequestException("Already a member")
 
         val userAggregate = userReadRepository.getById(payload.userId) ?: throw BadRequestException("Unknown user")

@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.chatRoom.core.aggreagte.User
 import org.chatRoom.core.repository.Transaction
+import org.chatRoom.core.repository.read.UserQuery
 import org.chatRoom.core.repository.read.UserReadRepository
 import org.chatRoom.core.repository.write.UserWriteRepository
 
@@ -17,12 +18,12 @@ class UserWriteGuardRepository(
         withContext(Dispatchers.Default) {
             val areUserIdsAvailable = async {
                 val userIds = users.map { user -> user.modelId }
-                userReadRepository.getAll(ids = userIds).isEmpty()
+                userReadRepository.getAll(UserQuery(ids = userIds)).isEmpty()
             }
 
             val areUserHandlesAvailable = async {
                 val userHandles = users.map { user -> user.handle }
-                userReadRepository.getAll(handles = userHandles).isEmpty()
+                userReadRepository.getAll(UserQuery(handles = userHandles)).isEmpty()
             }
 
             if (! areUserIdsAvailable.await()) error("Unable to create all specified users: User already exists")
@@ -34,7 +35,7 @@ class UserWriteGuardRepository(
 
     override suspend fun updateAll(users: Collection<User>, transaction: Transaction) {
         val userIds = users.map { user -> user.modelId }
-        val allIdsExist = userReadRepository.getAll(ids = userIds)
+        val allIdsExist = userReadRepository.getAll(UserQuery(ids = userIds))
             .map { user -> user.modelId }
             .containsAll(userIds)
         if (! allIdsExist) error("Unable to update all specified users: User not found")
@@ -44,7 +45,7 @@ class UserWriteGuardRepository(
 
     override suspend fun deleteAll(users: Collection<User>, transaction: Transaction) {
         val userIds = users.map { user -> user.modelId }
-        val allIdsExist = userReadRepository.getAll(ids = userIds)
+        val allIdsExist = userReadRepository.getAll(UserQuery(ids = userIds))
             .map { user -> user.modelId }
             .containsAll(userIds)
         if (! allIdsExist) error("Unable to delete all specified users: User not found")

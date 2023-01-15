@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.chatRoom.core.aggreagte.Room
 import org.chatRoom.core.repository.Transaction
+import org.chatRoom.core.repository.read.RoomQuery
 import org.chatRoom.core.repository.read.RoomReadRepository
 import org.chatRoom.core.repository.write.RoomWriteRepository
 
@@ -17,12 +18,12 @@ class RoomWriteGuardRepository(
         withContext(Dispatchers.Default) {
             val areRoomIdsAvailable = async {
                 val roomIds = rooms.map { room -> room.modelId }
-                roomReadRepository.getAll(ids = roomIds).isEmpty()
+                roomReadRepository.getAll(RoomQuery(ids = roomIds)).isEmpty()
             }
 
             val areRoomHandlesAvailable = async {
                 val roomHandles = rooms.map { room -> room.handle }
-                roomReadRepository.getAll(handles = roomHandles).isEmpty()
+                roomReadRepository.getAll(RoomQuery(handles = roomHandles)).isEmpty()
             }
 
             if (! areRoomIdsAvailable.await()) error("Unable to create all specified rooms: Room already exists")
@@ -34,7 +35,7 @@ class RoomWriteGuardRepository(
 
     override suspend fun updateAll(rooms: Collection<Room>, transaction: Transaction) {
         val roomIds = rooms.map { room -> room.modelId }
-        val allIdsExist = roomReadRepository.getAll(ids = roomIds)
+        val allIdsExist = roomReadRepository.getAll(RoomQuery(ids = roomIds))
             .map { room -> room.modelId }
             .containsAll(roomIds)
         if (! allIdsExist) error("Unable to update all specified rooms: Room not found")
@@ -44,7 +45,7 @@ class RoomWriteGuardRepository(
 
     override suspend fun deleteAll(rooms: Collection<Room>, transaction: Transaction) {
         val roomIds = rooms.map { room -> room.modelId }
-        val allIdsExist = roomReadRepository.getAll(ids = roomIds)
+        val allIdsExist = roomReadRepository.getAll(RoomQuery(ids = roomIds))
             .map { room -> room.modelId }
             .containsAll(roomIds)
         if (! allIdsExist) error("Unable to delete all specified rooms: Room not found")

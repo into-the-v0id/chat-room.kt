@@ -1,15 +1,11 @@
 package org.chatRoom.api.repository.read.state
 
 import org.chatRoom.core.aggreagte.Message
+import org.chatRoom.core.repository.read.MessageQuery
 import org.chatRoom.core.repository.read.MessageReadRepository
 import org.chatRoom.core.valueObject.Id
-import org.chatRoom.core.valueObject.Limit
-import org.chatRoom.core.valueObject.Offset
 import org.chatRoom.core.valueObject.message.MessageSortCriterion
-import org.jooq.Condition
-import org.jooq.Record
-import org.jooq.Result
-import org.jooq.SQLDialect
+import org.jooq.*
 import org.jooq.impl.DSL
 import java.time.Instant
 import javax.sql.DataSource
@@ -30,51 +26,61 @@ class MessageReadStateRepository(
     private fun parseAllAggregates(result: Result<Record>): List<Message> = result.map { record -> parseAggregate(record) }
 
     override fun getById(id: Id): Message? = dataSource.connection.use { connection ->
-        val query = DSL.using(connection, SQLDialect.POSTGRES)
+        val fetch = DSL.using(connection, SQLDialect.POSTGRES)
             .select()
             .from(DSL.table(tableName))
             .where(DSL.field("id").eq(id.toUuid()))
             .orderBy(DSL.field("date_created").asc())
 
-        val result = query.fetch()
+        val result = fetch.fetch()
         parseAllAggregates(result).firstOrNull()
     }
 
-    override fun getAll(
-        ids: List<Id>?,
-        memberIds: List<Id>?,
-        offset: Offset?,
-        limit: Limit?,
-        sortCriteria: List<MessageSortCriterion>,
-    ): Collection<Message> = dataSource.connection.use { connection ->
+    private fun <R: Record> applyQuery(
+        fetch: SelectWhereStep<R>,
+        query: MessageQuery,
+    ): SelectLimitPercentAfterOffsetStep<R> {
         val conditions = mutableListOf<Condition>()
 
-        if (ids != null) conditions.add(
+        if (query.ids != null) conditions.add(
             DSL.field("id")
-                .`in`(*ids.map { id -> id.toUuid() }.toTypedArray())
+                .`in`(*query.ids!!.map { id -> id.toUuid() }.toTypedArray())
         )
 
-        if (memberIds != null) conditions.add(
+        if (query.memberIds != null) conditions.add(
             DSL.field("member_id")
-                .`in`(*memberIds.map { id -> id.toUuid() }.toTypedArray())
+                .`in`(*query.memberIds!!.map { id -> id.toUuid() }.toTypedArray())
         )
 
-        val order = sortCriteria.map { criterion -> when (criterion) {
+        val order = query.sortCriteria.map { criterion -> when (criterion) {
             MessageSortCriterion.DATE_CREATED_ASC -> DSL.field("date_created").asc()
             MessageSortCriterion.DATE_CREATED_DESC -> DSL.field("date_created").desc()
             MessageSortCriterion.DATE_UPDATED_ASC -> DSL.field("date_updated").asc()
             MessageSortCriterion.DATE_UPDATED_DESC -> DSL.field("date_updated").desc()
         }}
 
-        val query = DSL.using(connection, SQLDialect.POSTGRES)
-            .select()
-            .from(DSL.table(tableName))
+        return fetch
             .where(conditions)
             .orderBy(order)
-            .offset(offset?.toInt())
-            .limit(limit?.toInt())
+            .offset(query.offset?.toInt())
+            .limit(query.limit?.toInt())
+    }
 
-        val result = query.fetch()
+    override fun getAll(query: MessageQuery): Collection<Message> = dataSource.connection.use { connection ->
+        val fetch = DSL.using(connection, SQLDialect.POSTGRES)
+            .select()
+            .from(DSL.table(tableName))
+
+        val result = applyQuery(fetch, query).fetch()
         parseAllAggregates(result)
+    }
+
+    override fun count(query: MessageQuery): Int = dataSource.connection.use { connection ->
+        val fetch = DSL.using(connection, SQLDialect.POSTGRES)
+            .select(DSL.count().`as`("count"))
+            .from(DSL.table(tableName))
+
+        val result = applyQuery(fetch, query).fetchOne()!!
+        result.get("count", Int::class.java)
     }
 }
