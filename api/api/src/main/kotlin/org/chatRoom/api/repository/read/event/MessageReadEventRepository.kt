@@ -27,22 +27,7 @@ class MessageReadEventRepository(
         }
     }
 
-    override fun getById(id: Id): Message? {
-        val events = dataSource.connection.use { connection ->
-            val fetch = DSL.using(connection, SQLDialect.POSTGRES)
-                .select()
-                .from(DSL.table(tableName))
-                .where(DSL.field("model_id").eq(id.toUuid()))
-                .orderBy(DSL.field("date_issued").asc())
-
-            val result = fetch.fetch()
-            parseAllEvents(result)
-        }
-
-        if (events.isEmpty()) return null
-
-        return Message.applyAllEvents(null, events)
-    }
+    override fun getById(id: Id): Message? = getAll(MessageQuery(ids = listOf(id))).firstOrNull()
 
     override fun getAll(query: MessageQuery): Collection<Message> {
         val allEvents = dataSource.connection.use { connection ->

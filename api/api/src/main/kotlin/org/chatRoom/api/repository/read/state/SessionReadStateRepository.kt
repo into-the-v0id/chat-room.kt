@@ -30,16 +30,7 @@ class SessionReadStateRepository(
 
     private fun parseAllAggregates(result: Result<Record>): List<Session> = result.map { record -> parseAggregate(record) }
 
-    override fun getById(id: Id): Session? = dataSource.connection.use { connection ->
-        val fetch = DSL.using(connection, SQLDialect.POSTGRES)
-            .select()
-            .from(DSL.table(tableName))
-            .where(DSL.field("id").eq(id.toUuid()))
-            .orderBy(DSL.field("date_created").asc())
-
-        val result = fetch.fetch()
-        parseAllAggregates(result).firstOrNull()
-    }
+    override fun getById(id: Id): Session? = getAll(SessionQuery(ids = listOf(id))).firstOrNull()
 
     private fun <R: Record> applyQuery(
         fetch: SelectWhereStep<R>,

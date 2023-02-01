@@ -27,22 +27,7 @@ class RoomReadEventRepository(
         }
     }
 
-    override fun getById(id: Id): Room? {
-        val events = dataSource.connection.use { connection ->
-            val fetch = DSL.using(connection, SQLDialect.POSTGRES)
-                .select()
-                .from(DSL.table(tableName))
-                .where(DSL.field("model_id").eq(id.toUuid()))
-                .orderBy(DSL.field("date_issued").asc())
-
-            val result = fetch.fetch()
-            parseAllEvents(result)
-        }
-
-        if (events.isEmpty()) return null
-
-        return Room.applyAllEvents(null, events)
-    }
+    override fun getById(id: Id): Room? = getAll(RoomQuery(ids = listOf(id))).firstOrNull()
 
     override fun getAll(query: RoomQuery): Collection<Room> {
         val allEvents = dataSource.connection.use { connection ->

@@ -25,22 +25,7 @@ class UserReadEventRepository(
         }
     }
 
-    override fun getById(id: Id): User? {
-        val events = dataSource.connection.use { connection ->
-            val fetch = DSL.using(connection, SQLDialect.POSTGRES)
-                .select()
-                .from(DSL.table(tableName))
-                .where(DSL.field("model_id").eq(id.toUuid()))
-                .orderBy(DSL.field("date_issued").asc())
-
-            val result = fetch.fetch()
-            parseAllEvents(result)
-        }
-
-        if (events.isEmpty()) return null
-
-        return User.applyAllEvents(null, events)
-    }
+    override fun getById(id: Id): User? = getAll(UserQuery(ids = listOf(id))).firstOrNull()
 
     override fun getAll(query: UserQuery): Collection<User> {
         val allEvents = dataSource.connection.use { connection ->
