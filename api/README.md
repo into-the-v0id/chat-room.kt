@@ -58,7 +58,6 @@ $ curl 'http://localhost:8080/messages?room_id=018562c4-fb64-7a84-b187-aec860bcb
 
 - Authentication and Authorization are not yet implemented
 - No real-time communication since connecting to a raw TCP Socket is not yet supported
-- Error Reporting is limited to HTTP Status Codes as of now
 
 ## License
 
