@@ -10,7 +10,7 @@ class AuthenticationRoutes(
     private val authenticationController: AuthenticationController,
 ) {
     fun Route.authenticationRouting() {
-        get<Authentication.Login> { authenticationController.login(call) }
         post<Authentication.Login> { authenticationController.login(call) }
+        post<Authentication.Registration> { authenticationController.registration(call) }
     }
 }

@@ -12,4 +12,10 @@ class Authentication() {
     class Login() {
         val parent: Authentication = Authentication()
     }
+
+    @Serializable
+    @Resource("registration")
+    class Registration() {
+        val parent: Authentication = Authentication()
+    }
 }
