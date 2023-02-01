@@ -33,7 +33,7 @@ class AuthenticationController(
 
         val userAggregate = run {
             if (payload.userId != null) return@run userReadRepository.getAll(UserQuery(ids = listOf(payload.userId!!))).firstOrNull()
-            if (payload.email != null) return@run userReadRepository.getAll(UserQuery(emails = listOf(payload.email!!))).firstOrNull()
+            if (payload.handle != null) return@run userReadRepository.getAll(UserQuery(handles = listOf(payload.handle!!))).firstOrNull()
             return@run null
         }
         if (userAggregate === null) {
