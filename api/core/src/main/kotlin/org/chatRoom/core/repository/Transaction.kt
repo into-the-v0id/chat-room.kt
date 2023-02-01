@@ -8,7 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection
 
-private typealias Subscriber = (Transaction) -> Unit
+private typealias Subscriber = suspend (Transaction) -> Unit
 
 class Transaction(val id: Id) : AutoCloseable {
     private val commitSubscribers = mutableListOf<Subscriber>()
