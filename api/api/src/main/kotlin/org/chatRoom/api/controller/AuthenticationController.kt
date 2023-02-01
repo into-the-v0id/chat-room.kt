@@ -2,10 +2,12 @@ package org.chatRoom.api.controller
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.response.*
+import org.chatRoom.api.authentication.SessionPrincipal
 import org.chatRoom.api.exception.HttpException
 import org.chatRoom.api.resource.Sessions
 import org.chatRoom.api.resource.Users
@@ -18,6 +20,7 @@ import org.chatRoom.core.repository.read.UserReadRepository
 import org.chatRoom.core.repository.write.SessionWriteRepository
 import org.chatRoom.core.repository.write.UserWriteRepository
 import org.chatRoom.core.repository.write.create
+import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.aggreagte.Session.Companion as SessionAggregate
 
 class AuthenticationController(
@@ -47,6 +50,15 @@ class AuthenticationController(
             call.application.href(Sessions.Detail(sessionAggregate.modelId))
         )
         call.respond(HttpStatusCode.Created, sessionModel)
+    }
+
+    suspend fun logout(call: ApplicationCall) {
+        val session = call.principal<SessionPrincipal>()?.session
+        if (session != null) {
+            sessionWriteRepository.delete(session)
+        }
+
+        call.respond(HttpStatusCode.NoContent)
     }
 
     suspend fun registration(call: ApplicationCall) {

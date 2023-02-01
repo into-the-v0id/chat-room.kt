@@ -1,6 +1,7 @@
 package org.chatRoom.api.route
 
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.resources.*
 import io.ktor.server.routing.Route
 import org.chatRoom.api.controller.AuthenticationController
@@ -11,6 +12,9 @@ class AuthenticationRoutes(
 ) {
     fun Route.authenticationRouting() {
         post<Authentication.Login> { authenticationController.login(call) }
+        authenticate(optional = true) {
+            post<Authentication.Logout> { authenticationController.logout(call) }
+        }
         post<Authentication.Registration> { authenticationController.registration(call) }
     }
 }
