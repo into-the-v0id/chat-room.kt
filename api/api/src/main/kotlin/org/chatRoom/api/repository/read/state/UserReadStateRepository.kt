@@ -57,6 +57,11 @@ class UserReadStateRepository(
                 .`in`(*query.handles!!.map { handle -> handle.toString() }.toTypedArray())
         )
 
+        if (query.emails != null) conditions.add(
+            DSL.field("email")
+                .`in`(*query.emails!!.map { email -> email.toString() }.toTypedArray())
+        )
+
         val order = query.sortCriteria.map { criterion -> when (criterion) {
             UserSortCriterion.DATE_CREATED_ASC -> DSL.field("date_created").asc()
             UserSortCriterion.DATE_CREATED_DESC -> DSL.field("date_created").desc()

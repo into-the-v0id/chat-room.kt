@@ -27,6 +27,7 @@ class UserController(
         val query = UserQuery(
             ids = resource.ids.ifEmpty { null },
             handles = resource.handles.ifEmpty { null },
+            emails = resource.emails.ifEmpty { null },
             offset = resource.offset,
             limit = resource.limit,
             sortCriteria = resource.sortCriteria,

@@ -9,6 +9,7 @@ import org.chatRoom.core.valueObject.user.UserSortCriterion
 data class UserQuery(
     val ids: List<Id>? = null,
     val handles: List<Handle>? = null,
+    val emails: List<EmailAddress>? = null,
     val offset: Offset? = null,
     val limit: Limit? = null,
     val sortCriteria: List<UserSortCriterion> = listOf(),
