@@ -10,52 +10,22 @@ import kotlinx.serialization.hocon.Hocon
 import kotlinx.serialization.hocon.decodeFromConfig
 import org.chatRoom.api.configuration.DatabaseConfiguration
 import org.chatRoom.api.configuration.ServerConfiguration
-import org.chatRoom.api.controller.MemberController
-import org.chatRoom.api.controller.MessageController
-import org.chatRoom.api.controller.RoomController
-import org.chatRoom.api.controller.UserController
+import org.chatRoom.api.controller.*
 import org.chatRoom.api.plugin.*
-import org.chatRoom.api.route.MemberRoutes
-import org.chatRoom.api.route.MessageRoutes
-import org.chatRoom.api.route.RoomRoutes
-import org.chatRoom.api.route.UserRoutes
 import org.chatRoom.api.db.MigrationManager
-import org.chatRoom.core.repository.read.MemberReadRepository
-import org.chatRoom.core.repository.read.MessageReadRepository
-import org.chatRoom.core.repository.read.RoomReadRepository
-import org.chatRoom.core.repository.read.UserReadRepository
-import org.chatRoom.api.repository.read.event.MemberReadEventRepository
-import org.chatRoom.api.repository.read.event.MessageReadEventRepository
-import org.chatRoom.api.repository.read.event.RoomReadEventRepository
-import org.chatRoom.api.repository.read.event.UserReadEventRepository
-import org.chatRoom.api.repository.read.state.MemberReadStateRepository
-import org.chatRoom.api.repository.read.state.MessageReadStateRepository
-import org.chatRoom.api.repository.read.state.RoomReadStateRepository
-import org.chatRoom.api.repository.read.state.UserReadStateRepository
-import org.chatRoom.core.repository.write.MemberWriteRepository
-import org.chatRoom.core.repository.write.MessageWriteRepository
-import org.chatRoom.core.repository.write.RoomWriteRepository
-import org.chatRoom.core.repository.write.UserWriteRepository
+import org.chatRoom.api.repository.read.event.*
+import org.chatRoom.api.repository.read.state.*
 import org.chatRoom.api.repository.write.cascade.MemberWriteCascadeRepository
 import org.chatRoom.api.repository.write.cascade.RoomWriteCascadeRepository
 import org.chatRoom.api.repository.write.cascade.UserWriteCascadeRepository
-import org.chatRoom.api.repository.write.concurrent.MemberWriteConcurrentRepository
-import org.chatRoom.api.repository.write.concurrent.MessageWriteConcurrentRepository
-import org.chatRoom.api.repository.write.concurrent.RoomWriteConcurrentRepository
-import org.chatRoom.api.repository.write.concurrent.UserWriteConcurrentRepository
-import org.chatRoom.api.repository.write.event.MemberWriteEventRepository
-import org.chatRoom.api.repository.write.event.MessageWriteEventRepository
-import org.chatRoom.api.repository.write.event.RoomWriteEventRepository
-import org.chatRoom.api.repository.write.event.UserWriteEventRepository
-import org.chatRoom.api.repository.write.guard.MemberWriteGuardRepository
-import org.chatRoom.api.repository.write.guard.MessageWriteGuardRepository
-import org.chatRoom.api.repository.write.guard.RoomWriteGuardRepository
-import org.chatRoom.api.repository.write.guard.UserWriteGuardRepository
-import org.chatRoom.api.repository.write.state.MemberWriteStateRepository
-import org.chatRoom.api.repository.write.state.MessageWriteStateRepository
-import org.chatRoom.api.repository.write.state.RoomWriteStateRepository
-import org.chatRoom.api.repository.write.state.UserWriteStateRepository
+import org.chatRoom.api.repository.write.concurrent.*
+import org.chatRoom.api.repository.write.event.*
+import org.chatRoom.api.repository.write.guard.*
+import org.chatRoom.api.repository.write.state.*
+import org.chatRoom.api.route.*
 import org.chatRoom.api.state.StateManager
+import org.chatRoom.core.repository.read.*
+import org.chatRoom.core.repository.write.*
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.koinApplication
@@ -175,6 +145,20 @@ object ServiceContainer {
             MessageWriteConcurrentRepository(listOf(
                 get<MessageWriteEventRepository>(),
                 get<MessageWriteStateRepository>(),
+            )),
+            get(),
+        ) }
+
+        singleOf(::SessionRoutes)
+        singleOf(::SessionController)
+        singleOf(::SessionReadEventRepository)
+        singleOf(::SessionWriteEventRepository)
+        singleOf(::SessionReadStateRepository) { bind<SessionReadRepository>() }
+        singleOf(::SessionWriteStateRepository)
+        single<SessionWriteRepository> { SessionWriteGuardRepository(
+            SessionWriteConcurrentRepository(listOf(
+                get<SessionWriteEventRepository>(),
+                get<SessionWriteStateRepository>(),
             )),
             get(),
         ) }
