@@ -3,6 +3,7 @@ package org.chatRoom.api.plugin
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
+import org.chatRoom.api.authentication.SessionPrincipal
 import org.chatRoom.core.repository.read.SessionQuery
 import org.chatRoom.core.repository.read.SessionReadRepository
 import org.chatRoom.core.valueObject.Token
@@ -34,7 +35,7 @@ class Authentication(
                         return@authenticate null
                     }
 
-                    UserIdPrincipal(sessionAggregate.userId.toString())
+                    SessionPrincipal(sessionAggregate)
                 }
             }
         }
