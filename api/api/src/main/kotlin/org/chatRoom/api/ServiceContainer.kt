@@ -81,6 +81,9 @@ object ServiceContainer {
         single { StateManager(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
         singleOf(::Routing)
 
+        singleOf(::AuthenticationRoutes)
+        singleOf(::AuthenticationController)
+
         singleOf(::UserRoutes)
         singleOf(::UserController)
         singleOf(::UserReadEventRepository)

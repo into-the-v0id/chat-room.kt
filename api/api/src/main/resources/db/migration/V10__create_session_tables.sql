@@ -8,7 +8,7 @@ CREATE TABLE session_events (
 
 CREATE TABLE session_state (
     id uuid NOT NULL,
-    userId uuid NOT NULL,
+    user_id uuid NOT NULL,
     token varchar(128) NOT NULL,
     date_valid_until timestamp NOT NULL,
     date_created timestamp NOT NULL

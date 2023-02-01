@@ -8,6 +8,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.serialization.SerializationException
+import org.chatRoom.api.exception.HttpException
 import org.chatRoom.core.response.ErrorResponse
 import java.lang.IllegalArgumentException
 import java.util.concurrent.TimeoutException
@@ -24,6 +25,10 @@ fun Application.configureErrorPage() {
             call.application.logException(call, exception)
 
             val (status, error) = when (exception) {
+                is HttpException -> Pair(exception.status, ErrorResponse.Error(
+                    code = "http_${ exception.status.value }",
+                    message = exception.message ?: exception.status.description,
+                ))
                 is BadRequestException -> {
                     var message = exception.message
                     var code = "http_${ HttpStatusCode.BadRequest.value }"
@@ -79,6 +84,7 @@ fun Application.logException(call: ApplicationCall, exception: Throwable) {
         val infoString = "$status: $logString. Exception ${exception::class.qualifiedName}: ${exception.message}"
 
         when (exception) {
+            is HttpException,
             is BadRequestException,
             is NotFoundException,
             is UnsupportedMediaTypeException -> log.debug(infoString, exception)
