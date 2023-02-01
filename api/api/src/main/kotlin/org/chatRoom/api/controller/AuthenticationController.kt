@@ -22,7 +22,11 @@ class AuthenticationController(
     suspend fun login(call: ApplicationCall) {
         val payload = call.receive<Login>()
 
-        val userAggregate = userReadRepository.getAll(UserQuery(emails = listOf(payload.email))).firstOrNull()
+        val userAggregate = run {
+            if (payload.userId != null) return@run userReadRepository.getAll(UserQuery(ids = listOf(payload.userId!!))).firstOrNull()
+            if (payload.email != null) return@run userReadRepository.getAll(UserQuery(emails = listOf(payload.email!!))).firstOrNull()
+            return@run null
+        }
         if (userAggregate === null) {
             throw HttpException(HttpStatusCode.Unauthorized, "Invalid credentials")
         }
