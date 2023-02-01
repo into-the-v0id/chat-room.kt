@@ -56,6 +56,7 @@ object ServiceContainer {
                 configureHTTP()
                 configureSerialization()
                 configureErrorPage()
+                get<Authentication>().apply { configureAuthentication() }
                 get<Routing>().apply { configureRouting() }
             }
         }
@@ -80,6 +81,7 @@ object ServiceContainer {
         singleOf(::MigrationManager)
         single { StateManager(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
         singleOf(::Routing)
+        singleOf(::Authentication)
 
         singleOf(::AuthenticationRoutes)
         singleOf(::AuthenticationController)
