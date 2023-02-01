@@ -33,7 +33,7 @@ class UserWriteStateRepository(
             statement = statement.values(listOf(
                 user.modelId.toUuid(),
                 user.handle.toString(),
-                user.email,
+                user.email.toString(),
                 user.dateCreated,
                 user.dateUpdated,
             ))
@@ -50,7 +50,7 @@ class UserWriteStateRepository(
         val valueRows = users.map { user -> DSL.row(
             user.modelId.toUuid(),
             user.handle.toString(),
-            user.email,
+            user.email.toString(),
             user.dateCreated,
             user.dateUpdated,
         ) }

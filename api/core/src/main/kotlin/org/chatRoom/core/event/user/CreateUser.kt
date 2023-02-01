@@ -4,6 +4,7 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.serializer.InstantSerializer
+import org.chatRoom.core.valueObject.EmailAddress
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
@@ -14,7 +15,7 @@ data class CreateUser(
     override val modelId: Id,
     @Serializable(with = InstantSerializer::class)
     override val dateIssued: Instant = Instant.now(),
-    val email: String,
+    val email: EmailAddress,
     val handle: Handle,
 ) : UserEvent {
     @OptIn(ExperimentalSerializationApi::class)

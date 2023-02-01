@@ -23,7 +23,7 @@ class UserReadStateRepository(
     private fun parseAggregate(record: Record): User = User(
         modelId = record.get("id", Id::class.java)!!,
         handle = record.get("handle", Handle::class.java)!!,
-        email = record.get("email", String::class.java)!!,
+        email = record.get("email", EmailAddress::class.java)!!,
         dateCreated = record.get("date_created", Instant::class.java)!!,
         dateUpdated = record.get("date_updated", Instant::class.java)!!,
     )

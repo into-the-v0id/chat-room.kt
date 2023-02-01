@@ -1,6 +1,7 @@
 package org.chatRoom.core.aggreagte
 
 import org.chatRoom.core.event.user.*
+import org.chatRoom.core.valueObject.EmailAddress
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import java.time.Instant
@@ -8,14 +9,14 @@ import java.time.Instant
 class User(
     modelId: Id,
     handle: Handle,
-    email: String,
+    email: EmailAddress,
     dateCreated: Instant = Instant.now(),
     dateUpdated: Instant = dateCreated,
 ) : Aggregate<UserEvent>(modelId = modelId) {
     var handle: Handle = handle
         protected set
 
-    var email: String = email
+    var email: EmailAddress = email
         protected set
 
     var dateCreated: Instant = dateCreated
@@ -25,7 +26,7 @@ class User(
         protected set
 
     companion object {
-        fun create(email: String, handle: Handle): User {
+        fun create(email: EmailAddress, handle: Handle): User {
             val event = CreateUser(
                 modelId = Id(),
                 email = email,
@@ -79,7 +80,7 @@ class User(
         return applyEvent(this, event) ?: error("Expected user")
     }
 
-    fun changeEmail(email: String): User {
+    fun changeEmail(email: EmailAddress): User {
         val event = ChangeEmail(
             modelId = this.modelId,
             email = email,
