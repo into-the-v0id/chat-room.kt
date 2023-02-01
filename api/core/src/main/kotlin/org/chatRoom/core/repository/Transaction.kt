@@ -1,5 +1,8 @@
 package org.chatRoom.core.repository
 
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.chatRoom.core.valueObject.Id
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -7,55 +10,87 @@ import java.sql.Connection
 
 private typealias Subscriber = (Transaction) -> Unit
 
-class Transaction(
-    val id: Id,
-) : AutoCloseable {
+class Transaction(val id: Id) : AutoCloseable {
     private val commitSubscribers = mutableListOf<Subscriber>()
     private val rollbackSubscribers = mutableListOf<Subscriber>()
     private val closeSubscribers = mutableListOf<Subscriber>()
-    var isClosed = false
-        private set
+    private var isClosed = false
+    private val stateMutex: Mutex = Mutex()
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger(Transaction::class.java)
     }
 
-    fun subscribeToCommit(subscriber: Subscriber) = commitSubscribers.add(subscriber)
-    fun subscribeToRollback(subscriber: Subscriber) = rollbackSubscribers.add(subscriber)
-    fun subscribeToClose(subscriber: Subscriber) = closeSubscribers.add(subscriber)
+    suspend fun isClosed() = stateMutex.withLock {
+        isClosed
+    }
 
-    fun commit() {
-        if (isClosed) error("Unable to commit transaction: Transaction is closed")
+    suspend fun subscribeToCommit(subscriber: Subscriber) = stateMutex.withLock {
+        commitSubscribers.add(subscriber)
+    }
+
+    suspend fun subscribeToRollback(subscriber: Subscriber) = stateMutex.withLock {
+        rollbackSubscribers.add(subscriber)
+    }
+
+    suspend fun subscribeToClose(subscriber: Subscriber) = stateMutex.withLock {
+        closeSubscribers.add(subscriber)
+    }
+
+    suspend fun commit() {
+        if (isClosed()) error("Unable to commit transaction: Transaction is closed")
 
         logger.debug("Committing Transaction with ID $id")
 
-        this.use {
+        try {
             commitSubscribers.forEach { subscriber -> subscriber(this) }
+        } catch (subscriberException: Throwable) {
+            try {
+                closeSuspending()
+            } catch (closeException: Throwable) {
+                subscriberException.addSuppressed(closeException)
+            }
+
+            throw subscriberException
         }
+
+        closeSuspending()
     }
 
-    fun rollback() {
-        if (isClosed) error("Unable to rollback transaction: Transaction is closed")
+    suspend fun rollback() {
+        if (isClosed()) error("Unable to rollback transaction: Transaction is closed")
 
         logger.debug("Rolling back Transaction with ID $id")
 
-        this.use {
+        try {
             rollbackSubscribers.forEach { subscriber -> subscriber(this) }
+        } catch (subscriberException: Throwable) {
+            try {
+                closeSuspending()
+            } catch (closeException: Throwable) {
+                subscriberException.addSuppressed(closeException)
+            }
+
+            throw subscriberException
         }
+
+        closeSuspending()
     }
 
-    override fun close() {
-        if (isClosed) error("Unable to close transaction: Transaction is already closed")
+    suspend fun closeSuspending() {
+        if (isClosed()) error("Unable to close transaction: Transaction is already closed")
 
         logger.debug("Closing Transaction with ID $id")
 
-        isClosed = true
+        stateMutex.withLock { isClosed = true }
         closeSubscribers.forEachCatching { subscriber -> subscriber(this) }
     }
+
+    override fun close() = runBlocking { closeSuspending() }
 }
 
-inline fun <R> Transaction.execute(block: (Transaction) -> R): R {
-    if (isClosed) error("Unable to use transaction: Transaction is closed")
+suspend inline fun <R> Transaction.execute(block: (Transaction) -> R): R {
+    if (isClosed()) error("Unable to use transaction: Transaction is closed")
 
     Transaction.logger.debug("Executing Transaction with ID $id")
 
@@ -76,7 +111,7 @@ inline fun <R> Transaction.execute(block: (Transaction) -> R): R {
     return response
 }
 
-fun Transaction.subscribeSqlConnection(connection: Connection) {
+suspend fun Transaction.subscribeSqlConnection(connection: Connection) {
     connection.autoCommit = false
     subscribeToCommit { connection.commit() }
     subscribeToRollback { connection.rollback() }
