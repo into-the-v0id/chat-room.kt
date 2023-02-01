@@ -57,6 +57,11 @@ class SessionReadStateRepository(
                 .`in`(*query.userIds!!.map { id -> id.toString() }.toTypedArray())
         )
 
+        if (query.tokens != null) conditions.add(
+            DSL.field("token")
+                .`in`(*query.tokens!!.map { token -> token.toString() }.toTypedArray())
+        )
+
         val order = query.sortCriteria.map { criterion -> when (criterion) {
             SessionSortCriterion.DATE_VALID_UNTIL_ASC -> DSL.field("date_valid_until").asc()
             SessionSortCriterion.DATE_VALID_UNTIL_DESC -> DSL.field("date_valid_until").desc()
