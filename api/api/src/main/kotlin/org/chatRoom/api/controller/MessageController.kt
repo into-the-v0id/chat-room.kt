@@ -2,10 +2,13 @@ package org.chatRoom.api.controller
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.response.*
+import org.chatRoom.api.authentication.SessionPrincipal
+import org.chatRoom.api.exception.HttpException
 import org.chatRoom.core.model.Message
 import org.chatRoom.core.payload.message.CreateMessage
 import org.chatRoom.core.payload.message.UpdateMessage
@@ -90,6 +93,12 @@ class MessageController(
 
     suspend fun update(call: ApplicationCall, resource: Messages.Detail) {
         var messageAggregate = messageReadRepository.getById(resource.id) ?: throw NotFoundException()
+        val memberAggregate = memberReadRepository.getById(messageAggregate.memberId)!!
+
+        val session = call.principal<SessionPrincipal>()!!.session
+        if (session.userId != memberAggregate.userId) {
+            throw HttpException(HttpStatusCode.Forbidden)
+        }
 
         val payload = call.receive<UpdateMessage>()
 
@@ -106,6 +115,12 @@ class MessageController(
 
     suspend fun delete(call: ApplicationCall, resource: Messages.Detail) {
         val messageAggregate = messageReadRepository.getById(resource.id) ?: throw NotFoundException()
+        val memberAggregate = memberReadRepository.getById(messageAggregate.memberId)!!
+
+        val session = call.principal<SessionPrincipal>()!!.session
+        if (session.userId != memberAggregate.userId) {
+            throw HttpException(HttpStatusCode.Forbidden)
+        }
 
         messageWriteRepository.delete(messageAggregate)
 
