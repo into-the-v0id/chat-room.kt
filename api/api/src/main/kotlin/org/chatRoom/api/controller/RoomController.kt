@@ -2,14 +2,19 @@ package org.chatRoom.api.controller
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.response.*
+import org.chatRoom.api.authentication.SessionPrincipal
+import org.chatRoom.api.exception.HttpException
 import org.chatRoom.core.model.Room
 import org.chatRoom.core.payload.room.CreateRoom
 import org.chatRoom.core.payload.room.UpdateRoom
 import org.chatRoom.api.resource.Rooms
+import org.chatRoom.core.repository.read.MemberQuery
+import org.chatRoom.core.repository.read.MemberReadRepository
 import org.chatRoom.core.repository.read.RoomQuery
 import org.chatRoom.core.repository.read.RoomReadRepository
 import org.chatRoom.core.repository.write.RoomWriteRepository
@@ -22,6 +27,7 @@ import org.chatRoom.core.aggreagte.Room as RoomAggregate
 class RoomController(
     private val roomReadRepository: RoomReadRepository,
     private val roomWriteRepository: RoomWriteRepository,
+    private val memberReadRepository: MemberReadRepository,
 ) {
     suspend fun list(call: ApplicationCall, resource: Rooms) {
         val query = RoomQuery(
@@ -76,6 +82,15 @@ class RoomController(
     suspend fun update(call: ApplicationCall, resource: Rooms.Detail) {
         var roomAggregate = roomReadRepository.getById(resource.id) ?: throw NotFoundException()
 
+        val session = call.principal<SessionPrincipal>()!!.session
+        val isMember = memberReadRepository.count(MemberQuery(
+            roomIds = listOf(roomAggregate.modelId),
+            userIds = listOf(session.userId),
+        )) > 0
+        if (! isMember) {
+            throw HttpException(HttpStatusCode.Forbidden)
+        }
+
         val payload = call.receive<UpdateRoom>()
 
         if (payload.id != null && payload.id != roomAggregate.modelId) throw BadRequestException("Mismatching IDs")
@@ -95,6 +110,15 @@ class RoomController(
 
     suspend fun delete(call: ApplicationCall, resource: Rooms.Detail) {
         val roomAggregate = roomReadRepository.getById(resource.id) ?: throw NotFoundException()
+
+        val session = call.principal<SessionPrincipal>()!!.session
+        val isMember = memberReadRepository.count(MemberQuery(
+            roomIds = listOf(roomAggregate.modelId),
+            userIds = listOf(session.userId),
+        )) > 0
+        if (! isMember) {
+            throw HttpException(HttpStatusCode.Forbidden)
+        }
 
         roomWriteRepository.delete(roomAggregate)
 
