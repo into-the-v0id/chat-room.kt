@@ -13,10 +13,7 @@ import org.chatRoom.core.model.Message
 import org.chatRoom.core.payload.message.CreateMessage
 import org.chatRoom.core.payload.message.UpdateMessage
 import org.chatRoom.api.resource.Messages
-import org.chatRoom.core.repository.read.MemberQuery
-import org.chatRoom.core.repository.read.MemberReadRepository
-import org.chatRoom.core.repository.read.MessageQuery
-import org.chatRoom.core.repository.read.MessageReadRepository
+import org.chatRoom.core.repository.read.*
 import org.chatRoom.core.repository.write.MessageWriteRepository
 import org.chatRoom.core.repository.write.create
 import org.chatRoom.core.repository.write.delete
@@ -30,21 +27,24 @@ class MessageController(
     private val memberReadRepository: MemberReadRepository,
 ) {
     suspend fun list(call: ApplicationCall, resource: Messages) {
-        val ids = resource.ids.ifEmpty { null }
-        var memberIds = resource.memberIds.ifEmpty { null }
+        val session = call.principal<SessionPrincipal>()!!.session
+        val memberAggregates = memberReadRepository.getAll(MemberQuery(
+            userIds = listOf(session.userId)
+        ))
+        val allowedMemberAggregates = memberReadRepository.getAll(MemberQuery(
+            roomIds = memberAggregates.map { member -> member.roomId }
+        ))
 
-        val roomIds = resource.roomIds
-        if (roomIds.isNotEmpty()) {
-            val roomMemberAggregates = memberReadRepository.getAll(MemberQuery(roomIds = roomIds))
+        var memberIds = allowedMemberAggregates.map { member -> member.modelId }
+        if (resource.memberIds.isNotEmpty()) memberIds = memberIds.intersect(resource.memberIds).toList()
+        if (resource.roomIds.isNotEmpty()) {
+            val roomMemberAggregates = memberReadRepository.getAll(MemberQuery(roomIds = resource.roomIds))
             val roomMemberIds = roomMemberAggregates.map { member -> member.modelId }
-
-            memberIds = (memberIds ?: roomMemberIds)
-                .intersect(roomMemberIds)
-                .toList()
+            memberIds = memberIds.intersect(roomMemberIds).toList()
         }
 
         val query = MessageQuery(
-            ids = ids,
+            ids = resource.ids.ifEmpty { null },
             memberIds = memberIds,
             offset = resource.offset,
             limit = resource.limit,
@@ -69,6 +69,15 @@ class MessageController(
 
     suspend fun detail(call: ApplicationCall, resource: Messages.Detail) {
         val messageAggregate = messageReadRepository.getById(resource.id) ?: throw NotFoundException()
+        val messageMemberAggregate = memberReadRepository.getById(messageAggregate.memberId)!!
+
+        val session = call.principal<SessionPrincipal>()!!.session
+        val memberAggregate = memberReadRepository.getAll(MemberQuery(
+            userIds = listOf(session.userId),
+            roomIds = listOf(messageMemberAggregate.roomId)
+        )).firstOrNull()
+        if (memberAggregate == null) throw NotFoundException()
+
         val messageModel = Message(messageAggregate)
 
         call.respond(messageModel)
