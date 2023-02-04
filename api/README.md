@@ -10,6 +10,9 @@ The Data Model is built around a concept called Event Sourcing. Basically, every
 
 ## Setup
 
+> **Warning**
+> The API Server expects to be run behind a reverse proxy and thus trusts relevant headers. To prevent abuse of these headers, always run a reverse proxy in front of the API Server.
+
 ### With Docker Compose
 
 ```bash

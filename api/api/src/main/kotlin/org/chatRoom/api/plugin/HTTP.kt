@@ -8,10 +8,13 @@ import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.conditionalheaders.*
 import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.server.plugins.forwardedheaders.*
 import io.ktor.util.*
 import java.util.Base64
 
 fun Application.configureHTTP() {
+    install(ForwardedHeaders)
+    install(XForwardedHeaders)
     install(DefaultHeaders) {
         header("X-Content-Type-Options", "nosniff")
         header("Referrer-Policy", "strict-origin")
