@@ -88,6 +88,9 @@ class MessageController(
 
         val memberAggregate = memberReadRepository.getById(payload.memberId) ?: throw BadRequestException("Unknown member")
 
+        val session = call.principal<SessionPrincipal>()!!.session
+        if (session.userId != memberAggregate.userId) throw HttpException(HttpStatusCode.Forbidden)
+
         val messageAggregate = MessageAggregate.create(member = memberAggregate, content = payload.content)
         messageWriteRepository.create(messageAggregate)
 
