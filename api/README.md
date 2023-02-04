@@ -10,7 +10,7 @@ The Data Model is built around a concept called Event Sourcing. Basically, every
 
 ## Setup
 
-> **Warning**
+> **Warning**  
 > The API Server expects to be run behind a reverse proxy and thus trusts relevant headers. To prevent abuse of these headers, always run a reverse proxy in front of the API Server.
 
 ### With Docker Compose
@@ -69,7 +69,7 @@ $ curl -H "Authorization: Bearer $API_TOKEN" 'http://localhost:8080/messages?roo
 
 ## Limitations
 
-- Authentication and Authorization are not yet implemented
+- Authorization is not yet implemented
 - No real-time communication since connecting to a raw TCP Socket is not yet supported
 
 ## License
