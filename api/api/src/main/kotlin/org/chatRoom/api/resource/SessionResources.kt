@@ -11,8 +11,6 @@ import org.chatRoom.core.valueObject.session.SessionSortCriterion
 class Sessions(
     @SerialName("id")
     val ids: List<Id> = listOf(),
-    @SerialName("user_id")
-    val userIds: List<Id> = listOf(),
     val offset: Offset? = null,
     val limit: Limit? = null,
     @SerialName("sort_criteria")

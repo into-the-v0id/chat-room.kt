@@ -2,8 +2,10 @@ package org.chatRoom.api.controller
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
 import io.ktor.server.response.*
+import org.chatRoom.api.authentication.SessionPrincipal
 import org.chatRoom.api.resource.Sessions
 import org.chatRoom.core.model.session.PublicSession
 import org.chatRoom.core.repository.read.SessionQuery
@@ -17,9 +19,11 @@ class SessionController(
     private val sessionWriteRepository: SessionWriteRepository,
 ) {
     suspend fun list(call: ApplicationCall, resource: Sessions) {
+        val session = call.principal<SessionPrincipal>()!!.session
+
         val query = SessionQuery(
             ids = resource.ids.ifEmpty { null },
-            userIds = resource.userIds.ifEmpty { null },
+            userIds = listOf(session.userId),
             offset = resource.offset,
             limit = resource.limit,
             sortCriteria = resource.sortCriteria,
@@ -42,14 +46,24 @@ class SessionController(
     }
 
     suspend fun detail(call: ApplicationCall, resource: Sessions.Detail) {
-        val sessionAggregate = sessionReadRepository.getById(resource.id) ?: throw NotFoundException()
+        val session = call.principal<SessionPrincipal>()!!.session
+
+        val sessionAggregate = sessionReadRepository.getAll(SessionQuery(
+            ids = listOf(resource.id),
+            userIds = listOf(session.userId),
+        )).firstOrNull() ?: throw NotFoundException()
         val sessionModel = PublicSession(sessionAggregate)
 
         call.respond(sessionModel)
     }
 
     suspend fun delete(call: ApplicationCall, resource: Sessions.Detail) {
-        val sessionAggregate = sessionReadRepository.getById(resource.id) ?: throw NotFoundException()
+        val session = call.principal<SessionPrincipal>()!!.session
+
+        val sessionAggregate = sessionReadRepository.getAll(SessionQuery(
+            ids = listOf(resource.id),
+            userIds = listOf(session.userId),
+        )).firstOrNull() ?: throw NotFoundException()
 
         sessionWriteRepository.delete(sessionAggregate)
 

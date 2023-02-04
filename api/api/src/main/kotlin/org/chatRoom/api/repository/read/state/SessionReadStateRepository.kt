@@ -45,7 +45,7 @@ class SessionReadStateRepository(
 
         if (query.userIds != null) conditions.add(
             DSL.field("user_id")
-                .`in`(*query.userIds!!.map { id -> id.toString() }.toTypedArray())
+                .`in`(*query.userIds!!.map { id -> id.toUuid() }.toTypedArray())
         )
 
         val order = query.sortCriteria.map { criterion -> when (criterion) {
