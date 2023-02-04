@@ -2,10 +2,13 @@ package org.chatRoom.api.controller
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.response.*
+import org.chatRoom.api.authentication.SessionPrincipal
+import org.chatRoom.api.exception.HttpException
 import org.chatRoom.core.model.Member
 import org.chatRoom.core.payload.member.CreateMember
 import org.chatRoom.api.resource.Members
@@ -84,6 +87,9 @@ class MemberController(
 
     suspend fun delete(call: ApplicationCall, resource: Members.Detail) {
         val memberAggregate = memberReadRepository.getById(resource.id) ?: throw NotFoundException()
+
+        val session = call.principal<SessionPrincipal>()!!.session
+        if (session.userId != memberAggregate.userId) throw HttpException(HttpStatusCode.Forbidden)
 
         memberWriteRepository.delete(memberAggregate)
 
