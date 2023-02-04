@@ -24,6 +24,7 @@ class UserWriteStateRepository(
                     DSL.field("id"),
                     DSL.field("handle"),
                     DSL.field("email"),
+                    DSL.field("password"),
                     DSL.field("date_created"),
                     DSL.field("date_updated"),
                 ),
@@ -34,6 +35,7 @@ class UserWriteStateRepository(
                 user.modelId.toUuid(),
                 user.handle.toString(),
                 user.email.toString(),
+                user.password.toString(),
                 user.dateCreated,
                 user.dateUpdated,
             ))
@@ -51,6 +53,7 @@ class UserWriteStateRepository(
             user.modelId.toUuid(),
             user.handle.toString(),
             user.email.toString(),
+            user.password.toString(),
             user.dateCreated,
             user.dateUpdated,
         ) }
@@ -60,12 +63,13 @@ class UserWriteStateRepository(
             .set(mapOf(
                 DSL.field("handle") to DSL.field("new.handle"),
                 DSL.field("email") to DSL.field("new.email"),
+                DSL.field("password") to DSL.field("new.password"),
                 DSL.field("date_created") to DSL.field("new.date_created"),
                 DSL.field("date_updated") to DSL.field("new.date_updated"),
             ))
             .from(
                 DSL.values(*valueRows.toTypedArray())
-                    .`as`("new", listOf("id", "handle", "email", "date_created", "date_updated"))
+                    .`as`("new", listOf("id", "handle", "email", "password", "date_created", "date_updated"))
             )
             .where(DSL.field("old.id").eq(DSL.field("new.id")))
 

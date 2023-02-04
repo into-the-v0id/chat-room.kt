@@ -11,8 +11,8 @@ import org.chatRoom.api.authentication.SessionPrincipal
 import org.chatRoom.api.exception.HttpException
 import org.chatRoom.api.resource.Sessions
 import org.chatRoom.api.resource.Users
-import org.chatRoom.core.aggreagte.User
 import org.chatRoom.core.model.Session
+import org.chatRoom.core.model.User
 import org.chatRoom.core.payload.authentication.Login
 import org.chatRoom.core.payload.authentication.Register
 import org.chatRoom.core.repository.read.UserQuery
@@ -21,7 +21,9 @@ import org.chatRoom.core.repository.write.SessionWriteRepository
 import org.chatRoom.core.repository.write.UserWriteRepository
 import org.chatRoom.core.repository.write.create
 import org.chatRoom.core.repository.write.delete
+import org.chatRoom.core.valueObject.Password
 import org.chatRoom.core.aggreagte.Session.Companion as SessionAggregate
+import org.chatRoom.core.aggreagte.User as UserAggregate
 
 class AuthenticationController(
     private val userReadRepository: UserReadRepository,
@@ -31,12 +33,17 @@ class AuthenticationController(
     suspend fun login(call: ApplicationCall) {
         val payload = call.receive<Login>()
 
-        val userAggregate = run {
+        val userAggregate: UserAggregate? = run {
             if (payload.userId != null) return@run userReadRepository.getAll(UserQuery(ids = listOf(payload.userId!!))).firstOrNull()
             if (payload.handle != null) return@run userReadRepository.getAll(UserQuery(handles = listOf(payload.handle!!))).firstOrNull()
             return@run null
         }
-        if (userAggregate === null) {
+        if (userAggregate == null) {
+            throw HttpException(HttpStatusCode.Unauthorized, "Invalid credentials")
+        }
+
+        val isValidPassword = userAggregate.password.verify(payload.password)
+        if (! isValidPassword) {
             throw HttpException(HttpStatusCode.Unauthorized, "Invalid credentials")
         }
 
@@ -67,10 +74,14 @@ class AuthenticationController(
         val existingUsers = userReadRepository.getAll(UserQuery(handles = listOf(payload.handle)))
         if (existingUsers.isNotEmpty()) throw BadRequestException("Handle in use")
 
-        val userAggregate = User.create(email = payload.email, handle = payload.handle)
+        val userAggregate = UserAggregate.create(
+            email = payload.email,
+            handle = payload.handle,
+            password = Password.create(payload.password)
+        )
         userWriteRepository.create(userAggregate)
 
-        val userModel = org.chatRoom.core.model.User(userAggregate)
+        val userModel = User(userAggregate)
 
         call.response.header(
             HttpHeaders.Location,

@@ -7,6 +7,7 @@ import org.chatRoom.core.serializer.InstantSerializer
 import org.chatRoom.core.valueObject.EmailAddress
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
+import org.chatRoom.core.valueObject.Password
 import java.time.Instant
 
 @Serializable
@@ -17,6 +18,7 @@ data class CreateUser(
     override val dateIssued: Instant = Instant.now(),
     val email: EmailAddress,
     val handle: Handle,
+    val password: Password,
 ) : UserEvent {
     @OptIn(ExperimentalSerializationApi::class)
     @EncodeDefault

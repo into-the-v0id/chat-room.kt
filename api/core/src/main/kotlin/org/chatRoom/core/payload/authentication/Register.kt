@@ -8,4 +8,5 @@ import org.chatRoom.core.valueObject.Handle
 data class Register(
     val email: EmailAddress,
     val handle: Handle,
+    val password: String,
 )

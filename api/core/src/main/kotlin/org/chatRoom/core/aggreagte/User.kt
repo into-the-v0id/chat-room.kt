@@ -4,12 +4,14 @@ import org.chatRoom.core.event.user.*
 import org.chatRoom.core.valueObject.EmailAddress
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
+import org.chatRoom.core.valueObject.Password
 import java.time.Instant
 
 class User(
     modelId: Id,
     handle: Handle,
     email: EmailAddress,
+    password: Password,
     dateCreated: Instant = Instant.now(),
     dateUpdated: Instant = dateCreated,
 ) : Aggregate<UserEvent>(modelId = modelId) {
@@ -19,6 +21,9 @@ class User(
     var email: EmailAddress = email
         protected set
 
+    var password: Password = password
+        protected set
+
     var dateCreated: Instant = dateCreated
         protected set
 
@@ -26,11 +31,12 @@ class User(
         protected set
 
     companion object {
-        fun create(email: EmailAddress, handle: Handle): User {
+        fun create(email: EmailAddress, handle: Handle, password: Password): User {
             val event = CreateUser(
                 modelId = Id(),
                 email = email,
                 handle = handle,
+                password = password,
             )
 
             return applyEvent(null, event) ?: error("Expected user")
@@ -48,6 +54,7 @@ class User(
                         modelId = event.modelId,
                         email = event.email,
                         handle = event.handle,
+                        password = event.password,
                         dateCreated = event.dateIssued,
                     )
                 }
