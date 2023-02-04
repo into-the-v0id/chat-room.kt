@@ -9,7 +9,6 @@ import org.chatRoom.core.valueObject.session.SessionSortCriterion
 data class SessionQuery(
     val ids: List<Id>? = null,
     val userIds: List<Id>? = null,
-    val secrets: List<Token>? = null,
     val offset: Offset? = null,
     val limit: Limit? = null,
     val sortCriteria: List<SessionSortCriterion> = listOf(),
