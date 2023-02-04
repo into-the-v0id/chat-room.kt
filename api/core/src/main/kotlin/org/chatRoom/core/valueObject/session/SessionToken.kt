@@ -2,7 +2,6 @@ package org.chatRoom.core.valueObject.session
 
 import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
-import org.chatRoom.core.model.Session
 import org.chatRoom.core.serializer.SessionTokenSerializer
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.valueObject.Token
@@ -44,7 +43,6 @@ class SessionToken private constructor(private val data: SessionTokenData) {
 
     constructor(id: Id, secret: Token) : this(SessionTokenData(id, secret))
     constructor(session: SessionAggregate) : this(SessionTokenData(session))
-    constructor(session: Session) : this(SessionTokenData(session))
 
     val id: Id
         get() = data.id
@@ -75,11 +73,6 @@ private data class SessionTokenData(
 
     constructor(session: SessionAggregate) : this(
         id = session.modelId,
-        secret = session.secret,
-    )
-
-    constructor(session: Session) : this(
-        id = session.id,
         secret = session.secret,
     )
 

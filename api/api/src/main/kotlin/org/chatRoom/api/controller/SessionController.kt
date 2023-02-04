@@ -3,11 +3,9 @@ package org.chatRoom.api.controller
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
-import io.ktor.server.request.*
-import io.ktor.server.resources.*
 import io.ktor.server.response.*
-import org.chatRoom.core.model.Session
 import org.chatRoom.api.resource.Sessions
+import org.chatRoom.core.model.session.PublicSession
 import org.chatRoom.core.repository.read.SessionQuery
 import org.chatRoom.core.repository.read.SessionReadRepository
 import org.chatRoom.core.repository.write.SessionWriteRepository
@@ -28,7 +26,7 @@ class SessionController(
         )
 
         val sessionModels = sessionReadRepository.getAll(query)
-            .map { sessionAggregate -> Session(sessionAggregate) }
+            .map { sessionAggregate -> PublicSession(sessionAggregate) }
 
         val listResponse = ListResponse(
             data = sessionModels,
@@ -45,7 +43,7 @@ class SessionController(
 
     suspend fun detail(call: ApplicationCall, resource: Sessions.Detail) {
         val sessionAggregate = sessionReadRepository.getById(resource.id) ?: throw NotFoundException()
-        val sessionModel = Session(sessionAggregate)
+        val sessionModel = PublicSession(sessionAggregate)
 
         call.respond(sessionModel)
     }

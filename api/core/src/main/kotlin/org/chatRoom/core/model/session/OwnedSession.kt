@@ -1,4 +1,4 @@
-package org.chatRoom.core.model
+package org.chatRoom.core.model.session
 
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.serializer.OffsetDateTimeSerializer
@@ -10,7 +10,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
 @Serializable
-data class Session(
+data class OwnedSession(
     val id: Id,
     val userId: Id,
     val secret: Token,
@@ -19,7 +19,7 @@ data class Session(
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateCreated: OffsetDateTime,
 ) {
-    val token = SessionToken(this)
+    val token = SessionToken(id, secret)
 
     constructor(session: SessionAggregate) : this(
         id = session.modelId,
