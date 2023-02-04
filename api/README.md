@@ -38,23 +38,33 @@ $ ./gradlew :api:run
 ## Example
 
 ```bash
-$ curl 'http://localhost:8080/messages?room_id=018562c4-fb64-7a84-b187-aec860bcbff8'
-[
-    {
-        "id": "018562ef-631c-74eb-aadb-22b5a63ad507",
-        "memberId": "018562ea-de2d-70d1-b39b-e058a13dc967",
-        "content": "Hello",
-        "dateCreated": "2022-12-30T12:08:53.788369Z",
-        "dateUpdated": "2022-12-30T12:08:53.788369Z"
-    },
-    {
-        "id": "018562ef-89b0-7284-be73-329a16c397aa",
-        "memberId": "018562ea-de2d-70d1-b39b-e058a13dc967",
-        "content": "World",
-        "dateCreated": "2022-12-30T12:09:03.664871Z",
-        "dateUpdated": "2022-12-30T12:09:03.664871Z"
+$ curl -H "Authorization: Bearer $API_TOKEN" 'http://localhost:8080/messages?room_id=018562c4-fb64-7a84-b187-aec860bcbff8'
+{
+    "data": [
+        {
+            "id": "018562ef-631c-74eb-aadb-22b5a63ad507",
+            "memberId": "018562ea-de2d-70d1-b39b-e058a13dc967",
+            "content": "Hello",
+            "dateCreated": "2022-12-30T12:08:53.788369Z",
+            "dateUpdated": "2022-12-30T12:08:53.788369Z"
+        },
+        {
+            "id": "018562ef-89b0-7284-be73-329a16c397aa",
+            "memberId": "018562ea-de2d-70d1-b39b-e058a13dc967",
+            "content": "World",
+            "dateCreated": "2022-12-30T12:09:03.664871Z",
+            "dateUpdated": "2022-12-30T12:09:03.664871Z"
+        }
+    ],
+    "list": {
+        "offset": null,
+        "limit": null,
+        "currentItemCount": 2,
+        "totalItemCount": 2,
+        "totalItemsBefore": 0,
+        "totalItemsAfter": 0
     }
-]
+}
 ```
 
 ## Limitations
