@@ -2,9 +2,12 @@ package org.chatRoom.api.controller
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
+import org.chatRoom.api.authentication.SessionPrincipal
+import org.chatRoom.api.exception.HttpException
 import org.chatRoom.core.payload.user.UpdateUser
 import org.chatRoom.api.resource.Users
 import org.chatRoom.core.model.user.PublicUser
@@ -55,6 +58,11 @@ class UserController(
     suspend fun update(call: ApplicationCall, resource: Users.Detail) {
         var userAggregate = userReadRepository.getById(resource.id) ?: throw NotFoundException()
 
+        val session = call.principal<SessionPrincipal>()!!.session
+        if (session.userId != userAggregate.modelId) {
+            throw HttpException(HttpStatusCode.Forbidden)
+        }
+
         val payload = call.receive<UpdateUser>()
 
         if (payload.id != null && payload.id != userAggregate.modelId) throw BadRequestException("Mismatching IDs")
@@ -75,6 +83,11 @@ class UserController(
 
     suspend fun delete(call: ApplicationCall, resource: Users.Detail) {
         val userAggregate = userReadRepository.getById(resource.id) ?: throw NotFoundException()
+
+        val session = call.principal<SessionPrincipal>()!!.session
+        if (session.userId != userAggregate.modelId) {
+            throw HttpException(HttpStatusCode.Forbidden)
+        }
 
         userWriteRepository.delete(userAggregate)
 

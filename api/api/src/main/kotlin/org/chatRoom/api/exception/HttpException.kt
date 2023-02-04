@@ -4,5 +4,5 @@ import io.ktor.http.*
 
 class HttpException(
     val status: HttpStatusCode,
-    message: String?,
+    message: String? = null,
 ): Throwable(message)
