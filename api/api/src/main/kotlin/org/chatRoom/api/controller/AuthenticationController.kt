@@ -11,8 +11,8 @@ import org.chatRoom.api.authentication.SessionPrincipal
 import org.chatRoom.api.exception.HttpException
 import org.chatRoom.api.resource.Sessions
 import org.chatRoom.api.resource.Users
-import org.chatRoom.core.model.User
 import org.chatRoom.core.model.session.OwnedSession
+import org.chatRoom.core.model.user.OwnedUser
 import org.chatRoom.core.payload.authentication.Login
 import org.chatRoom.core.payload.authentication.Register
 import org.chatRoom.core.repository.read.UserQuery
@@ -81,7 +81,7 @@ class AuthenticationController(
         )
         userWriteRepository.create(userAggregate)
 
-        val userModel = User(userAggregate)
+        val userModel = OwnedUser(userAggregate)
 
         call.response.header(
             HttpHeaders.Location,

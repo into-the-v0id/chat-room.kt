@@ -5,9 +5,9 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
-import org.chatRoom.core.model.User
 import org.chatRoom.core.payload.user.UpdateUser
 import org.chatRoom.api.resource.Users
+import org.chatRoom.core.model.user.PublicUser
 import org.chatRoom.core.repository.read.UserQuery
 import org.chatRoom.core.repository.read.UserReadRepository
 import org.chatRoom.core.repository.write.UserWriteRepository
@@ -30,7 +30,7 @@ class UserController(
         )
 
         val userModels = userReadRepository.getAll(query)
-            .map { userAggregate -> User(userAggregate) }
+            .map { userAggregate -> PublicUser(userAggregate) }
 
         val listResponse = ListResponse(
             data = userModels,
@@ -47,7 +47,7 @@ class UserController(
 
     suspend fun detail(call: ApplicationCall, resource: Users.Detail) {
         val userAggregate = userReadRepository.getById(resource.id) ?: throw NotFoundException()
-        val userModel = User(userAggregate)
+        val userModel = PublicUser(userAggregate)
 
         call.respond(userModel)
     }
@@ -68,7 +68,7 @@ class UserController(
 
         userWriteRepository.update(userAggregate)
 
-        val userModel = User(userAggregate)
+        val userModel = PublicUser(userAggregate)
 
         call.respond(userModel)
     }
