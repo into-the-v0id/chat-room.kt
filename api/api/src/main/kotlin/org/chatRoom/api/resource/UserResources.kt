@@ -13,8 +13,6 @@ class Users(
     val ids: List<Id> = listOf(),
     @SerialName("handle")
     val handles: List<Handle> = listOf(),
-    @SerialName("email")
-    val emails: List<EmailAddress> = listOf(),
     val offset: Offset? = null,
     val limit: Limit? = null,
     @SerialName("sort_criteria")
