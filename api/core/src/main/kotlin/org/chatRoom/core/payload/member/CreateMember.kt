@@ -5,6 +5,5 @@ import org.chatRoom.core.valueObject.Id
 
 @Serializable
 data class CreateMember(
-    val userId: Id,
     val roomId: Id,
 )
