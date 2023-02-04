@@ -83,13 +83,11 @@ class RoomController(
         var roomAggregate = roomReadRepository.getById(resource.id) ?: throw NotFoundException()
 
         val session = call.principal<SessionPrincipal>()!!.session
-        val isMember = memberReadRepository.count(MemberQuery(
+        val memberAggregate = memberReadRepository.getAll(MemberQuery(
             roomIds = listOf(roomAggregate.modelId),
             userIds = listOf(session.userId),
-        )) > 0
-        if (! isMember) {
-            throw HttpException(HttpStatusCode.Forbidden)
-        }
+        )).firstOrNull()
+        if (memberAggregate == null) throw HttpException(HttpStatusCode.Forbidden)
 
         val payload = call.receive<UpdateRoom>()
 
@@ -112,13 +110,11 @@ class RoomController(
         val roomAggregate = roomReadRepository.getById(resource.id) ?: throw NotFoundException()
 
         val session = call.principal<SessionPrincipal>()!!.session
-        val isMember = memberReadRepository.count(MemberQuery(
+        val memberAggregate = memberReadRepository.getAll(MemberQuery(
             roomIds = listOf(roomAggregate.modelId),
             userIds = listOf(session.userId),
-        )) > 0
-        if (! isMember) {
-            throw HttpException(HttpStatusCode.Forbidden)
-        }
+        )).firstOrNull()
+        if (memberAggregate == null) throw HttpException(HttpStatusCode.Forbidden)
 
         roomWriteRepository.delete(roomAggregate)
 

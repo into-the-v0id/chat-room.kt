@@ -96,9 +96,7 @@ class MessageController(
         val memberAggregate = memberReadRepository.getById(messageAggregate.memberId)!!
 
         val session = call.principal<SessionPrincipal>()!!.session
-        if (session.userId != memberAggregate.userId) {
-            throw HttpException(HttpStatusCode.Forbidden)
-        }
+        if (session.userId != memberAggregate.userId) throw HttpException(HttpStatusCode.Forbidden)
 
         val payload = call.receive<UpdateMessage>()
 
@@ -118,9 +116,7 @@ class MessageController(
         val memberAggregate = memberReadRepository.getById(messageAggregate.memberId)!!
 
         val session = call.principal<SessionPrincipal>()!!.session
-        if (session.userId != memberAggregate.userId) {
-            throw HttpException(HttpStatusCode.Forbidden)
-        }
+        if (session.userId != memberAggregate.userId) throw HttpException(HttpStatusCode.Forbidden)
 
         messageWriteRepository.delete(messageAggregate)
 

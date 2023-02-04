@@ -58,12 +58,10 @@ class SessionController(
     }
 
     suspend fun delete(call: ApplicationCall, resource: Sessions.Detail) {
-        val session = call.principal<SessionPrincipal>()!!.session
+        val sessionAggregate = sessionReadRepository.getById(resource.id) ?: throw NotFoundException()
 
-        val sessionAggregate = sessionReadRepository.getAll(SessionQuery(
-            ids = listOf(resource.id),
-            userIds = listOf(session.userId),
-        )).firstOrNull() ?: throw NotFoundException()
+        val session = call.principal<SessionPrincipal>()!!.session
+        if (session.userId != sessionAggregate.userId) throw NotFoundException()
 
         sessionWriteRepository.delete(sessionAggregate)
 

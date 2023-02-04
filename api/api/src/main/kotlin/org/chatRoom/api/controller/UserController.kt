@@ -59,9 +59,7 @@ class UserController(
         var userAggregate = userReadRepository.getById(resource.id) ?: throw NotFoundException()
 
         val session = call.principal<SessionPrincipal>()!!.session
-        if (session.userId != userAggregate.modelId) {
-            throw HttpException(HttpStatusCode.Forbidden)
-        }
+        if (session.userId != userAggregate.modelId) throw HttpException(HttpStatusCode.Forbidden)
 
         val payload = call.receive<UpdateUser>()
 
@@ -85,9 +83,7 @@ class UserController(
         val userAggregate = userReadRepository.getById(resource.id) ?: throw NotFoundException()
 
         val session = call.principal<SessionPrincipal>()!!.session
-        if (session.userId != userAggregate.modelId) {
-            throw HttpException(HttpStatusCode.Forbidden)
-        }
+        if (session.userId != userAggregate.modelId) throw HttpException(HttpStatusCode.Forbidden)
 
         userWriteRepository.delete(userAggregate)
 
