@@ -23,7 +23,7 @@ class SessionReadStateRepository(
     private fun parseAggregate(record: Record): Session = Session(
         modelId = record.get("id", Id::class.java)!!,
         userId = record.get("user_id", Id::class.java)!!,
-        token = record.get("token", Token::class.java)!!,
+        secret = record.get("secret", Token::class.java)!!,
         dateValidUntil = record.get("date_valid_until", Instant::class.java)!!,
         dateCreated = record.get("date_created", Instant::class.java)!!,
     )
@@ -48,9 +48,9 @@ class SessionReadStateRepository(
                 .`in`(*query.userIds!!.map { id -> id.toString() }.toTypedArray())
         )
 
-        if (query.tokens != null) conditions.add(
-            DSL.field("token")
-                .`in`(*query.tokens!!.map { token -> token.toString() }.toTypedArray())
+        if (query.secrets != null) conditions.add(
+            DSL.field("secret")
+                .`in`(*query.secrets!!.map { token -> token.toString() }.toTypedArray())
         )
 
         val order = query.sortCriteria.map { criterion -> when (criterion) {

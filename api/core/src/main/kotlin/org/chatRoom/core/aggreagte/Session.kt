@@ -5,20 +5,21 @@ import org.chatRoom.core.event.session.DeleteSession
 import org.chatRoom.core.event.session.*
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.valueObject.Token
+import org.chatRoom.core.valueObject.session.SessionToken
 import java.time.Duration
 import java.time.Instant
 
 class Session(
     modelId: Id,
     userId: Id,
-    token: Token,
+    secret: Token,
     dateValidUntil: Instant,
     dateCreated: Instant = Instant.now(),
 ) : Aggregate<SessionEvent>(modelId = modelId) {
     var userId: Id = userId
         protected set
 
-    var token: Token = token
+    var secret: Token = secret
         protected set
 
     var dateValidUntil: Instant = dateValidUntil
@@ -32,7 +33,7 @@ class Session(
             val event = CreateSession(
                 modelId = Id(),
                 userId = userId,
-                token = Token(),
+                secret = Token(),
                 dateValidUntil = Instant.now().plus(Duration.ofHours(6))
             )
 
@@ -50,7 +51,7 @@ class Session(
                     session = Session(
                         modelId = event.modelId,
                         userId = event.userId,
-                        token = event.token,
+                        secret = event.secret,
                         dateValidUntil = event.dateValidUntil,
                         dateCreated = event.dateIssued,
                     )

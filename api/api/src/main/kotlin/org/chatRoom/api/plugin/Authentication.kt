@@ -2,11 +2,10 @@ package org.chatRoom.api.plugin
 
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.plugins.*
 import org.chatRoom.api.authentication.SessionPrincipal
 import org.chatRoom.core.repository.read.SessionQuery
 import org.chatRoom.core.repository.read.SessionReadRepository
-import org.chatRoom.core.valueObject.Token
+import org.chatRoom.core.valueObject.session.SessionToken
 import java.time.Instant
 
 class Authentication(
@@ -17,16 +16,21 @@ class Authentication(
             bearer {
                 authenticate { credential ->
                     val token = try {
-                        Token(credential.token)
+                        SessionToken.parse(credential.token)
                     } catch (e: IllegalArgumentException) {
                         // Invalid token
-                        throw BadRequestException("Invalid authentication token")
+                        return@authenticate null
                     }
 
-                    val sessionAggregate = sessionReadRepository.getAll(SessionQuery(tokens = listOf(token))).firstOrNull()
+                    val sessionAggregate = sessionReadRepository.getAll(SessionQuery(ids = listOf(token.id))).firstOrNull()
 
-                    // Token not found
+                    // Session not found
                     if (sessionAggregate == null) {
+                        return@authenticate null
+                    }
+
+                    // Mismatching secret
+                    if (token.secret != sessionAggregate.secret) {
                         return@authenticate null
                     }
 

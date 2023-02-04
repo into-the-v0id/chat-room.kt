@@ -4,8 +4,6 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.serializer.InstantSerializer
-import org.chatRoom.core.valueObject.EmailAddress
-import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.valueObject.Token
 import java.time.Instant
@@ -17,7 +15,7 @@ data class CreateSession(
     @Serializable(with = InstantSerializer::class)
     override val dateIssued: Instant = Instant.now(),
     val userId: Id,
-    val token: Token,
+    val secret: Token,
     @Serializable(with = InstantSerializer::class)
     val dateValidUntil: Instant,
 ) : SessionEvent {

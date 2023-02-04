@@ -35,7 +35,7 @@ class SessionReadEventRepository(
             )
 
             require(query.userIds == null) { "Unsupported filter" }
-            require(query.tokens == null) { "Unsupported filter" }
+            require(query.secrets == null) { "Unsupported filter" }
             require(query.offset == null) { "Unsupported filter" }
             require(query.limit == null) { "Unsupported filter" }
             require(query.sortCriteria.isEmpty()) { "Custom sort criteria not supported" }
