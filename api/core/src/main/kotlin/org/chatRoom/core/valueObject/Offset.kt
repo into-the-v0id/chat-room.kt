@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @JvmInline
 value class Offset(private val offset: Int) {
     init {
-        require(offset > 0) { "Offset must be a positive number" }
+        require(offset >= 0) { "Offset must be greater than or equal to 0" }
     }
 
     override fun toString(): String = offset.toString()
