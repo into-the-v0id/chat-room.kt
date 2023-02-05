@@ -23,6 +23,9 @@ class AuthRepository {
             method: 'POST',
             baseURL: this.apiBaseUrl,
             body: data,
+            headers: {
+                Accept: 'application/json',
+            },
         }).catch(e => {
             if (e.response.status === 401) {
                 return null

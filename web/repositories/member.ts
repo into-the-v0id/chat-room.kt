@@ -38,6 +38,7 @@ class MemberRepository {
                 sort_criteria: query.sortCriteria ?? undefined,
             },
             headers: {
+                Accept: 'application/json',
                 Authorization: 'Bearer ' + useSessionStore().session!.token,
             },
         })
