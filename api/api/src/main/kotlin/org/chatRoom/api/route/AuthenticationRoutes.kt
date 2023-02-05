@@ -11,10 +11,10 @@ class AuthenticationRoutes(
     private val authenticationController: AuthenticationController,
 ) {
     fun Route.authenticationRouting() {
-        post<Authentication.Login> { authenticationController.login(call) }
         authenticate("session", optional = true) {
+            post<Authentication.Login> { authenticationController.login(call) }
             post<Authentication.Logout> { authenticationController.logout(call) }
+            post<Authentication.Registration> { authenticationController.registration(call) }
         }
-        post<Authentication.Registration> { authenticationController.registration(call) }
     }
 }
