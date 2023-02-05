@@ -69,7 +69,6 @@ $ curl -H "Authorization: Bearer $API_TOKEN" 'http://localhost:8080/messages?roo
 
 ## Limitations
 
-- Authorization is not yet implemented
 - No real-time communication since connecting to a raw TCP Socket is not yet supported
 
 ## License
