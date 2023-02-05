@@ -27,7 +27,7 @@ class MemberRepository {
             return []
         }
 
-        const fetchedRawMembers = await $fetch<any[]>('members', {
+        const result = await $fetch<any>('members', {
             baseURL: this.apiBaseUrl,
             query: {
                 id: removeDuplicates(query.ids ?? []),
@@ -42,7 +42,7 @@ class MemberRepository {
             },
         })
 
-        const fetchedMembers = fetchedRawMembers.map(fetchedRawMember => new Member(fetchedRawMember))
+        const fetchedMembers = result.data.map((rawMember: any) => new Member(rawMember))
 
         return fetchedMembers
     }

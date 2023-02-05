@@ -27,7 +27,7 @@ class MessageRepository {
             return []
         }
 
-        const fetchedRawMessages = await $fetch<any[]>('messages', {
+        const result = await $fetch<any>('messages', {
             baseURL: this.apiBaseUrl,
             query: {
                 id: removeDuplicates(query.ids ?? []),
@@ -42,7 +42,7 @@ class MessageRepository {
             },
         })
 
-        const fetchedMessages = fetchedRawMessages.map(fetchedRawMessage => new Message(fetchedRawMessage))
+        const fetchedMessages = result.data.map((rawMessage: any) => new Message(rawMessage))
 
         return fetchedMessages
     }

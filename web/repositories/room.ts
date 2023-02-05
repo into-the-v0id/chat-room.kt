@@ -22,7 +22,7 @@ class RoomRepository {
             return []
         }
 
-        const fetchedRawRooms = await $fetch<any[]>('rooms', {
+        const result = await $fetch<any>('rooms', {
             baseURL: this.apiBaseUrl,
             query: {
                 id: removeDuplicates(query.ids ?? []),
@@ -36,7 +36,7 @@ class RoomRepository {
             },
         })
 
-        const fetchedRooms = fetchedRawRooms.map(fetchedRawRoom => new Room(fetchedRawRoom))
+        const fetchedRooms = result.data.map((rawRoom: any) => new Room(rawRoom))
 
         return fetchedRooms
     }
