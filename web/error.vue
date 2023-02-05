@@ -10,6 +10,7 @@
     }>()
 
     useHead({
+        title: 'Error',
         meta: [
             { name: 'robots', content: 'noindex' },
         ],
