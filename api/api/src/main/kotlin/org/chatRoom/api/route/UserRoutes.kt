@@ -11,7 +11,7 @@ class UserRoutes(
     private val userController: UserController,
 ) {
     fun Route.userRouting() {
-        authenticate {
+        authenticate("session") {
             get<Users> { resource -> userController.list(call, resource) }
 
             get<Users.Self> { userController.selfDetail(call) }

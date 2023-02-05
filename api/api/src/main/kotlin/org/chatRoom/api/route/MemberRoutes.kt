@@ -11,7 +11,7 @@ class MemberRoutes(
     private val memberController: MemberController,
 ) {
     fun Route.memberRouting() {
-        authenticate {
+        authenticate("session") {
             get<Members> { resource -> memberController.list(call, resource) }
             post<Members> { memberController.create(call) }
 

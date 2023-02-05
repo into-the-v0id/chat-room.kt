@@ -12,7 +12,7 @@ class AuthenticationRoutes(
 ) {
     fun Route.authenticationRouting() {
         post<Authentication.Login> { authenticationController.login(call) }
-        authenticate(optional = true) {
+        authenticate("session", optional = true) {
             post<Authentication.Logout> { authenticationController.logout(call) }
         }
         post<Authentication.Registration> { authenticationController.registration(call) }

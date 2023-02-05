@@ -11,7 +11,7 @@ class MessageRoutes(
     private val messageController: MessageController,
 ) {
     fun Route.messageRouting() {
-        authenticate {
+        authenticate("session") {
             get<Messages> { resource -> messageController.list(call, resource) }
             post<Messages> { messageController.create(call) }
 

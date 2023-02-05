@@ -11,7 +11,7 @@ class RoomRoutes(
     private val roomController: RoomController,
 ) {
     fun Route.roomRouting() {
-        authenticate {
+        authenticate("session") {
             get<Rooms> { resource -> roomController.list(call, resource) }
             post<Rooms> { roomController.create(call) }
 

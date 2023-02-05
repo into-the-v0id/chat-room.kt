@@ -11,7 +11,7 @@ class SessionRoutes(
     private val sessionController: SessionController,
 ) {
     fun Route.sessionRouting() {
-        authenticate {
+        authenticate("session") {
             get<Sessions> { resource -> sessionController.list(call, resource) }
 
             get<Sessions.Detail> { resource -> sessionController.detail(call, resource) }

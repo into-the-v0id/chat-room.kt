@@ -13,7 +13,7 @@ class Authentication(
 ) {
     fun Application.configureAuthentication() {
         install(Authentication) {
-            bearer {
+            bearer("session") {
                 authenticate { credential ->
                     val token = try {
                         SessionToken.parse(credential.token)
