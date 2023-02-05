@@ -76,7 +76,7 @@ class MemberReadStateRepository(
             .select(DSL.count().`as`("count"))
             .from(DSL.table(tableName))
 
-        val result = applyQuery(fetch, query).fetchOne()!!
+        val result = applyQuery(fetch, query.copy(sortCriteria = listOf())).fetchOne()!!
         result.get("count", Int::class.java)
     }
 }
