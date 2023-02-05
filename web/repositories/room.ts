@@ -1,4 +1,5 @@
 import Room from '~~/models/room'
+import useSessionStore from '~~/stores/session'
 
 interface RoomQuery {
     ids?: string[]
@@ -29,6 +30,9 @@ class RoomRepository {
                 offset: query.offset ?? undefined,
                 limit: query.limit ?? undefined,
                 sort_criteria: query.sortCriteria ?? undefined,
+            },
+            headers: {
+                Authorization: 'Bearer ' + useSessionStore().session!.token,
             },
         })
 

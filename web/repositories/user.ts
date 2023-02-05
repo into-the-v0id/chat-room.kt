@@ -1,4 +1,5 @@
 import User from '~~/models/user'
+import useSessionStore from '~~/stores/session'
 
 interface UserQuery {
     ids?: string[]
@@ -29,6 +30,9 @@ class UserRepository {
                 offset: query.offset ?? undefined,
                 limit: query.limit ?? undefined,
                 sort_criteria: query.sortCriteria ?? undefined,
+            },
+            headers: {
+                Authorization: 'Bearer ' + useSessionStore().session!.token,
             },
         })
 

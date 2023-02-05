@@ -6,8 +6,13 @@
             <label for="handle-input" style="display: block;">Handle</label>
             <input type="text" id="handle-input" name="handle" autocomplete="username" required
                 v-model.trim="handle" ref="handleInput" />
-            <div class="error" v-if="handleError">
-                {{ handleError }}
+
+            <label for="password-input" style="display: block;">Password</label>
+            <input type="password" id="password-input" name="password" autocomplete="password" required
+                v-model.trim="password" />
+
+            <div class="error" v-if="authError">
+                {{ authError }}
             </div>
         </div>
 
@@ -20,35 +25,38 @@
 </template>
 
 <script lang="ts" setup>
-    import users from '~~/repositories/user'
-    import useAuthenticatedUserStore from '~~/stores/authenticatedUser'
+    import auth from '~~/repositories/auth'
+    import useSessionStore from '~~/stores/session'
 
     const handleInput = ref<HTMLInputElement|null>(null)
     const handle = ref('')
-    const handleError = ref<string|null>(null)
+    const password = ref('')
+    const authError = ref<string | null>(null)
 
     async function onSubmit() {
-        const user = await users.getAll({ handles: [handle.value] })
-            .then(users => users.length ? users[0] : null)
-
-        if (! user) {
-            showHandleError('User not found')
+        const session = await auth.login({
+            handle: handle.value,
+            password: password.value,
+        })
+        if (! session) {
+            showAuthError('Invalid credentials')
             return
         }
 
-        useAuthenticatedUserStore().authenticate(user)
+        useSessionStore().authenticate(session)
 
-        showHandleError(null)
+        showAuthError(null)
         navigateTo({ name: 'index' })
     }
 
-    function showHandleError(message: string|null) {
+    function showAuthError(message: string|null) {
         if (! message) {
-            handleError.value = null
+            authError.value = null
             return
         }
 
-        handleError.value = 'User not found'
+        authError.value = message
         handleInput.value!.focus()
+        password.value = ''
     }
 </script>

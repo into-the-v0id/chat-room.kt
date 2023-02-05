@@ -1,4 +1,5 @@
 import Member from '~~/models/member'
+import useSessionStore from '~~/stores/session'
 
 interface MemberQuery {
     ids?: string[]
@@ -35,6 +36,9 @@ class MemberRepository {
                 offset: query.offset ?? undefined,
                 limit: query.limit ?? undefined,
                 sort_criteria: query.sortCriteria ?? undefined,
+            },
+            headers: {
+                Authorization: 'Bearer ' + useSessionStore().session!.token,
             },
         })
 

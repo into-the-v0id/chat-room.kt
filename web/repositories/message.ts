@@ -1,4 +1,5 @@
 import Message from '~~/models/message'
+import useSessionStore from '~~/stores/session'
 
 interface MessageQuery {
     ids?: string[]
@@ -35,6 +36,9 @@ class MessageRepository {
                 offset: query.offset ?? undefined,
                 limit: query.limit ?? undefined,
                 sort_criteria: query.sortCriteria ?? undefined,
+            },
+            headers: {
+                Authorization: 'Bearer ' + useSessionStore().session!.token,
             },
         })
 
