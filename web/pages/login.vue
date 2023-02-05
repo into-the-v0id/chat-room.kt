@@ -21,6 +21,7 @@
 
 <script lang="ts" setup>
     import users from '~~/repositories/user'
+    import useAuthenticatedUserStore from '~~/stores/authenticatedUser'
 
     const handleInput = ref<HTMLInputElement|null>(null)
     const handle = ref('')
@@ -35,7 +36,7 @@
             return
         }
 
-        // TODO: store user
+        useAuthenticatedUserStore().authenticate(user)
 
         showHandleError(null)
         navigateTo({ name: 'index' })
