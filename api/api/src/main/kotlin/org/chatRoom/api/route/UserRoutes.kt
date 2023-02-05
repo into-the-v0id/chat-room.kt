@@ -14,9 +14,11 @@ class UserRoutes(
         authenticate {
             get<Users> { resource -> userController.list(call, resource) }
 
+            get<Users.Self> { userController.selfDetail(call) }
+            put<Users.Self> { userController.selfUpdate(call) }
+            delete<Users.Self> { userController.selfDelete(call) }
+
             get<Users.Detail> { resource -> userController.detail(call, resource) }
-            put<Users.Detail> { resource -> userController.update(call, resource) }
-            delete<Users.Detail> { resource -> userController.delete(call, resource) }
         }
     }
 }

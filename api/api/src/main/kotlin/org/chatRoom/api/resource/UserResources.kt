@@ -19,6 +19,12 @@ class Users(
     val sortCriteria: List<UserSortCriterion> = listOf(),
 ) {
     @Serializable
+    @Resource("self")
+    class Self() {
+        val parent: Users = Users()
+    }
+
+    @Serializable
     @Resource("{id}")
     class Detail(val id: Id) {
         val parent: Users = Users()

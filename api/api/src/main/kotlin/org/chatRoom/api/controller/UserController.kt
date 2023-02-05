@@ -7,9 +7,9 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import org.chatRoom.api.authentication.SessionPrincipal
-import org.chatRoom.api.exception.HttpException
 import org.chatRoom.core.payload.user.UpdateUser
 import org.chatRoom.api.resource.Users
+import org.chatRoom.core.model.user.OwnedUser
 import org.chatRoom.core.model.user.PublicUser
 import org.chatRoom.core.repository.read.UserQuery
 import org.chatRoom.core.repository.read.UserReadRepository
@@ -54,11 +54,18 @@ class UserController(
         call.respond(userModel)
     }
 
-    suspend fun update(call: ApplicationCall, resource: Users.Detail) {
-        var userAggregate = userReadRepository.getById(resource.id) ?: throw NotFoundException()
-
+    suspend fun selfDetail(call: ApplicationCall) {
         val session = call.principal<SessionPrincipal>()!!.session
-        if (session.userId != userAggregate.modelId) throw HttpException(HttpStatusCode.Forbidden)
+        val userAggregate = userReadRepository.getById(session.userId)!!
+
+        val userModel = OwnedUser(userAggregate)
+
+        call.respond(userModel)
+    }
+
+    suspend fun selfUpdate(call: ApplicationCall) {
+        val session = call.principal<SessionPrincipal>()!!.session
+        var userAggregate = userReadRepository.getById(session.userId)!!
 
         val payload = call.receive<UpdateUser>()
 
@@ -73,16 +80,14 @@ class UserController(
 
         userWriteRepository.update(userAggregate)
 
-        val userModel = PublicUser(userAggregate)
+        val userModel = OwnedUser(userAggregate)
 
         call.respond(userModel)
     }
 
-    suspend fun delete(call: ApplicationCall, resource: Users.Detail) {
-        val userAggregate = userReadRepository.getById(resource.id) ?: throw NotFoundException()
-
+    suspend fun selfDelete(call: ApplicationCall) {
         val session = call.principal<SessionPrincipal>()!!.session
-        if (session.userId != userAggregate.modelId) throw HttpException(HttpStatusCode.Forbidden)
+        val userAggregate = userReadRepository.getById(session.userId)!!
 
         userWriteRepository.delete(userAggregate)
 
