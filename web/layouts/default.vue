@@ -10,11 +10,12 @@
     const status = usePromise<null>()
 
     onErrorCaptured(error => {
+        console.error(error)
+
         if (status.isFailure) {
             return false
         }
 
-        console.error(error)
         status.reject(error)
 
         useHead({
