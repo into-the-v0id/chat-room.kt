@@ -4,7 +4,7 @@
     <PromiseLoadingIndicator v-else-if="messagesQuery.isPending || membersQuery.isPending || usersQuery.isPending" />
     <div v-else>
         <ul>
-            <li v-for="message in messagesQuery.data">
+            <li v-for="message in messagesQuery.data" :key="message.id">
                 <div style="font-size: 0.75em;">
                     <UserHandle :handle="getUserForMessage(message)!.handle" />
                 </div>

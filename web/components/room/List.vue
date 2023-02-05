@@ -4,7 +4,7 @@
     <PromiseLoadingIndicator v-else-if="membersQuery.isPending || roomsQuery.isPending" />
     <div v-else>
         <ul>
-            <li v-for="room in roomsQuery.data">
+            <li v-for="room in roomsQuery.data" :key="room.id">
                 <NuxtLink :to="{ name: 'rooms-handle', params: { handle: room.handle } }">
                     <RoomHandle :handle="room.handle" />
                 </NuxtLink>

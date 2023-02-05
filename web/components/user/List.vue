@@ -4,7 +4,7 @@
     <PromiseLoadingIndicator v-else-if="membersQuery.isPending || usersQuery.isPending" />
     <div v-else>
         <ul>
-            <li v-for="user in usersQuery.data">
+            <li v-for="user in usersQuery.data" :key="user.id">
                 <NuxtLink :to="{ name: 'users-handle', params: { handle: user.handle } }">
                     <UserHandle :handle="user.handle" />
                 </NuxtLink>
