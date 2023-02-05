@@ -8,7 +8,6 @@
         X-Frame-Options "DENY"
         Content-Security-Policy "frame-ancestors 'self'"
         Referrer-Policy "strict-origin"
-        Strict-Transport-Security "max-age=31536000;"
     }
     header ?Cache-Control "public, max-age=0, must-revalidate"
     header -Server
