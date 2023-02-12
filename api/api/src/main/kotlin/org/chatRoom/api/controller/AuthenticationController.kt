@@ -21,7 +21,7 @@ import org.chatRoom.core.repository.write.SessionWriteRepository
 import org.chatRoom.core.repository.write.UserWriteRepository
 import org.chatRoom.core.repository.write.create
 import org.chatRoom.core.repository.write.delete
-import org.chatRoom.core.valueObject.Password
+import org.chatRoom.core.valueObject.PasswordHash
 import org.chatRoom.core.valueObject.Token
 import org.chatRoom.core.aggreagte.Session.Companion as SessionAggregate
 import org.chatRoom.core.aggreagte.User as UserAggregate
@@ -43,7 +43,7 @@ class AuthenticationController(
             throw HttpException(HttpStatusCode.Unauthorized, "Invalid credentials")
         }
 
-        val isValidPassword = userAggregate.password.verify(payload.password)
+        val isValidPassword = userAggregate.passwordHash.verify(payload.password)
         if (! isValidPassword) {
             throw HttpException(HttpStatusCode.Unauthorized, "Invalid credentials")
         }
@@ -82,7 +82,7 @@ class AuthenticationController(
         val userAggregate = UserAggregate.create(
             email = payload.email,
             handle = payload.handle,
-            password = Password.create(payload.password)
+            password = payload.password,
         )
         userWriteRepository.create(userAggregate)
 

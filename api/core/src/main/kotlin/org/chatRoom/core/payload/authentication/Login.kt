@@ -3,7 +3,6 @@ package org.chatRoom.core.payload.authentication
 import kotlinx.serialization.Serializable
 import org.chatRoom.core.valueObject.Handle
 import org.chatRoom.core.valueObject.Id
-import org.chatRoom.core.valueObject.Password
 
 @Serializable
 data class Login(

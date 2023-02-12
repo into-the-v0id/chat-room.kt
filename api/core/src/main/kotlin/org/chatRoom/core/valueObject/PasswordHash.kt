@@ -6,13 +6,13 @@ import org.springframework.security.crypto.password.PasswordEncoder
 
 @Serializable
 @JvmInline
-value class Password private constructor(private val hash: String) {
+value class PasswordHash private constructor(private val hash: String) {
     companion object {
         private val encoder: PasswordEncoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8()
 
-        fun create(rawPassword: String): Password = Password(encoder.encode(rawPassword))
+        fun create(rawPassword: String): PasswordHash = PasswordHash(encoder.encode(rawPassword))
 
-        fun fromHash(hash: String): Password = Password(hash)
+        fun fromHash(hash: String): PasswordHash = PasswordHash(hash)
     }
 
     init {

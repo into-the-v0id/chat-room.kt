@@ -24,7 +24,7 @@ class UserWriteStateRepository(
                     DSL.field("id"),
                     DSL.field("handle"),
                     DSL.field("email"),
-                    DSL.field("password"),
+                    DSL.field("password_hash"),
                     DSL.field("date_created"),
                     DSL.field("date_updated"),
                 ),
@@ -35,7 +35,7 @@ class UserWriteStateRepository(
                 user.modelId.toUuid(),
                 user.handle.toString(),
                 user.email.toString(),
-                user.password.toString(),
+                user.passwordHash.toString(),
                 user.dateCreated,
                 user.dateUpdated,
             ))
@@ -53,7 +53,7 @@ class UserWriteStateRepository(
             user.modelId.toUuid(),
             user.handle.toString(),
             user.email.toString(),
-            user.password.toString(),
+            user.passwordHash.toString(),
             user.dateCreated,
             user.dateUpdated,
         ) }
