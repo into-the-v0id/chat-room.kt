@@ -22,6 +22,8 @@ import org.chatRoom.core.repository.write.create
 import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.repository.write.update
 import org.chatRoom.core.response.ListResponse
+import org.chatRoom.core.valueObject.Limit
+import org.chatRoom.core.valueObject.Offset
 import org.chatRoom.core.aggreagte.Room as RoomAggregate
 
 class RoomController(
@@ -33,8 +35,8 @@ class RoomController(
         val query = RoomQuery(
             ids = resource.ids.ifEmpty { null },
             handles = resource.handles.ifEmpty { null },
-            offset = resource.offset,
-            limit = resource.limit,
+            offset = resource.offset ?: Offset(0),
+            limit = resource.limit ?: Limit(100),
             sortCriteria = resource.sortCriteria,
         )
 
@@ -44,8 +46,8 @@ class RoomController(
         val listResponse = ListResponse(
             data = roomModels,
             list = ListResponse.ListInfo(
-                offset = resource.offset,
-                limit = resource.limit,
+                offset = query.offset,
+                limit = query.limit,
                 currentItemCount = roomModels.size,
                 totalItemCount = roomReadRepository.count(query.copy(offset = null, limit = null)),
             )

@@ -17,6 +17,8 @@ import org.chatRoom.core.repository.write.UserWriteRepository
 import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.repository.write.update
 import org.chatRoom.core.response.ListResponse
+import org.chatRoom.core.valueObject.Limit
+import org.chatRoom.core.valueObject.Offset
 
 class UserController(
     private val userReadRepository: UserReadRepository,
@@ -26,8 +28,8 @@ class UserController(
         val query = UserQuery(
             ids = resource.ids.ifEmpty { null },
             handles = resource.handles.ifEmpty { null },
-            offset = resource.offset,
-            limit = resource.limit,
+            offset = resource.offset ?: Offset(0),
+            limit = resource.limit ?: Limit(100),
             sortCriteria = resource.sortCriteria,
         )
 
@@ -37,8 +39,8 @@ class UserController(
         val listResponse = ListResponse(
             data = userModels,
             list = ListResponse.ListInfo(
-                offset = resource.offset,
-                limit = resource.limit,
+                offset = query.offset,
+                limit = query.limit,
                 currentItemCount = userModels.size,
                 totalItemCount = userReadRepository.count(query.copy(offset = null, limit = null)),
             )

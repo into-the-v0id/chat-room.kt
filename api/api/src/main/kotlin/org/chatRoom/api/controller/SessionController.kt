@@ -13,6 +13,8 @@ import org.chatRoom.core.repository.read.SessionReadRepository
 import org.chatRoom.core.repository.write.SessionWriteRepository
 import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.response.ListResponse
+import org.chatRoom.core.valueObject.Limit
+import org.chatRoom.core.valueObject.Offset
 
 class SessionController(
     private val sessionReadRepository: SessionReadRepository,
@@ -24,8 +26,8 @@ class SessionController(
         val query = SessionQuery(
             ids = resource.ids.ifEmpty { null },
             userIds = listOf(session.userId),
-            offset = resource.offset,
-            limit = resource.limit,
+            offset = resource.offset ?: Offset(0),
+            limit = resource.limit ?: Limit(100),
             sortCriteria = resource.sortCriteria,
         )
 
@@ -35,8 +37,8 @@ class SessionController(
         val listResponse = ListResponse(
             data = sessionModels,
             list = ListResponse.ListInfo(
-                offset = resource.offset,
-                limit = resource.limit,
+                offset = query.offset,
+                limit = query.limit,
                 currentItemCount = sessionModels.size,
                 totalItemCount = sessionReadRepository.count(query.copy(offset = null, limit = null)),
             )

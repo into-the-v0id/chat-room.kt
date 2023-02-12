@@ -19,6 +19,8 @@ import org.chatRoom.core.repository.write.create
 import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.repository.write.update
 import org.chatRoom.core.response.ListResponse
+import org.chatRoom.core.valueObject.Limit
+import org.chatRoom.core.valueObject.Offset
 import org.chatRoom.core.aggreagte.Message as MessageAggregate
 
 class MessageController(
@@ -46,8 +48,8 @@ class MessageController(
         val query = MessageQuery(
             ids = resource.ids.ifEmpty { null },
             memberIds = memberIds,
-            offset = resource.offset,
-            limit = resource.limit,
+            offset = resource.offset ?: Offset(0),
+            limit = resource.limit ?: Limit(100),
             sortCriteria = resource.sortCriteria,
         )
 
@@ -57,8 +59,8 @@ class MessageController(
         val listResponse = ListResponse(
             data = messageModels,
             list = ListResponse.ListInfo(
-                offset = resource.offset,
-                limit = resource.limit,
+                offset = query.offset,
+                limit = query.limit,
                 currentItemCount = messageModels.size,
                 totalItemCount = messageReadRepository.count(query.copy(offset = null, limit = null)),
             )
