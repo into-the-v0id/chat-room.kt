@@ -35,7 +35,7 @@ class Authentication(
                     }
 
                     // Session expired
-                    if (sessionAggregate.dateValidUntil.isBefore(Instant.now())) {
+                    if (sessionAggregate.isExpired()) {
                         return@authenticate null
                     }
 

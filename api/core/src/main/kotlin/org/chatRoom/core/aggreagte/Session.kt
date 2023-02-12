@@ -65,4 +65,6 @@ class Session(
             session
         }
     }
+
+    fun isExpired(): Boolean = dateValidUntil.isBefore(Instant.now())
 }

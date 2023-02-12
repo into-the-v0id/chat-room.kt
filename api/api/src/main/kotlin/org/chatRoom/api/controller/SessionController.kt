@@ -15,6 +15,7 @@ import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.response.ListResponse
 import org.chatRoom.core.valueObject.Limit
 import org.chatRoom.core.valueObject.Offset
+import java.time.Instant
 
 class SessionController(
     private val sessionReadRepository: SessionReadRepository,
@@ -26,6 +27,7 @@ class SessionController(
         val query = SessionQuery(
             ids = resource.ids.ifEmpty { null },
             userIds = listOf(session.userId),
+            isExpired = false,
             offset = resource.offset ?: Offset(0),
             limit = resource.limit ?: Limit(100),
             sortCriteria = resource.sortCriteria,
@@ -53,6 +55,8 @@ class SessionController(
         val session = call.principal<SessionPrincipal>()!!.session
         if (session.userId != sessionAggregate.userId) throw NotFoundException()
 
+        if (sessionAggregate.isExpired()) throw NotFoundException()
+
         val sessionModel = PublicSession(sessionAggregate)
 
         call.respond(sessionModel)
@@ -63,6 +67,8 @@ class SessionController(
 
         val session = call.principal<SessionPrincipal>()!!.session
         if (session.userId != sessionAggregate.userId) throw NotFoundException()
+
+        if (sessionAggregate.isExpired()) throw NotFoundException()
 
         sessionWriteRepository.delete(sessionAggregate)
 

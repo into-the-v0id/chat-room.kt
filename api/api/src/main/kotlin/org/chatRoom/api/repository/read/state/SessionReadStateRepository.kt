@@ -48,6 +48,16 @@ class SessionReadStateRepository(
                 .`in`(*query.userIds!!.map { id -> id.toUuid() }.toTypedArray())
         )
 
+        if (query.isExpired != null) {
+            val now = Instant.now()
+
+            if (query.isExpired!!) {
+                conditions.add(DSL.field("date_valid_until").lessThan(now))
+            } else {
+                conditions.add(DSL.field("date_valid_until").greaterOrEqual(now))
+            }
+        }
+
         val order = query.sortCriteria.map { criterion -> when (criterion) {
             SessionSortCriterion.DATE_VALID_UNTIL_ASC -> DSL.field("date_valid_until").asc()
             SessionSortCriterion.DATE_VALID_UNTIL_DESC -> DSL.field("date_valid_until").desc()
