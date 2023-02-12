@@ -16,8 +16,8 @@ class MessageReadStateRepository(
     private val tableName = "message_state"
 
     private fun parseAggregate(record: Record): Message = Message(
-        modelId = record.get("id", Id::class.java)!!,
-        memberId = record.get("member_id", Id::class.java)!!,
+        modelId = Id(record.get("id", String::class.java)!!),
+        memberId = Id(record.get("member_id", String::class.java)!!),
         content = record.get("content", String::class.java)!!,
         dateCreated = record.get("date_created", Instant::class.java)!!,
         dateUpdated = record.get("date_updated", Instant::class.java)!!,

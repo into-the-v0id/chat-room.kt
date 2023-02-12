@@ -21,8 +21,8 @@ class SessionReadStateRepository(
     private val tableName = "session_state"
 
     private fun parseAggregate(record: Record): Session = Session(
-        modelId = record.get("id", Id::class.java)!!,
-        userId = record.get("user_id", Id::class.java)!!,
+        modelId = Id(record.get("id", String::class.java)!!),
+        userId = Id(record.get("user_id", String::class.java)!!),
         secretHash = Hash.fromHash(record.get("secret_hash", String::class.java)!!),
         dateValidUntil = record.get("date_valid_until", Instant::class.java)!!,
         dateCreated = record.get("date_created", Instant::class.java)!!,

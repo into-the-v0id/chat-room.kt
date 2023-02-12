@@ -21,10 +21,10 @@ class UserReadStateRepository(
     private val tableName = "user_state"
 
     private fun parseAggregate(record: Record): User = User(
-        modelId = record.get("id", Id::class.java)!!,
-        handle = record.get("handle", Handle::class.java)!!,
-        email = record.get("email", EmailAddress::class.java)!!,
-        passwordHash = record.get("password_hash", PasswordHash::class.java)!!,
+        modelId = Id(record.get("id", String::class.java)!!),
+        handle = Handle(record.get("handle", String::class.java)!!),
+        email = EmailAddress(record.get("email", String::class.java)!!),
+        passwordHash = PasswordHash.fromHash(record.get("password_hash", String::class.java)!!),
         dateCreated = record.get("date_created", Instant::class.java)!!,
         dateUpdated = record.get("date_updated", Instant::class.java)!!,
     )

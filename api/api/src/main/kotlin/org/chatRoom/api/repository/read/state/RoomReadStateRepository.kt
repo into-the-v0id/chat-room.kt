@@ -16,8 +16,8 @@ class RoomReadStateRepository(
     private val tableName = "room_state"
 
     private fun parseAggregate(record: Record): Room = Room(
-        modelId = record.get("id", Id::class.java)!!,
-        handle = record.get("handle", Handle::class.java)!!,
+        modelId = Id(record.get("id", String::class.java)!!),
+        handle = Handle(record.get("handle", String::class.java)!!),
         dateCreated = record.get("date_created", Instant::class.java)!!,
         dateUpdated = record.get("date_updated", Instant::class.java)!!,
     )

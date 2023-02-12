@@ -16,9 +16,9 @@ class MemberReadStateRepository(
     private val tableName = "member_state"
 
     private fun parseAggregate(record: Record): Member = Member(
-        modelId = record.get("id", Id::class.java)!!,
-        userId = record.get("user_id", Id::class.java)!!,
-        roomId = record.get("room_id", Id::class.java)!!,
+        modelId = Id(record.get("id", String::class.java)!!),
+        userId = Id(record.get("user_id", String::class.java)!!),
+        roomId = Id(record.get("room_id", String::class.java)!!),
         dateCreated = record.get("date_created", Instant::class.java)!!,
         dateUpdated = record.get("date_updated", Instant::class.java)!!,
     )
