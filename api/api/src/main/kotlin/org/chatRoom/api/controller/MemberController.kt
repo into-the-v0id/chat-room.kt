@@ -31,12 +31,20 @@ class MemberController(
     private val roomReadRepository: RoomReadRepository,
 ) {
     suspend fun list(call: ApplicationCall, resource: Members) {
+        val session = call.principal<SessionPrincipal>()!!.session
+        val sessionMemberAggregates = memberReadRepository.getAll(MemberQuery(
+            userIds = listOf(session.userId)
+        ))
+
+        var roomIds = sessionMemberAggregates.map { member -> member.roomId }
+        if (resource.roomIds.isNotEmpty()) roomIds = roomIds.intersect(resource.roomIds).toList()
+
         val query = MemberQuery(
             ids = resource.ids.ifEmpty { null },
             userIds = resource.userIds.ifEmpty { null },
-            roomIds = resource.roomIds.ifEmpty { null },
-            offset = resource.offset ?: Offset(0),
-            limit = resource.limit ?: Limit(100),
+            roomIds = roomIds,
+            offset = resource.offset,
+            limit = resource.limit,
             sortCriteria = resource.sortCriteria,
         )
 
@@ -58,6 +66,14 @@ class MemberController(
 
     suspend fun detail(call: ApplicationCall, resource: Members.Detail) {
         val memberAggregate = memberReadRepository.getById(resource.id) ?: throw NotFoundException()
+
+        val session = call.principal<SessionPrincipal>()!!.session
+        val sessionMemberAggregate = memberReadRepository.getAll(MemberQuery(
+            userIds = listOf(session.userId),
+            roomIds = listOf(memberAggregate.roomId)
+        )).firstOrNull()
+        if (sessionMemberAggregate == null) throw NotFoundException()
+
         val memberModel = Member(memberAggregate)
 
         call.respond(memberModel)
