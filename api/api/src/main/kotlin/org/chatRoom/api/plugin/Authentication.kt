@@ -30,7 +30,8 @@ class Authentication(
                     }
 
                     // Mismatching secret
-                    if (! sessionAggregate.secretHash.verify(token.secret.toString())) {
+                    val isValidSecret = sessionAggregate.secretHash.verify(token.secret.toString())
+                    if (! isValidSecret) {
                         return@authenticate null
                     }
 
