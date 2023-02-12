@@ -23,7 +23,7 @@ class SessionReadStateRepository(
     private fun parseAggregate(record: Record): Session = Session(
         modelId = record.get("id", Id::class.java)!!,
         userId = record.get("user_id", Id::class.java)!!,
-        secret = record.get("secret", Token::class.java)!!,
+        secretHash = Hash.fromHash(record.get("secret_hash", String::class.java)!!),
         dateValidUntil = record.get("date_valid_until", Instant::class.java)!!,
         dateCreated = record.get("date_created", Instant::class.java)!!,
     )

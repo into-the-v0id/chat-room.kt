@@ -30,7 +30,7 @@ class Authentication(
                     }
 
                     // Mismatching secret
-                    if (token.secret != sessionAggregate.secret) {
+                    if (! sessionAggregate.secretHash.verify(token.secret.toString())) {
                         return@authenticate null
                     }
 

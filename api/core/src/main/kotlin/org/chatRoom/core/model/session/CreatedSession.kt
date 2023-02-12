@@ -10,21 +10,19 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
 @Serializable
-data class OwnedSession(
+data class CreatedSession(
     val id: Id,
     val userId: Id,
-    val secret: Token,
+    val token: SessionToken,
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateValidUntil: OffsetDateTime,
     @Serializable(with = OffsetDateTimeSerializer::class)
     val dateCreated: OffsetDateTime,
 ) {
-    val token = SessionToken(id, secret)
-
-    constructor(session: SessionAggregate) : this(
+    constructor(session: SessionAggregate, secret: Token) : this(
         id = session.modelId,
         userId = session.userId,
-        secret = session.secret,
+        token = SessionToken(session.modelId, secret),
         dateValidUntil = session.dateValidUntil.atOffset(ZoneOffset.UTC),
         dateCreated = session.dateCreated.atOffset(ZoneOffset.UTC),
     )

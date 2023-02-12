@@ -42,7 +42,6 @@ class SessionToken private constructor(private val data: SessionTokenData) {
     }
 
     constructor(id: Id, secret: Token) : this(SessionTokenData(id, secret))
-    constructor(session: SessionAggregate) : this(SessionTokenData(session))
 
     val id: Id
         get() = data.id
@@ -70,11 +69,6 @@ private data class SessionTokenData(
     @OptIn(ExperimentalSerializationApi::class)
     @EncodeDefault
     val type: String = "session"
-
-    constructor(session: SessionAggregate) : this(
-        id = session.modelId,
-        secret = session.secret,
-    )
 
     init {
         require(type == "session") { "Invalid session token data: Mismatching type" }

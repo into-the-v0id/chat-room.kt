@@ -11,7 +11,7 @@ import org.chatRoom.api.authentication.SessionPrincipal
 import org.chatRoom.api.exception.HttpException
 import org.chatRoom.api.resource.Sessions
 import org.chatRoom.api.resource.Users
-import org.chatRoom.core.model.session.OwnedSession
+import org.chatRoom.core.model.session.CreatedSession
 import org.chatRoom.core.model.user.OwnedUser
 import org.chatRoom.core.payload.authentication.Login
 import org.chatRoom.core.payload.authentication.Register
@@ -22,6 +22,7 @@ import org.chatRoom.core.repository.write.UserWriteRepository
 import org.chatRoom.core.repository.write.create
 import org.chatRoom.core.repository.write.delete
 import org.chatRoom.core.valueObject.Password
+import org.chatRoom.core.valueObject.Token
 import org.chatRoom.core.aggreagte.Session.Companion as SessionAggregate
 import org.chatRoom.core.aggreagte.User as UserAggregate
 
@@ -47,10 +48,14 @@ class AuthenticationController(
             throw HttpException(HttpStatusCode.Unauthorized, "Invalid credentials")
         }
 
-        val sessionAggregate = SessionAggregate.create(userId = userAggregate.modelId)
+        val sessionToken = Token()
+        val sessionAggregate = SessionAggregate.create(
+            userId = userAggregate.modelId,
+            secret = sessionToken,
+        )
         sessionWriteRepository.create(sessionAggregate)
 
-        val sessionModel = OwnedSession(sessionAggregate)
+        val sessionModel = CreatedSession(sessionAggregate, sessionToken)
 
         call.response.header(
             HttpHeaders.Location,

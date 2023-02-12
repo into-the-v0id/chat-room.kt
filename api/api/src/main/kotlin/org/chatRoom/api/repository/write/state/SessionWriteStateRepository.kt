@@ -23,7 +23,7 @@ class SessionWriteStateRepository(
                 listOf(
                     DSL.field("id"),
                     DSL.field("user_id"),
-                    DSL.field("secret"),
+                    DSL.field("secret_hash"),
                     DSL.field("date_valid_until"),
                     DSL.field("date_created"),
                 ),
@@ -33,7 +33,7 @@ class SessionWriteStateRepository(
             statement = statement.values(listOf(
                 session.modelId.toUuid(),
                 session.userId.toUuid(),
-                session.secret.toString(),
+                session.secretHash.toString(),
                 session.dateValidUntil,
                 session.dateCreated,
             ))

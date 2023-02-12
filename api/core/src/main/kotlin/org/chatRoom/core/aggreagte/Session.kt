@@ -3,23 +3,23 @@ package org.chatRoom.core.aggreagte
 import org.chatRoom.core.event.session.CreateSession
 import org.chatRoom.core.event.session.DeleteSession
 import org.chatRoom.core.event.session.*
+import org.chatRoom.core.valueObject.Hash
 import org.chatRoom.core.valueObject.Id
 import org.chatRoom.core.valueObject.Token
-import org.chatRoom.core.valueObject.session.SessionToken
 import java.time.Duration
 import java.time.Instant
 
 class Session(
     modelId: Id,
     userId: Id,
-    secret: Token,
+    secretHash: Hash,
     dateValidUntil: Instant,
     dateCreated: Instant = Instant.now(),
 ) : Aggregate<SessionEvent>(modelId = modelId) {
     var userId: Id = userId
         protected set
 
-    var secret: Token = secret
+    var secretHash: Hash = secretHash
         protected set
 
     var dateValidUntil: Instant = dateValidUntil
@@ -29,11 +29,11 @@ class Session(
         protected set
 
     companion object {
-        fun create(userId: Id): Session {
+        fun create(userId: Id, secret: Token): Session {
             val event = CreateSession(
                 modelId = Id(),
                 userId = userId,
-                secret = Token(),
+                secretHash = Hash.create(secret.toString()),
                 dateValidUntil = Instant.now().plus(Duration.ofHours(6))
             )
 
@@ -51,7 +51,7 @@ class Session(
                     session = Session(
                         modelId = event.modelId,
                         userId = event.userId,
-                        secret = event.secret,
+                        secretHash = event.secretHash,
                         dateValidUntil = event.dateValidUntil,
                         dateCreated = event.dateIssued,
                     )
